@@ -13,8 +13,8 @@ export const Value = ({ label, value, unit }: ValueProps) => {
     <View className="flex items-start">
       <Text>{label}</Text>
       <View className="flex-row items-baseline">
-        <Text variant="h2">{value}</Text>
-        {unit ? <Text variant="xs">{unit.toUpperCase()}</Text> : null}
+        <Text variant="h1">{value.toFixed(2)}</Text>
+        {unit ? <Text variant="h1"> {unit}</Text> : null}
       </View>
     </View>
   );
