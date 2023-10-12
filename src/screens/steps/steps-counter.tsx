@@ -66,7 +66,7 @@ export const StepsCounter = () => {
       <Text variant="h1">Steps counter!</Text>
       <View className="py-8">
         <ProgressRing
-          progress={healthInfo.steps / (healthInfo.steps * 2)}
+          progress={healthInfo.steps / (healthInfo.steps * 2 + 1)}
           radius={90}
           strokeWidth={30}
         />
