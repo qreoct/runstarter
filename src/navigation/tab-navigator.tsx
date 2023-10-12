@@ -6,11 +6,12 @@ import type { ComponentType } from 'react';
 import * as React from 'react';
 import type { SvgProps } from 'react-native-svg';
 
-import { Settings, Style } from '@/screens';
+import { Settings, Steps, Style } from '@/screens';
 import {
   colors,
   Feed as FeedIcon,
   Settings as SettingsIcon,
+  Steps as StepsIcon,
   Style as StyleIcon,
 } from '@/ui';
 
@@ -20,6 +21,7 @@ type TabParamList = {
   Style: undefined;
   FeedNavigator: undefined;
   Settings: undefined;
+  Steps: undefined;
 };
 
 type TabType = {
@@ -38,6 +40,7 @@ const tabsIcons: TabIconsType = {
   Style: (props: SvgProps) => <StyleIcon {...props} />,
   FeedNavigator: (props: SvgProps) => <FeedIcon {...props} />,
   Settings: (props: SvgProps) => <SettingsIcon {...props} />,
+  Steps: (props: SvgProps) => <StepsIcon {...props} />,
 };
 
 export type TabList<T extends keyof TabParamList> = {
@@ -55,6 +58,11 @@ const tabs: TabType[] = [
     name: 'FeedNavigator',
     component: FeedNavigator,
     label: 'Feed',
+  },
+  {
+    name: 'Steps',
+    component: Steps,
+    label: 'Steps',
   },
   {
     name: 'Settings',

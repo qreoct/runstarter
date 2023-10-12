@@ -7,6 +7,7 @@ export * from './no-data';
 export * from './rate';
 export * from './settings';
 export * from './share';
+export * from './steps';
 export * from './style';
 export * from './support';
 export * from './website';

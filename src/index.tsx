@@ -1,6 +1,7 @@
 import 'react-native-gesture-handler';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import * as NavigationBar from 'expo-navigation-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import React from 'react';
 import { StyleSheet } from 'react-native';
@@ -14,6 +15,8 @@ import { RootNavigator } from '@/navigation';
 hydrateAuth();
 loadSelectedTheme();
 SplashScreen.preventAutoHideAsync();
+NavigationBar.setPositionAsync('absolute');
+NavigationBar.setBackgroundColorAsync('#ffffff00');
 
 const App = () => {
   return (
