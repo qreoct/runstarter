@@ -5,6 +5,10 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { Button, ControlledInput, Text, View } from '@/ui';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 
 const schema = z.object({
   name: z.string().optional(),
