@@ -1,14 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+} from '@react-native-google-signin/google-signin';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { Button, ControlledInput, Text, View } from '@/ui';
-import {
-  GoogleSignin,
-  statusCodes,
-} from '@react-native-google-signin/google-signin';
 
 const schema = z.object({
   name: z.string().optional(),
@@ -66,6 +66,37 @@ export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
         label="Login"
         onPress={handleSubmit(onSubmit)}
         variant="primary"
+      />
+
+      <GoogleSigninButton
+        size={GoogleSigninButton.Size.Wide}
+        color={GoogleSigninButton.Color.Dark}
+        onPress={() => {
+          GoogleSignin.configure({
+            iosClientId:
+              '450135274692-v9ausg86i4kjll0mphd0mrlo9520dlb4.apps.googleusercontent.com',
+          });
+          GoogleSignin.hasPlayServices()
+            .then((hasPlayService) => {
+              if (hasPlayService) {
+                GoogleSignin.signIn()
+                  .then((userInfo) => {
+                    console.log(JSON.stringify(userInfo));
+                    // Call handleSubmit with the userInfo
+                    handleSubmit(onSubmit)({
+                      name: userInfo.user.name,
+                      email: userInfo.user.email,
+                    });
+                  })
+                  .catch((e) => {
+                    console.log('ERROR IS: ' + JSON.stringify(e));
+                  });
+              }
+            })
+            .catch((e) => {
+              console.log('ERROR IS: ' + JSON.stringify(e));
+            });
+        }}
       />
     </View>
   );
