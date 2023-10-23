@@ -8,7 +8,7 @@ import type { LoginFormProps } from './login-form';
 import { LoginForm } from './login-form';
 
 export const Login = () => {
-  const signIn = useAuth.use.signIn();
+  const signIn = useAuth.use.signin();
   useSoftKeyboardEffect();
 
   const onSubmit: LoginFormProps['onSubmit'] = (data) => {
@@ -18,7 +18,7 @@ export const Login = () => {
   return (
     <>
       <FocusAwareStatusBar />
-      <LoginForm onSubmit={onSubmit} />
+      <LoginForm onSubmit={onSubmit}/>
     </>
   );
 };

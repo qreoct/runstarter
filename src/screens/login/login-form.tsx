@@ -1,14 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  GoogleSignin,
-  GoogleSigninButton,
-} from '@react-native-google-signin/google-signin';
-import React from 'react';
+import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
+import React, { useState, useEffect } from 'react';
+
+import * as Google from 'expo-auth-session/providers/google';
+import { GoogleAuthProvider, onAuthStateChanged, signInWithCredential } from 'firebase/auth';
+import { auth } from 'firebase-config';
+
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { Button, ControlledInput, Text, View } from '@/ui';
+import { useAuth } from '@/core';
 
 const schema = z.object({
   name: z.string().optional(),
@@ -31,21 +34,44 @@ export type LoginFormProps = {
 };
 
 export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
+  const [userInfo, setUserInfo] = useState(null);
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    iosClientId: '923831664425-9crg238fbqfe2g5ktgdoeg6ao9ktisan.apps.googleusercontent.com',
+    androidClientId: '923831664425-qjmcljl658jb59hed6eopg4hc5vbn08t.apps.googleusercontent.com'
+  });
+  const signIn = useAuth.use.signin();
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { id_token } = response.params;
+      const credential = GoogleAuthProvider.credential(id_token);
+      signInWithCredential(auth, credential);
+    }
+  }, [response]);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (user) { 
+        console.log("USER: " + JSON.stringify(user));
+        setUserInfo(user);
+        signIn({ access: 'access-token', refresh: 'refresh-token' });
+      } else {
+        console.log("NO USER");
+      }
+    });
+
+    return () => unsub();
+  }, []);
+
   const { handleSubmit, control } = useForm<FormType>({
     resolver: zodResolver(schema),
   });
+
   return (
     <View className="flex-1 justify-center p-4">
       <Text testID="form-title" variant="h1" className="pb-6 text-center">
         Sign In
       </Text>
-
-      <ControlledInput
-        testID="name"
-        control={control}
-        name="name"
-        label="Name"
-      />
 
       <ControlledInput
         testID="email-input"
@@ -71,32 +97,7 @@ export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
       <GoogleSigninButton
         size={GoogleSigninButton.Size.Wide}
         color={GoogleSigninButton.Color.Dark}
-        onPress={() => {
-          GoogleSignin.configure({
-            iosClientId:
-              '450135274692-v9ausg86i4kjll0mphd0mrlo9520dlb4.apps.googleusercontent.com',
-          });
-          GoogleSignin.hasPlayServices()
-            .then((hasPlayService) => {
-              if (hasPlayService) {
-                GoogleSignin.signIn()
-                  .then((userInfo) => {
-                    console.log(JSON.stringify(userInfo));
-                    // Call handleSubmit with the userInfo
-                    handleSubmit(onSubmit)({
-                      name: userInfo.user.name,
-                      email: userInfo.user.email,
-                    });
-                  })
-                  .catch((e) => {
-                    console.log('ERROR IS: ' + JSON.stringify(e));
-                  });
-              }
-            })
-            .catch((e) => {
-              console.log('ERROR IS: ' + JSON.stringify(e));
-            });
-        }}
+        onPress={() => promptAsync()}
       />
     </View>
   );
