@@ -34,7 +34,7 @@ export type LoginFormProps = {
 };
 
 export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
-  const [userInfo, setUserInfo] = useState(null);
+  const [userInfo, setUserInfo] = useState<any>(null);
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId: '923831664425-9crg238fbqfe2g5ktgdoeg6ao9ktisan.apps.googleusercontent.com',
     androidClientId: '923831664425-qjmcljl658jb59hed6eopg4hc5vbn08t.apps.googleusercontent.com'
