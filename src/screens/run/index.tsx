@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Text, View } from 'react-native';
+import { Button, SafeAreaView, Text, View } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import { FocusAwareStatusBar, ScrollView } from '@/ui';
 import { auth, db } from 'firebase-config';
@@ -10,8 +10,9 @@ import {
   serverTimestamp,
   setDoc,
 } from 'firebase/firestore';
+import WalkedPathMap from './WalkedPathMap';
 
-interface Coords {
+export interface Coords {
   latitude: number;
   longitude: number;
 }
@@ -54,7 +55,7 @@ export const Run: React.FC = () => {
       }, 1000);
 
       const watchId = Geolocation.watchPosition(
-        (position: any) => {
+        (position) => {
           if (!previousPositionRef.current) {
             previousPositionRef.current = {
               latitude: position.coords.latitude,
@@ -80,7 +81,7 @@ export const Run: React.FC = () => {
                 },
                 distance: dist,
               };
-              return [newRecord, ...prevRecords].slice(0, 20);
+              return [...prevRecords, newRecord];
             });
 
             console.log('position', position, 'distance', dist);
@@ -138,6 +139,14 @@ export const Run: React.FC = () => {
           onPress={() => setIsRunning(!isRunning)}
         />
         <Button title="Finish" onPress={handleFinish} />
+
+        {positionRecords.length > 0 ? (
+          <WalkedPathMap coords={positionRecords.map((r) => r.coords)} />
+        ) : null}
+
+        {/* <WalkedPathMap
+          coords={[{ latitude: 42.785834, longitude: -123.99143 }]}
+        /> */}
 
         {/* <View>
           {positionRecords.map((record, index) => (

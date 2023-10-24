@@ -125,6 +125,9 @@ dependencies:
   react-native-gesture-handler:
     specifier: ~2.12.0
     version: 2.12.0(react-native@0.72.5)(react@18.2.0)
+  react-native-maps:
+    specifier: 1.7.1
+    version: 1.7.1(react-native-web@0.19.7)(react-native@0.72.5)(react@18.2.0)
   react-native-mmkv:
     specifier: 2.6.3
     version: 2.6.3(react-native@0.72.5)(react@18.2.0)
@@ -4368,6 +4371,10 @@ packages:
       '@types/node': 18.11.9
       '@types/responselike': 1.0.0
     dev: true
+
+  /@types/geojson@7946.0.12:
+    resolution: {integrity: sha512-uK2z1ZHJyC0nQRbuovXFt4mzXDwf27vQeUWNhfKGwRcWW429GOhP8HxUHlM6TLH4bzmlv/HlEjpvJh3JfmGsAA==}
+    dev: false
 
   /@types/graceful-fs@4.1.6:
     resolution: {integrity: sha512-Sig0SNORX9fdW+bQuTEovKj3uHcUL6LQKbCrrqb1X7J6/ReAbhCXRAhc+SMejhLELFj2QcyuxmUooZ4bt5ReSw==}
@@ -11844,6 +11851,22 @@ packages:
       react-native: '>=0.42.0'
     dependencies:
       react-native: 0.72.5(@babel/core@7.21.0)(@babel/preset-env@7.22.10)(react@18.2.0)
+    dev: false
+
+  /react-native-maps@1.7.1(react-native-web@0.19.7)(react-native@0.72.5)(react@18.2.0):
+    resolution: {integrity: sha512-CHVLzL+Q2jiUGgbt4/vosxVI1SukWyaLGjD62VLgR/wZpnH4Umi9ql1bmKDPWcfj2C1QZwMU0Yc7rXTbvZUIiw==}
+    peerDependencies:
+      react: '>= 17.0.1'
+      react-native: '>= 0.64.3'
+      react-native-web: '>= 0.11'
+    peerDependenciesMeta:
+      react-native-web:
+        optional: true
+    dependencies:
+      '@types/geojson': 7946.0.12
+      react: 18.2.0
+      react-native: 0.72.5(@babel/core@7.21.0)(@babel/preset-env@7.22.10)(react@18.2.0)
+      react-native-web: 0.19.7(react-dom@18.2.0)(react@18.2.0)
     dev: false
 
   /react-native-mmkv@2.6.3(react-native@0.72.5)(react@18.2.0):
