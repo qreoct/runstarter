@@ -12,7 +12,6 @@
  * we use dotenv to load the correct variables from the .env file based on the APP_ENV variable (default is development)
  * APP_ENV is passed as an inline variable while executing the command, for example: APP_ENV=staging pnpm build:android
  */
-from 
 
 const z = require('zod');
 
