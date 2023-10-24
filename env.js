@@ -12,6 +12,8 @@
  * we use dotenv to load the correct variables from the .env file based on the APP_ENV variable (default is development)
  * APP_ENV is passed as an inline variable while executing the command, for example: APP_ENV=staging pnpm build:android
  */
+from 
+
 const z = require('zod');
 
 const packageJSON = require('./package.json');
@@ -34,7 +36,7 @@ require('dotenv').config({
 const BUNDLE_ID = 'com.runstarter'; // ios bundle id
 const PACKAGE = 'com.runstarter'; // android package name
 const NAME = 'RunStarter'; // app name
-const EXPO_ACCOUNT_OWNER = 'kleonang'; // expo account owner
+const EXPO_ACCOUNT_OWNER = 'qreoct'; // expo account owner
 
 /**
  * We declare a function withEnvSuffix that will add a suffix to the variable name based on the APP_ENV
