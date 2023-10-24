@@ -3,7 +3,7 @@ import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 import React, { useState, useEffect } from 'react';
 
 import * as Google from 'expo-auth-session/providers/google';
-import { GoogleAuthProvider, onAuthStateChanged, signInWithCredential } from 'firebase/auth';
+import { GoogleAuthProvider, onAuthStateChanged, signInWithCredential, signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from 'firebase-config';
 
 import type { SubmitHandler } from 'react-hook-form';
