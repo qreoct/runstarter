@@ -1,8 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button, Text, View } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
-
 import { FocusAwareStatusBar, ScrollView } from '@/ui';
+import { auth, db } from 'firebase-config';
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  setDoc,
+} from 'firebase/firestore';
 
 interface Coords {
   latitude: number;
@@ -47,7 +54,7 @@ export const Run: React.FC = () => {
       }, 1000);
 
       const watchId = Geolocation.watchPosition(
-        (position) => {
+        (position: any) => {
           if (!previousPositionRef.current) {
             previousPositionRef.current = {
               latitude: position.coords.latitude,
@@ -89,6 +96,37 @@ export const Run: React.FC = () => {
     }
   }, [isRunning]);
 
+  const handleFinish = async () => {
+    try {
+      // Stop tracking
+      setIsRunning(false);
+
+      // Get current user's UID
+      const uid = auth.currentUser?.uid;
+      if (!uid) {
+        console.error('No user logged in.');
+        return;
+      }
+
+      // Prepare data for Firestore
+      const runData = {
+        timeElapsed,
+        distance,
+        timestamp: serverTimestamp(),
+      };
+
+      // Reference to the current user's runs sub-collection
+      const runsCollectionRef = collection(db, 'users', uid, 'runs');
+
+      // Save to Firestore
+      const docRef = await addDoc(runsCollectionRef, runData);
+
+      console.log('Document saved with ID: ', docRef.id);
+    } catch (error) {
+      console.error('Error saving to Firestore: ', error);
+    }
+  };
+
   return (
     <>
       <FocusAwareStatusBar />
@@ -99,6 +137,7 @@ export const Run: React.FC = () => {
           title={isRunning ? 'Pause' : 'Play'}
           onPress={() => setIsRunning(!isRunning)}
         />
+        <Button title="Finish" onPress={handleFinish} />
 
         {/* <View>
           {positionRecords.map((record, index) => (

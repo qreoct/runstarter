@@ -13,21 +13,23 @@ export const Login = () => {
   useSoftKeyboardEffect();
 
   const onSubmitLogin: LoginFormProps['onSubmit'] = (data) => {
-    console.log("onSubmitLogin:\n" + JSON.stringify(data));
-    signInWithEmailAndPassword(auth, data.email, data.password).then(() => {
-      signIn({ access: 'access-token', refresh: 'refresh-token' })
-    }).catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log("Error signing in: " + errorCode + ", " + errorMessage);
-      // TODO: Display error message to user
-    });
+    console.log('onSubmitLogin:\n' + JSON.stringify(data));
+    signInWithEmailAndPassword(auth, data.email, data.password)
+      .then(() => {
+        signIn({ access: 'access-token', refresh: 'refresh-token' });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log('Error signing in: ' + errorCode + ', ' + errorMessage);
+        // TODO: Display error message to user
+      });
   };
 
   return (
     <>
       <FocusAwareStatusBar />
-      <LoginForm onSubmit={onSubmitLogin}/>
+      <LoginForm onSubmit={onSubmitLogin} />
     </>
   );
 };
