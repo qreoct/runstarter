@@ -23,3 +23,5 @@ android/local.properties
 
 # Firebase
 firebase-config.js
+android/app/google-services.json
+android/app/client_secret*.json

@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 import React, { useState, useEffect } from 'react';
+import { useNavigation } from '@react-navigation/native';
 
 import * as Google from 'expo-auth-session/providers/google';
-import { GoogleAuthProvider, onAuthStateChanged, signInWithCredential, signInWithEmailAndPassword } from 'firebase/auth';
+import { GoogleAuthProvider, onAuthStateChanged, signInWithCredential } from 'firebase/auth';
 import { auth } from 'firebase-config';
 
 import type { SubmitHandler } from 'react-hook-form';
@@ -14,7 +15,6 @@ import { Button, ControlledInput, Text, View } from '@/ui';
 import { useAuth } from '@/core';
 
 const schema = z.object({
-  name: z.string().optional(),
   email: z
     .string({
       required_error: 'Email is required',
@@ -24,7 +24,7 @@ const schema = z.object({
     .string({
       required_error: 'Password is required',
     })
-    .min(6, 'Password must be at least 6 characters'),
+    .min(8, 'Password must be at least 8 characters'),
 });
 
 export type FormType = z.infer<typeof schema>;
@@ -40,6 +40,11 @@ export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
     androidClientId: '923831664425-qjmcljl658jb59hed6eopg4hc5vbn08t.apps.googleusercontent.com'
   });
   const signIn = useAuth.use.signin();
+  const navigation = useNavigation();
+
+  const navigateToSignup = () => {
+    navigation.navigate('Signup');
+  };
 
   useEffect(() => {
     if (response?.type === 'success') {
@@ -84,7 +89,7 @@ export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
         control={control}
         name="password"
         label="Password"
-        placeholder="***"
+        placeholder="********"
         secureTextEntry={true}
       />
       <Button
@@ -92,6 +97,13 @@ export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
         label="Login"
         onPress={handleSubmit(onSubmit)}
         variant="primary"
+      />
+
+      <Button
+        testID="signup-button"
+        label="Sign Up"
+        onPress={ navigateToSignup }
+        variant="outline"
       />
 
       <GoogleSigninButton
