@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { Image } from 'react-native';
 
 import * as Google from 'expo-auth-session/providers/google';
 import { GoogleAuthProvider, onAuthStateChanged, signInWithCredential } from 'firebase/auth';
@@ -74,9 +75,11 @@ export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
 
   return (
     <View className="flex-1 justify-center p-4">
-      <Text testID="form-title" variant="h1" className="pb-6 text-center">
-        Sign In
+      <Text className="text-3xl font-bold text-center mb-8">
+        Welcome to RunSquad!
       </Text>
+
+      <Image source={require('/assets/logo-large.png')} style={{width: 150, height: 150, alignSelf: 'center'}}/>
 
       <ControlledInput
         testID="email-input"
