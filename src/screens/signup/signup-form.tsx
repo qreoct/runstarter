@@ -11,7 +11,7 @@ import { LoginFormProps } from '../login/login-form';
 const schema = z.object({
   name: z.string({
     required_error: 'First Name is required',
-  }).optional(),
+  }),
   email: z
     .string({
       required_error: 'Email is required',
