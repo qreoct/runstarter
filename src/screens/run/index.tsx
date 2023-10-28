@@ -22,7 +22,11 @@ interface PositionRecord {
   distance: number;
 }
 
-export const Run: React.FC = () => {
+export interface RunProps {
+  onFinish: () => void;
+}
+
+export const Run = (props: RunProps) => {
   const [distance, setDistance] = useState<number>(0);
   const [timeElapsed, setTimeElapsed] = useState<number>(0);
   const previousPositionRef = useRef<Coords | null>(null);
@@ -126,23 +130,53 @@ export const Run: React.FC = () => {
     } catch (error) {
       console.error('Error saving to Firestore: ', error);
     }
+
+    props.onFinish();
   };
+
+  const avgPace =
+    timeElapsed && distance ? timeElapsed / 60 / (distance / 1000) : 0; // pace in min/km
 
   return (
     <>
       <FocusAwareStatusBar />
       <ScrollView className="pt-16">
-        <Text>Distance traveled: {distance.toFixed(2)} meters</Text>
-        <Text>Time elapsed: {timeElapsed} seconds</Text>
-        <Button
-          title={isRunning ? 'Pause' : 'Play'}
-          onPress={() => setIsRunning(!isRunning)}
-        />
-        <Button title="Finish" onPress={handleFinish} />
+        <View className="flex-row justify-between px-4">
+          <View className="items-center">
+            <Text className="text-white text-xl">
+              {(distance / 1000).toFixed(2)}
+            </Text>
+            <Text className="text-white">kilometres</Text>
+          </View>
+          <View className="items-center">
+            <Text className="text-white text-xl">
+              {avgPace.toFixed(2)} min/km
+            </Text>
+            <Text className="text-white">Avg. Pace</Text>
+          </View>
+          <View className="items-center">
+            <Text className="text-white text-xl">
+              {Math.floor(timeElapsed / 60)
+                .toString()
+                .padStart(2, '0')}
+              :{(timeElapsed % 60).toString().padStart(2, '0')}
+            </Text>
+            <Text className="text-white">Time</Text>
+          </View>
+        </View>
 
-        {positionRecords.length > 0 ? (
+        {isRunning ? (
+          <Button title="Pause" onPress={() => setIsRunning(false)} />
+        ) : (
+          <View className="flex flex-col">
+            <Button title="Resume" onPress={() => setIsRunning(true)} />
+            <Button title="Finish" onPress={() => handleFinish()} />
+          </View>
+        )}
+
+        {/* {positionRecords.length > 0 ? (
           <WalkedPathMap coords={positionRecords.map((r) => r.coords)} />
-        ) : null}
+        ) : null} */}
 
         {/* <WalkedPathMap
           coords={[{ latitude: 42.785834, longitude: -123.99143 }]}

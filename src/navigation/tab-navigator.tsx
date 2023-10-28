@@ -6,7 +6,7 @@ import type { ComponentType } from 'react';
 import * as React from 'react';
 import type { SvgProps } from 'react-native-svg';
 
-import { Run, Settings } from '@/screens';
+import { Run, NewRun, Settings } from '@/screens';
 import {
   colors,
   Feed as FeedIcon,
@@ -14,12 +14,11 @@ import {
   Style as StyleIcon,
 } from '@/ui';
 
-import { FeedNavigator } from './feed-navigator';
-
 type TabParamList = {
   // Style: undefined;
   Run: undefined;
-  FeedNavigator: undefined;
+  // FeedNavigator: undefined;
+  NewRun: undefined;
   Settings: undefined;
 };
 
@@ -38,7 +37,8 @@ const Tab = createBottomTabNavigator<TabParamList>();
 const tabsIcons: TabIconsType = {
   // Style: (props: SvgProps) => <StyleIcon {...props} />,
   Run: (props: SvgProps) => <StyleIcon {...props} />,
-  FeedNavigator: (props: SvgProps) => <FeedIcon {...props} />,
+  // FeedNavigator: (props: SvgProps) => <FeedIcon {...props} />,
+  NewRun: (props: SvgProps) => <FeedIcon {...props} />,
   Settings: (props: SvgProps) => <SettingsIcon {...props} />,
 };
 
@@ -59,9 +59,9 @@ const tabs: TabType[] = [
     label: 'Run',
   },
   {
-    name: 'FeedNavigator',
-    component: FeedNavigator,
-    label: 'Feed',
+    name: 'NewRun',
+    component: NewRun,
+    label: 'NewRun',
   },
   {
     name: 'Settings',
