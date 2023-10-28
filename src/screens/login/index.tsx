@@ -8,6 +8,7 @@ import { LoginForm, LoginFormProps } from './login-form';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from 'firebase-config';
 import { Alert } from 'react-native';
+import { addUserIfNotExist } from '@/database/firestore';
 
 export const Login = () => {
   const signIn = useAuth.use.signin();
@@ -16,6 +17,9 @@ export const Login = () => {
   const onSubmitLogin: LoginFormProps['onSubmit'] = (data) => {
     console.log("onSubmitLogin:\n" + JSON.stringify(data));
     signInWithEmailAndPassword(auth, data.email, data.password).then(() => {
+      if (auth.currentUser) {
+        addUserIfNotExist(auth.currentUser.uid);
+      }
       signIn({ access: 'access-token', refresh: 'refresh-token' })
     }).catch((error) => {
       const errorCode = error.code;

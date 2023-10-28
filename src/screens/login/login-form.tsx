@@ -6,7 +6,7 @@ import { Image } from 'react-native';
 
 import * as Google from 'expo-auth-session/providers/google';
 import { GoogleAuthProvider, onAuthStateChanged, signInWithCredential } from 'firebase/auth';
-import { auth } from 'firebase-config';
+import { auth, IOS_CLIENT_ID, ANDROID_CLIENT_ID } from 'firebase-config';
 
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
@@ -37,8 +37,8 @@ export type LoginFormProps = {
 export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
   const [userInfo, setUserInfo] = useState<any>(null);
   const [request, response, promptAsync] = Google.useAuthRequest({
-    iosClientId: '923831664425-9crg238fbqfe2g5ktgdoeg6ao9ktisan.apps.googleusercontent.com',
-    androidClientId: '923831664425-qjmcljl658jb59hed6eopg4hc5vbn08t.apps.googleusercontent.com'
+    iosClientId: IOS_CLIENT_ID,
+    androidClientId: ANDROID_CLIENT_ID
   });
   const signIn = useAuth.use.signin();
   const navigation = useNavigation();

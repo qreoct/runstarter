@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -9,9 +9,6 @@ import { LoginFormProps } from '../login/login-form';
 
 
 const schema = z.object({
-  name: z.string({
-    required_error: 'First Name is required',
-  }),
   email: z
     .string({
       required_error: 'Email is required',
@@ -36,13 +33,6 @@ export const SignupForm = ({ onSubmit = () => {} }: LoginFormProps) => {
       <Text testID="form-title" variant="h1" className="pb-6 text-center">
         Sign Up
       </Text>
-
-      <ControlledInput
-        testID="name-input"
-        control={control}
-        name="name"
-        label="Name"
-      />
 
       <ControlledInput
         testID="email-input"

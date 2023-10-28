@@ -1,11 +1,12 @@
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import { OnboardingMain, OnboardingRunning } from '@/screens';
+import { Onboarding, OnboardingRunning, OnboardingDisclaimer } from '@/screens';
 
 export type OnboardingStackParamList = {
-  OnboardingMain: undefined;
+  Onboarding: undefined;
   OnboardingRunning: undefined;
+  OnboardingDisclaimer: undefined;
 };
 
 const Stack = createNativeStackNavigator<OnboardingStackParamList>();
@@ -13,8 +14,9 @@ const Stack = createNativeStackNavigator<OnboardingStackParamList>();
 export const OnboardingNavigator = () => {
   return (
     <Stack.Navigator>
-        <Stack.Screen name="OnboardingMain" component={OnboardingMain} options={{ headerShown: false }} />
+        <Stack.Screen name="Onboarding" component={Onboarding} options={{ headerShown: false }} />
         <Stack.Screen name="OnboardingRunning" component={OnboardingRunning} options={{ headerShown: false }} />
+        <Stack.Screen name="OnboardingDisclaimer" component={OnboardingDisclaimer} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 };

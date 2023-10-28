@@ -1,51 +1,111 @@
 import React from 'react';
 
-// import { useIsFirstTime } from '@/core/hooks';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
-import { Button, FocusAwareStatusBar, SafeAreaView, Text, View } from '@/ui';
+import { useSoftKeyboardEffect } from '@/core/keyboard';
+import { Button, ControlledInput, ControlledSelect, FocusAwareStatusBar, SafeAreaView, Text, View } from '@/ui';
 
-import { Cover } from './cover';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { updateUserParticulars } from '@/database/firestore';
+import { auth } from 'firebase-config';
 
-export const OnboardingMain = () => {
-  // const [_, setIsFirstTime] = useIsFirstTime();
-  const navigation = useNavigation();
-  const navigateToRunning = () => {
-    navigation.navigate('OnboardingRunning');
-  };
+const schema = z.object({
+  name: z.string({
+    required_error: 'Name is required',
+  }),
+  age: z.string({
+    required_error: 'Age is required',
+  }).regex(/^[0-9]+$/, 'Age must be a number'),
+  gender: z.string({
+    required_error: 'Gender is required',
+  }),
+});
+
+export type FormType = z.infer<typeof schema>;
+export type OnboardingFormProps = {
+  onSubmit?: SubmitHandler<FormType>;
+};
+
+export type OnboardingFormType = z.infer<typeof schema>;
+
+export const OnboardingForm = ({ onSubmit = () => {} }: OnboardingFormProps) => {
+  interface Option {
+    label: string;
+    value: string;
+  }
+
+  const genderOptions: Option[] = [
+    { label: "Male", value: "M" },
+    { label: "Female", value: "F" },
+    { label: "Others", value: "O" },
+  ];
+
+  const { handleSubmit, control } = useForm<OnboardingFormType>({
+    resolver: zodResolver(schema),
+  });
 
   return (
-    <View className="flex h-full items-center  justify-center">
+    <View className="flex-1 justify-center p-4">
       <FocusAwareStatusBar />
-      <View className="w-full flex-1">
-        <Cover />
-      </View>
-      <View className="justify-end ">
-        <Text className="my-3 text-center text-5xl font-bold">
-          Obytes Starter
+      <SafeAreaView className="mt-6">
+        <Text variant='h1' style={{ fontWeight: 'bold' }} >
+          Welcome to RunSquad!
         </Text>
-        <Text className="mb-2 text-center text-lg text-gray-600">
-          The right way to build your mobile app
+        <Text variant='lg'>
+          We're glad to have you on board. Let's get to know you a little better!
         </Text>
+      </SafeAreaView>
 
-        <Text className="my-1 pt-6 text-left text-lg">
-          🚀 Production-ready{' '}
-        </Text>
-        <Text className="my-1 text-left text-lg">
-          🥷 Developer experience + Productivity
-        </Text>
-        <Text className="my-1 text-left text-lg">
-          🧩 Minimal code and dependencies
-        </Text>
-        <Text className="my-1 text-left text-lg">
-          💪 well maintained third-party libraries
-        </Text>
-      </View>
+      <SafeAreaView className="mt-6">
+        <ControlledInput
+            testID="name-input"
+            control={control}
+            name="name"
+            label="Name"
+        />
+        <ControlledInput
+            testID="age-input"
+            control={control}
+            name="age"
+            label="Age"
+        />
+        <ControlledSelect 
+          name="gender" 
+          control={control} 
+          options={genderOptions} 
+          label="Gender"
+        />
+      </SafeAreaView>
+
       <SafeAreaView className="mt-6">
         <Button
           label="Next"
-          onPress={navigateToRunning}
+          onPress={handleSubmit(onSubmit)}
         />
       </SafeAreaView>
     </View>
   );
 };
+
+export const Onboarding = () => {
+  useSoftKeyboardEffect();
+  const navigation = useNavigation();
+
+  const onSubmitOnboarding: OnboardingFormProps['onSubmit'] = (data) => {
+    if (!auth.currentUser) {
+      console.log("NO USER FOUND!");
+      return;
+    }
+    const userId = auth.currentUser.uid;
+    updateUserParticulars(userId, data);
+    navigation.navigate('OnboardingRunning');
+  };
+
+  return (
+    <View className="flex-1">
+      <FocusAwareStatusBar />
+      <OnboardingForm onSubmit={onSubmitOnboarding}/>
+    </View>
+  );
+}
