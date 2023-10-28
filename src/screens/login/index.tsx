@@ -25,7 +25,6 @@ export const Login = () => {
       if (errorCode === "auth/invalid-login-credentials") {
         Alert.alert("Error signing in", "Wrong email or password. Ensure that you have an account, or sign up below, then try again with the right email and password!");
       } else {
-        // Strip the "auth/" prefix from the error code
         Alert.alert("Generic error signing in", "Error signing in, please try again later!");
       }
     });

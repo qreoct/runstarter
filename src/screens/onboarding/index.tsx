@@ -1,1 +1,2 @@
-export * from './onboarding';
+export * from './onboarding-main';
+export * from './onboarding-running';

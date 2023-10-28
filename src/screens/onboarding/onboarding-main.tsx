@@ -1,11 +1,18 @@
 import React from 'react';
 
-import { useIsFirstTime } from '@/core/hooks';
+// import { useIsFirstTime } from '@/core/hooks';
+import { useNavigation } from '@react-navigation/native';
 import { Button, FocusAwareStatusBar, SafeAreaView, Text, View } from '@/ui';
 
 import { Cover } from './cover';
-export const Onboarding = () => {
-  const [_, setIsFirstTime] = useIsFirstTime();
+
+export const OnboardingMain = () => {
+  // const [_, setIsFirstTime] = useIsFirstTime();
+  const navigation = useNavigation();
+  const navigateToRunning = () => {
+    navigation.navigate('OnboardingRunning');
+  };
+
   return (
     <View className="flex h-full items-center  justify-center">
       <FocusAwareStatusBar />
@@ -35,10 +42,8 @@ export const Onboarding = () => {
       </View>
       <SafeAreaView className="mt-6">
         <Button
-          label="Let's Get Started "
-          onPress={() => {
-            setIsFirstTime(false);
-          }}
+          label="Next"
+          onPress={navigateToRunning}
         />
       </SafeAreaView>
     </View>
