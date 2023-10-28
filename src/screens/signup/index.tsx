@@ -7,6 +7,7 @@ import { type LoginFormProps } from '../login/login-form';
 import { auth } from 'firebase-config';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { SignupForm } from './signup-form';
+import { Alert } from 'react-native';
 
 export const Signup = () => {
   useSoftKeyboardEffect();
@@ -21,7 +22,12 @@ export const Signup = () => {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log("Error creating new user: " + errorCode + ", " + errorMessage);
-      // TODO: Display error message to user
+      // Display error message to user
+      if (errorCode === "auth/email-already-in-use") {
+        Alert.alert("Error creating new user", "This email has already been used! Please try again with a different email.");
+      } else {
+        Alert.alert("Generic error creating new user ", "Error creating your account, please try again later!");
+      }
     });
   };
 

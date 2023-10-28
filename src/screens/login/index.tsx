@@ -7,6 +7,7 @@ import { FocusAwareStatusBar } from '@/ui';
 import { LoginForm, LoginFormProps } from './login-form';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from 'firebase-config';
+import { Alert } from 'react-native';
 
 export const Login = () => {
   const signIn = useAuth.use.signin();
@@ -20,7 +21,13 @@ export const Login = () => {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log("Error signing in: " + errorCode + ", " + errorMessage);
-      // TODO: Display error message to user
+      // Display error message to user
+      if (errorCode === "auth/invalid-login-credentials") {
+        Alert.alert("Error signing in", "Wrong email or password. Ensure that you have an account, or sign up below, then try again with the right email and password!");
+      } else {
+        // Strip the "auth/" prefix from the error code
+        Alert.alert("Generic error signing in", "Error signing in, please try again later!");
+      }
     });
   };
 
