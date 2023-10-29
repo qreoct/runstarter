@@ -14,6 +14,8 @@ import * as z from 'zod';
 
 import { Button, ControlledInput, Text, View } from '@/ui';
 import { useAuth } from '@/core';
+import { addUserIfNotExist, getUserOnboarding } from '@/database/firestore';
+import { setOnboarding } from '@/core';
 
 const schema = z.object({
   email: z
@@ -60,6 +62,9 @@ export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
       if (user) { 
         console.log("USER: " + JSON.stringify(user));
         setUserInfo(user);
+        await addUserIfNotExist(user.uid);
+        const userOnboardingState = await getUserOnboarding(user.uid);
+        setOnboarding(userOnboardingState);
         signIn({ access: 'access-token', refresh: 'refresh-token' });
       } else {
         console.log("NO USER");

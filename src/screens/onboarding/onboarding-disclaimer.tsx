@@ -3,7 +3,7 @@ import { Button, FocusAwareStatusBar, SafeAreaView, Text, View } from '@/ui';
 import { auth } from 'firebase-config';
 import { finishUserOnboarding } from '@/database/firestore';
 import { GestureResponderEvent } from 'react-native';
-import { finishOnboarding } from '@/core';
+import { setOnboarding } from '@/core';
 
 export const OnboardingDisclaimer = () => {
   const onSubmitOnboardingDisclaimer: (event: GestureResponderEvent) => void | undefined = () => {
@@ -13,7 +13,7 @@ export const OnboardingDisclaimer = () => {
     }
     const userId = auth.currentUser.uid;
     finishUserOnboarding(userId);
-    finishOnboarding();
+    setOnboarding(true);
   };
 
   const paraMargin = 10

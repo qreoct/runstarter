@@ -13,7 +13,7 @@ interface AuthState {
   signin: (data: TokenType) => void;
   signout: () => void;
   hydrate: () => void;
-  finishOnboarding: () => void;
+  setOnboarding: (bool: boolean) => void;
 }
 
 const _useAuth = create<AuthState>((set, get) => ({
@@ -42,8 +42,8 @@ const _useAuth = create<AuthState>((set, get) => ({
       // Maybe sign_out user!
     }
   },
-  finishOnboarding: () => {
-    set({ onboardingStatus: true });
+  setOnboarding: (bool) => {
+    set({ onboardingStatus: bool });
   },
 }));
 
@@ -52,4 +52,4 @@ export const useAuth = createSelectors(_useAuth);
 export const signout = () => _useAuth.getState().signout();
 export const signin = (token: TokenType) => _useAuth.getState().signin(token);
 export const hydrateAuth = () => _useAuth.getState().hydrate();
-export const finishOnboarding = () => _useAuth.getState().finishOnboarding();
+export const setOnboarding = (bool: boolean) => _useAuth.getState().setOnboarding(bool);

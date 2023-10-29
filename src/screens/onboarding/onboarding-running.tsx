@@ -6,18 +6,14 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from 'firebase-config';
 import { updateUserPreferences } from '@/database/firestore';
-import { GestureResponderEvent } from 'react-native';
 
 const schema = z.object({
   habit: z.string({
-    required_error: 'Please enter your current running habits',
+    required_error: 'Please select your current running habits',
   }),
-  goal: z
-    .number({
-      required_error: 'Please enter your desired running frequency',
-    })
-    .min(1, 'Please enter a number 1 or greater')
-    .max(7, 'Please enter a number 7 or less'),
+  goal: z.number({
+    required_error: 'Please select your desired running frequency',
+  })
 });
 
 export type PreferenceFormType = z.infer<typeof schema>;
@@ -31,7 +27,7 @@ export const OnboardingRunning = () => {
   // const options = ["Less than Once a Week", "1 to 2 times a Week", "3 to 5 times a Week", "5 times a Week or More"];
   // const [selectedOption, setSelectedOption] = useState(String);
 
-  const { handleSubmit, control, getValues } = useForm<OnboardingPreferenceType>({
+  const { handleSubmit, control } = useForm<OnboardingPreferenceType>({
     resolver: zodResolver(schema),
   });
 
@@ -62,13 +58,13 @@ export const OnboardingRunning = () => {
   ];
 
   const navigation = useNavigation();
-  const onSubmitOnboardingPreference: (event: GestureResponderEvent) => void | undefined = () => {
+  const onSubmitOnboardingPreference: OnboardingPreferenceProps['onSubmit'] = (data) => {
     if (!auth.currentUser) {
       console.log("NO USER FOUND!");
       return;
     }
     const userId = auth.currentUser.uid;
-    updateUserPreferences(userId, getValues('habit'), getValues('goal'));
+    updateUserPreferences(userId, data.habit, data.goal);
     navigation.navigate('OnboardingDisclaimer');
   };
 
@@ -117,7 +113,7 @@ export const OnboardingRunning = () => {
       <SafeAreaView className="mt-6">
         <Button
           label="Next"
-          onPress={onSubmitOnboardingPreference}
+          onPress={handleSubmit(onSubmitOnboardingPreference)}
         />
       </SafeAreaView>
 
