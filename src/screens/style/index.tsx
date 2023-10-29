@@ -12,7 +12,7 @@ export const Style = () => {
     <>
       <FocusAwareStatusBar />
       <ScrollView>
-        <View className="flex-1  px-4 pt-10">
+        <View className="flex-1 px-4 pt-10">
           <TextVariants />
           <ColorVariants />
           <InputVariants />

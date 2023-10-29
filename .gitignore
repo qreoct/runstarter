@@ -17,11 +17,11 @@ yarn-error.log
 
 # android
 android/local.properties
+android/app/*.json
 
 # macOS
 .DS_Store
 
 # Firebase
-firebase-config.js
 android/app/google-services.json
 android/app/client_secret*.json

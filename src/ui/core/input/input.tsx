@@ -1,5 +1,5 @@
 import { styled, useColorScheme } from 'nativewind';
-import * as React from 'react';
+import React, { useCallback, useState } from 'react';
 import type { TextInput, TextInputProps } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { TextInput as NTextInput } from 'react-native';
@@ -22,9 +22,9 @@ export const Input = React.forwardRef<TextInput, NInputProps>((props, ref) => {
   const { label, error, ...inputProps } = props;
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
-  const [isFocussed, setIsFocussed] = React.useState(false);
-  const onBlur = React.useCallback(() => setIsFocussed(false), []);
-  const onFocus = React.useCallback(() => setIsFocussed(true), []);
+  const [isFocussed, setIsFocussed] = useState(false);
+  const onBlur = useCallback(() => setIsFocussed(false), []);
+  const onFocus = useCallback(() => setIsFocussed(true), []);
 
   const borderColor = error
     ? 'border-danger-600'
@@ -62,7 +62,7 @@ export const Input = React.forwardRef<TextInput, NInputProps>((props, ref) => {
         testID="STextInput"
         ref={ref}
         placeholderTextColor={colors.neutral[400]}
-        className={`mt-0 border-[1px] py-4 px-2  ${borderColor} rounded-md ${bgColor} text-[16px] ${textDirection} dark:text-charcoal-100`}
+        className={`mt-0 border-[1px] px-2 py-4  ${borderColor} rounded-md ${bgColor} text-[16px] ${textDirection} dark:text-charcoal-100`}
         onBlur={onBlur}
         onFocus={onFocus}
         {...inputProps}

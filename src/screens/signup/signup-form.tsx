@@ -1,17 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useState, useEffect } from 'react';
-
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { Button, ControlledInput, Text, View } from '@/ui';
-import { LoginFormProps } from '../login/login-form';
 
+import type { LoginFormProps } from '../login/login-form';
 
 const schema = z.object({
-  name: z.string({
-    required_error: 'First Name is required',
-  }).optional(),
   email: z
     .string({
       required_error: 'Email is required',
@@ -26,7 +22,10 @@ const schema = z.object({
 
 export type FormType = z.infer<typeof schema>;
 
-export const SignupForm = ({ onSubmit = () => {} }: LoginFormProps) => {
+export const SignupForm = ({
+  onSubmit = () => {},
+  isLoading,
+}: LoginFormProps) => {
   const { handleSubmit, control } = useForm<FormType>({
     resolver: zodResolver(schema),
   });
@@ -36,13 +35,6 @@ export const SignupForm = ({ onSubmit = () => {} }: LoginFormProps) => {
       <Text testID="form-title" variant="h1" className="pb-6 text-center">
         Sign Up
       </Text>
-
-      <ControlledInput
-        testID="name-input"
-        control={control}
-        name="name"
-        label="Name"
-      />
 
       <ControlledInput
         testID="email-input"
@@ -64,8 +56,8 @@ export const SignupForm = ({ onSubmit = () => {} }: LoginFormProps) => {
         label="Submit"
         onPress={handleSubmit(onSubmit)}
         variant="primary"
+        disabled={isLoading}
       />
-
     </View>
   );
 };
