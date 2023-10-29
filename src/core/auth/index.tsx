@@ -6,8 +6,6 @@ import { auth } from '@/database/firebase-config';
 import { createSelectors } from '../utils';
 import type { TokenType } from './utils';
 import { getToken, removeToken, setToken } from './utils';
-import { signOut } from 'firebase/auth';
-import { auth } from '../../../firebase-config';
 
 interface AuthState {
   token: TokenType | null;

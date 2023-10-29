@@ -6,9 +6,7 @@ import {
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithCredential,
-  signInWithEmailAndPassword,
 } from 'firebase/auth';
-import { auth } from '../../../firebase-config';
 import React, { useEffect, useState } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';

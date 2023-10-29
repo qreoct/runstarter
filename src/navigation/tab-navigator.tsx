@@ -6,7 +6,7 @@ import type { ComponentType } from 'react';
 import * as React from 'react';
 import type { SvgProps } from 'react-native-svg';
 
-import { Run, NewRun, Settings } from '@/screens';
+import { NewRun, Run, Settings } from '@/screens';
 import {
   colors,
   Feed as FeedIcon,

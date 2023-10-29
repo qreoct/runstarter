@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Text, View, TouchableOpacity, Modal, StyleSheet } from 'react-native';
-import { Run } from '../';
+import { Modal, Text, TouchableOpacity, View } from 'react-native';
+
+import { Run } from '../run';
 
 export const NewRun: React.FC = () => {
   // state to control modal visibility
@@ -44,5 +45,3 @@ export const NewRun: React.FC = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({});

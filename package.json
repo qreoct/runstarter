@@ -43,6 +43,7 @@
     "@react-native-async-storage/async-storage": "^1.19.3",
     "@react-native-community/geolocation": "^3.1.0",
     "@react-native-firebase/app": "^18.5.0",
+    "@react-native-firebase/auth": "^18.6.0",
     "@react-native-google-signin/google-signin": "^10.0.1",
     "@react-navigation/bottom-tabs": "^6.5.7",
     "@react-navigation/native": "^6.1.6",
@@ -54,6 +55,7 @@
     "expo": "~49.0.13",
     "expo-application": "^5.4.0",
     "expo-auth-session": "~5.0.2",
+    "expo-av": "~13.4.1",
     "expo-build-properties": "~0.8.3",
     "expo-constants": "~14.4.2",
     "expo-crypto": "~12.4.1",
@@ -78,6 +80,7 @@
     "react-native-avoid-softinput": "^4.0.1",
     "react-native-flash-message": "^0.4.0",
     "react-native-gesture-handler": "~2.12.0",
+    "react-native-maps": "1.7.1",
     "react-native-mmkv": "2.6.3",
     "react-native-reanimated": "~3.3.0",
     "react-native-restart": "0.0.27",
@@ -87,9 +90,7 @@
     "react-native-web": "~0.19.7",
     "react-query-kit": "^1.4.6",
     "zod": "^3.21.4",
-    "zustand": "^4.3.6",
-    "react-native-maps": "1.7.1",
-    "expo-av": "~13.4.1"
+    "zustand": "^4.3.6"
   },
   "devDependencies": {
     "@babel/core": "^7.21.0",

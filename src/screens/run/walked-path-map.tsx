@@ -1,19 +1,20 @@
 import React from 'react';
-import MapView, { LatLng, Polyline, Region } from 'react-native-maps';
-import { Coords } from './index';
-import { Dimensions, Text } from 'react-native';
+import { Dimensions } from 'react-native';
+import MapView, { Polyline } from 'react-native-maps';
 
-const WalkedPathMap = ({ coords }: { coords: Coords[] }) => {
+import type { Coords } from './index';
+
+const WalkedPathMap = ({ coords: inputCoords }: { coords: Coords[] }) => {
   // Assuming the path is an array of coordinates in the format:
   // [{ latitude: xxx, longitude: yyy }, ...]
 
   // Optionally, calculate the region to display based on the path
-  let region = {
-    latitude: coords[0].latitude,
-    longitude: coords[0].longitude,
-    latitudeDelta: 0.005, // Adjust as needed
-    longitudeDelta: 0.005, // Adjust as needed
-  };
+  // let region = {
+  //   latitude: coords[0].latitude,
+  //   longitude: coords[0].longitude,
+  //   latitudeDelta: 0.005, // Adjust as needed
+  //   longitudeDelta: 0.005, // Adjust as needed
+  // };
 
   const mapStyle = {
     width: Dimensions.get('window').width,
@@ -55,11 +56,11 @@ const WalkedPathMap = ({ coords }: { coords: Coords[] }) => {
   return (
     <MapView
       style={mapStyle}
-      region={calculateRegion(coords) ?? undefined}
+      region={calculateRegion(inputCoords) ?? undefined}
       className="bg-red-200"
     >
       <Polyline
-        coordinates={coords}
+        coordinates={inputCoords}
         strokeColor="#000" // Black color
         strokeWidth={3}
       />

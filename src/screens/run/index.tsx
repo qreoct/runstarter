@@ -1,17 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Button, SafeAreaView } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
-import { FocusAwareStatusBar, ScrollView, View, Text } from '@/ui';
-import { auth, db } from 'firebase-config';
-import {
-  addDoc,
-  collection,
-  doc,
-  serverTimestamp,
-  setDoc,
-} from 'firebase/firestore';
-import WalkedPathMap from './WalkedPathMap';
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import React, { useEffect, useRef, useState } from 'react';
+import { Button } from 'react-native';
+
+import { auth, db } from '@/database/firebase-config';
+import { FocusAwareStatusBar, ScrollView, Text, View } from '@/ui';
 
 export interface Coords {
   latitude: number;
@@ -44,7 +38,7 @@ export const Run = (props: RunProps) => {
   const [distance, setDistance] = useState<number>(0);
   const [timeElapsed, setTimeElapsed] = useState<number>(0);
   const previousPositionRef = useRef<Coords | null>(null);
-  const [positionRecords, setPositionRecords] = useState<PositionRecord[]>([]);
+  const [_positionRecords, setPositionRecords] = useState<PositionRecord[]>([]);
   const [isRunning, setIsRunning] = useState<boolean>(true);
   const playedDistancesRef = useRef(new Set<number>());
 
@@ -67,9 +61,9 @@ export const Run = (props: RunProps) => {
     return R * c;
   };
 
-  const playSound = async (distance: number) => {
-    if (distance in audioFiles) {
-      let soundFile = audioFiles[distance];
+  const playSound = async (dist: number) => {
+    if (dist in audioFiles) {
+      let soundFile = audioFiles[dist];
       const soundObject = new Audio.Sound();
       try {
         await soundObject.loadAsync(soundFile, { shouldPlay: true });
@@ -206,22 +200,22 @@ export const Run = (props: RunProps) => {
   return (
     <>
       <FocusAwareStatusBar />
-      <ScrollView className="pt-16 bg-black flex">
+      <ScrollView className="flex bg-black pt-16">
         <View className="flex flex-row justify-center gap-x-4">
           <View className="items-center">
-            <Text className="text-white text-xl">
+            <Text className="text-xl text-white">
               {(distance / 1000).toFixed(2)}
             </Text>
             <Text className="text-white">kilometres</Text>
           </View>
           <View className="items-center">
-            <Text className="text-white text-xl">
+            <Text className="text-xl text-white">
               {avgPace.toFixed(2)} min/km
             </Text>
             <Text className="text-white">Avg. Pace</Text>
           </View>
           <View className="items-center">
-            <Text className="text-white text-xl">
+            <Text className="text-xl text-white">
               {Math.floor(timeElapsed / 60)
                 .toString()
                 .padStart(2, '0')}
