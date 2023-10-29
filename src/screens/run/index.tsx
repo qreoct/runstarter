@@ -11,6 +11,7 @@ import {
   setDoc,
 } from 'firebase/firestore';
 import WalkedPathMap from './WalkedPathMap';
+import { Audio } from 'expo-av';
 
 export interface Coords {
   latitude: number;
@@ -26,12 +27,26 @@ export interface RunProps {
   onFinish: () => void;
 }
 
+const audioFiles: { [key: number]: any } = {
+  0.5: require('../../../assets/distances/0.5.wav'),
+  1.0: require('../../../assets/distances/1.0.wav'),
+  1.5: require('../../../assets/distances/1.5.wav'),
+  2.0: require('../../../assets/distances/2.0.wav'),
+  2.5: require('../../../assets/distances/2.5.wav'),
+  3.0: require('../../../assets/distances/3.0.wav'),
+  3.5: require('../../../assets/distances/3.5.wav'),
+  4.0: require('../../../assets/distances/4.0.wav'),
+  4.5: require('../../../assets/distances/4.5.wav'),
+  5.0: require('../../../assets/distances/5.0.wav'),
+};
+
 export const Run = (props: RunProps) => {
   const [distance, setDistance] = useState<number>(0);
   const [timeElapsed, setTimeElapsed] = useState<number>(0);
   const previousPositionRef = useRef<Coords | null>(null);
   const [positionRecords, setPositionRecords] = useState<PositionRecord[]>([]);
   const [isRunning, setIsRunning] = useState<boolean>(true);
+  const playedDistancesRef = useRef(new Set<number>());
 
   const calculateDistance = (
     lat1: number,
@@ -50,6 +65,20 @@ export const Run = (props: RunProps) => {
         Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
+  };
+
+  const playSound = async (distance: number) => {
+    if (distance in audioFiles) {
+      let soundFile = audioFiles[distance];
+      const soundObject = new Audio.Sound();
+      try {
+        await soundObject.loadAsync(soundFile, { shouldPlay: true });
+        await soundObject.setPositionAsync(0);
+        await soundObject.playAsync();
+      } catch (error) {
+        console.log('Error playing sound:', error);
+      }
+    }
   };
 
   useEffect(() => {
@@ -72,7 +101,25 @@ export const Run = (props: RunProps) => {
               position.coords.latitude,
               position.coords.longitude
             );
-            setDistance((prevDistance) => prevDistance + dist);
+            setDistance((prevDistance) => {
+              const updatedDistance = prevDistance + dist;
+              const updatedKm = updatedDistance / 1000; // Convert to kilometers
+              const prevKm = prevDistance / 1000; // Convert to kilometers
+
+              // Check in reverse from updatedKm to prevKm for the furthest milestone crossed
+              for (
+                let milestone = Math.floor(updatedKm * 2) / 2;
+                milestone >= prevKm;
+                milestone -= 0.5
+              ) {
+                if (!playedDistancesRef.current.has(milestone)) {
+                  playSound(milestone);
+                  playedDistancesRef.current.add(milestone);
+                  break; // Exit once the latest milestone sound is played
+                }
+              }
+              return updatedDistance;
+            });
             previousPositionRef.current = {
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
