@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, SafeAreaView, Text, View } from 'react-native';
+import { Button, SafeAreaView } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
-import { FocusAwareStatusBar, ScrollView } from '@/ui';
+import { FocusAwareStatusBar, ScrollView, View, Text } from '@/ui';
 import { auth, db } from 'firebase-config';
 import {
   addDoc,
@@ -140,8 +140,8 @@ export const Run = (props: RunProps) => {
   return (
     <>
       <FocusAwareStatusBar />
-      <ScrollView className="pt-16">
-        <View className="flex-row justify-between px-4">
+      <ScrollView className="pt-16 bg-black flex">
+        <View className="flex flex-row justify-center gap-x-4">
           <View className="items-center">
             <Text className="text-white text-xl">
               {(distance / 1000).toFixed(2)}
