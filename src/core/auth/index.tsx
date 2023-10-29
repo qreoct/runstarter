@@ -1,5 +1,5 @@
 import { signOut } from 'firebase/auth';
-import { auth } from 'firebase-config';
+import { auth } from '@/database/firebase-config';
 import { create } from 'zustand';
 
 import { createSelectors } from '../utils';

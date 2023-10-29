@@ -7,7 +7,7 @@ import {
   onAuthStateChanged,
   signInWithCredential,
 } from 'firebase/auth';
-import { ANDROID_CLIENT_ID, auth, IOS_CLIENT_ID } from 'firebase-config';
+import { ANDROID_CLIENT_ID, auth, IOS_CLIENT_ID } from '@/database/firebase-config';
 import React, { useEffect, useState } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';

@@ -1,4 +1,4 @@
-import { auth } from 'firebase-config';
+import { auth } from '@/database/firebase-config';
 import React from 'react';
 import type { GestureResponderEvent } from 'react-native';
 
