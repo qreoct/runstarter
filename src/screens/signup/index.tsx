@@ -1,5 +1,5 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert } from 'react-native';
 
 import { useSoftKeyboardEffect } from '@/core/keyboard';
@@ -12,11 +12,15 @@ import { SignupForm } from './signup-form';
 export const Signup = () => {
   useSoftKeyboardEffect();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const onSubmitSignup: LoginFormProps['onSubmit'] = (data) => {
     console.log('Creating new user with: ' + JSON.stringify(data));
+    setIsLoading(true);
     createUserWithEmailAndPassword(auth, data.email, data.password)
       .then((userCredential) => {
         const user = userCredential.user;
+        setIsLoading(false);
         console.log('New user created: ' + JSON.stringify(user));
         // Navigate to Login screen
       })
@@ -27,6 +31,7 @@ export const Signup = () => {
           'Error creating new user: ' + errorCode + ', ' + errorMessage
         );
         // Display error message to user
+        setIsLoading(false);
         if (errorCode === 'auth/email-already-in-use') {
           Alert.alert(
             'Error creating new user',
@@ -44,7 +49,7 @@ export const Signup = () => {
   return (
     <>
       <FocusAwareStatusBar />
-      <SignupForm onSubmit={onSubmitSignup} />
+      <SignupForm onSubmit={onSubmitSignup} isLoading={isLoading} />
     </>
   );
 };

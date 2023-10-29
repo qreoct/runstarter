@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useState } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -35,12 +35,14 @@ const schema = z.object({
 export type FormType = z.infer<typeof schema>;
 export type OnboardingFormProps = {
   onSubmit?: SubmitHandler<FormType>;
+  isLoading?: boolean;
 };
 
 export type OnboardingFormType = z.infer<typeof schema>;
 
 export const OnboardingForm = ({
   onSubmit = () => {},
+  isLoading,
 }: OnboardingFormProps) => {
   interface Option {
     label: string;
@@ -92,7 +94,11 @@ export const OnboardingForm = ({
       </SafeAreaView>
 
       <SafeAreaView className="mt-6">
-        <Button label="Next" onPress={handleSubmit(onSubmit)} />
+        <Button
+          label="Next"
+          onPress={handleSubmit(onSubmit)}
+          disabled={isLoading}
+        />
       </SafeAreaView>
     </View>
   );
@@ -101,21 +107,24 @@ export const OnboardingForm = ({
 export const Onboarding = () => {
   useSoftKeyboardEffect();
   const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmitOnboarding: OnboardingFormProps['onSubmit'] = (data) => {
+    setIsLoading(true);
     if (!auth.currentUser) {
       console.log('NO USER FOUND!');
       return;
     }
     const userId = auth.currentUser.uid;
     updateUserParticulars(userId, data);
+    setIsLoading(false);
     navigation.navigate('OnboardingRunning');
   };
 
   return (
     <View className="flex-1">
       <FocusAwareStatusBar />
-      <OnboardingForm onSubmit={onSubmitOnboarding} />
+      <OnboardingForm onSubmit={onSubmitOnboarding} isLoading={isLoading} />
     </View>
   );
 };

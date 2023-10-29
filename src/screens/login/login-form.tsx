@@ -40,6 +40,7 @@ export type FormType = z.infer<typeof schema>;
 
 export type LoginFormProps = {
   onSubmit?: SubmitHandler<FormType>;
+  isLoading?: boolean;
 };
 
 export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
@@ -75,7 +76,7 @@ export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
   }, []);
 
   return (
-    <View className="flex-1 justify-center p-4">
+    <View className="flex w-screen flex-1 items-center justify-center p-4">
       <Text className="mb-8 text-center text-3xl font-bold">
         Welcome to RunSquad!
       </Text>
@@ -107,7 +108,7 @@ const EmailPasswordLogin = ({ onSubmit = () => {} }: LoginFormProps) => {
   };
 
   return (
-    <View>
+    <View className="w-[100%]">
       <ControlledInput
         testID="email-input"
         control={control}
