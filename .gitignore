@@ -17,6 +17,7 @@ yarn-error.log
 
 # android
 android/local.properties
+android/app/*.json
 
 # macOS
 .DS_Store

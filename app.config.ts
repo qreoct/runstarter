@@ -18,6 +18,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     resizeMode: 'cover',
     backgroundColor: '#2A3D4C',
   },
+  androidStatusBar: {
+    hidden: true,
+  },
   updates: {
     fallbackToCacheTimeout: 0,
   },
@@ -66,7 +69,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         ],
       },
     ],
+    [
+      'expo-navigation-bar',
+      {
+        position: 'absolute',
+        visibility: 'hidden',
+        behavior: 'inset-touch',
+        backgroundColor: '#ffffff',
+      },
+    ],
   ],
+
   extra: {
     ...ClientEnv,
     eas: {
