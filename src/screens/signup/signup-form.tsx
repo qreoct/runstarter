@@ -1,12 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import React from 'react';
-
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { Button, ControlledInput, Text, View } from '@/ui';
-import { LoginFormProps } from '../login/login-form';
 
+import type { LoginFormProps } from '../login/login-form';
 
 const schema = z.object({
   email: z
@@ -55,7 +54,6 @@ export const SignupForm = ({ onSubmit = () => {} }: LoginFormProps) => {
         onPress={handleSubmit(onSubmit)}
         variant="primary"
       />
-
     </View>
   );
 };

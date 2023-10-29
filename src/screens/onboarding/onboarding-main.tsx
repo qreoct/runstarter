@@ -1,22 +1,32 @@
-import React from 'react';
-
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { useNavigation } from '@react-navigation/native';
-import { useSoftKeyboardEffect } from '@/core/keyboard';
-import { Button, ControlledInput, ControlledSelect, FocusAwareStatusBar, SafeAreaView, Text, View } from '@/ui';
-
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { updateUserParticulars } from '@/database/firestore';
+import { useNavigation } from '@react-navigation/native';
 import { auth } from 'firebase-config';
+import React from 'react';
+import type { SubmitHandler } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+
+import { useSoftKeyboardEffect } from '@/core/keyboard';
+import { updateUserParticulars } from '@/database/firestore';
+import {
+  Button,
+  ControlledInput,
+  ControlledSelect,
+  FocusAwareStatusBar,
+  SafeAreaView,
+  Text,
+  View,
+} from '@/ui';
 
 const schema = z.object({
   name: z.string({
     required_error: 'Name is required',
   }),
-  age: z.string({
-    required_error: 'Age is required',
-  }).regex(/^[0-9]+$/, 'Age must be a number'),
+  age: z
+    .string({
+      required_error: 'Age is required',
+    })
+    .regex(/^[0-9]+$/, 'Age must be a number'),
   gender: z.string({
     required_error: 'Gender is required',
   }),
@@ -29,16 +39,18 @@ export type OnboardingFormProps = {
 
 export type OnboardingFormType = z.infer<typeof schema>;
 
-export const OnboardingForm = ({ onSubmit = () => {} }: OnboardingFormProps) => {
+export const OnboardingForm = ({
+  onSubmit = () => {},
+}: OnboardingFormProps) => {
   interface Option {
     label: string;
     value: string;
   }
 
   const genderOptions: Option[] = [
-    { label: "Male", value: "M" },
-    { label: "Female", value: "F" },
-    { label: "Others", value: "O" },
+    { label: 'Male', value: 'M' },
+    { label: 'Female', value: 'F' },
+    { label: 'Others', value: 'O' },
   ];
 
   const { handleSubmit, control } = useForm<OnboardingFormType>({
@@ -49,40 +61,38 @@ export const OnboardingForm = ({ onSubmit = () => {} }: OnboardingFormProps) => 
     <View className="flex-1 justify-center p-4">
       <FocusAwareStatusBar />
       <SafeAreaView className="mt-6">
-        <Text variant='h1' style={{ fontWeight: 'bold' }} >
+        <Text variant="h1" style={{ fontWeight: 'bold' }}>
           Welcome to RunSquad!
         </Text>
-        <Text variant='lg'>
-          We're glad to have you on board. Let's get to know you a little better!
+        <Text variant="lg">
+          We're glad to have you on board. Let's get to know you a little
+          better!
         </Text>
       </SafeAreaView>
 
       <SafeAreaView className="mt-6">
         <ControlledInput
-            testID="name-input"
-            control={control}
-            name="name"
-            label="Name"
+          testID="name-input"
+          control={control}
+          name="name"
+          label="Name"
         />
         <ControlledInput
-            testID="age-input"
-            control={control}
-            name="age"
-            label="Age"
+          testID="age-input"
+          control={control}
+          name="age"
+          label="Age"
         />
-        <ControlledSelect 
-          name="gender" 
-          control={control} 
-          options={genderOptions} 
+        <ControlledSelect
+          name="gender"
+          control={control}
+          options={genderOptions}
           label="Gender"
         />
       </SafeAreaView>
 
       <SafeAreaView className="mt-6">
-        <Button
-          label="Next"
-          onPress={handleSubmit(onSubmit)}
-        />
+        <Button label="Next" onPress={handleSubmit(onSubmit)} />
       </SafeAreaView>
     </View>
   );
@@ -94,7 +104,7 @@ export const Onboarding = () => {
 
   const onSubmitOnboarding: OnboardingFormProps['onSubmit'] = (data) => {
     if (!auth.currentUser) {
-      console.log("NO USER FOUND!");
+      console.log('NO USER FOUND!');
       return;
     }
     const userId = auth.currentUser.uid;
@@ -105,7 +115,7 @@ export const Onboarding = () => {
   return (
     <View className="flex-1">
       <FocusAwareStatusBar />
-      <OnboardingForm onSubmit={onSubmitOnboarding}/>
+      <OnboardingForm onSubmit={onSubmitOnboarding} />
     </View>
   );
-}
+};

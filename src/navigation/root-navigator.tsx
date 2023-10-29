@@ -1,8 +1,9 @@
-
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
+
 import { useAuth } from '@/core';
+
 import { AuthNavigator } from './auth-navigator';
 import { NavigationContainer } from './navigation-container';
 import { OnboardingNavigator } from './onboarding-navigator';
@@ -35,10 +36,13 @@ export const Root = () => {
         <Stack.Screen name="Auth" component={AuthNavigator} />
       ) : (
         <Stack.Group>
-          {onboardingStatus ? (    
+          {onboardingStatus ? (
             <Stack.Screen name="App" component={TabNavigator} />
           ) : (
-            <Stack.Screen name="OnboardingNav" component={OnboardingNavigator} />
+            <Stack.Screen
+              name="OnboardingNav"
+              component={OnboardingNavigator}
+            />
           )}
         </Stack.Group>
       )}

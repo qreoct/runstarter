@@ -1,10 +1,10 @@
+import { signOut } from 'firebase/auth';
+import { auth } from 'firebase-config';
 import { create } from 'zustand';
 
 import { createSelectors } from '../utils';
 import type { TokenType } from './utils';
 import { getToken, removeToken, setToken } from './utils';
-import { signOut } from 'firebase/auth';
-import { auth } from 'firebase-config';
 
 interface AuthState {
   token: TokenType | null;
@@ -52,4 +52,5 @@ export const useAuth = createSelectors(_useAuth);
 export const signout = () => _useAuth.getState().signout();
 export const signin = (token: TokenType) => _useAuth.getState().signin(token);
 export const hydrateAuth = () => _useAuth.getState().hydrate();
-export const setOnboarding = (bool: boolean) => _useAuth.getState().setOnboarding(bool);
+export const setOnboarding = (bool: boolean) =>
+  _useAuth.getState().setOnboarding(bool);
