@@ -103,7 +103,7 @@ const EmailPasswordLogin = ({ onSubmit = () => {} }: LoginFormProps) => {
   };
 
   return (
-    <View className="flex-1 justify-center p-4">
+    <View>
       <ControlledInput
         testID="email-input"
         control={control}

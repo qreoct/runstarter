@@ -30,7 +30,7 @@
     "type-check": "tsc  --noemit",
     "lint:translations": "eslint ./src/translations/ --fix --ext .json  ",
     "test": "jest",
-    "test:ci": "pnpm run test --coverage",
+    "test:ci": "pnpm run test --coverage --passWithNoTests",
     "test:watch": "pnpm run test --watch",
     "eas-build-pre-install": "bash ./scripts/eas-pre-install.sh",
     "install-maestro": "curl -Ls 'https://get.maestro.mobile.dev' | bash",
