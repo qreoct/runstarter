@@ -1,4 +1,7 @@
+import { signOut } from 'firebase/auth';
 import { create } from 'zustand';
+
+import { auth } from '@/database/firebase-config';
 
 import { createSelectors } from '../utils';
 import type { TokenType } from './utils';
@@ -7,19 +10,23 @@ import { getToken, removeToken, setToken } from './utils';
 interface AuthState {
   token: TokenType | null;
   status: 'idle' | 'signOut' | 'signIn';
-  signIn: (data: TokenType) => void;
-  signOut: () => void;
+  onboardingStatus: boolean;
+  signin: (data: TokenType) => void;
+  signout: () => void;
   hydrate: () => void;
+  setOnboarding: (bool: boolean) => void;
 }
 
 const _useAuth = create<AuthState>((set, get) => ({
   status: 'idle',
   token: null,
-  signIn: (token) => {
+  onboardingStatus: false,
+  signin: (token) => {
     setToken(token);
     set({ status: 'signIn', token });
   },
-  signOut: () => {
+  signout: () => {
+    signOut(auth);
     removeToken();
     set({ status: 'signOut', token: null });
   },
@@ -27,19 +34,24 @@ const _useAuth = create<AuthState>((set, get) => ({
     try {
       const userToken = getToken();
       if (userToken !== null) {
-        get().signIn(userToken);
+        get().signin(userToken);
       } else {
-        get().signOut();
+        get().signout();
       }
     } catch (e) {
       // catch error here
       // Maybe sign_out user!
     }
   },
+  setOnboarding: (bool) => {
+    set({ onboardingStatus: bool });
+  },
 }));
 
 export const useAuth = createSelectors(_useAuth);
 
-export const signOut = () => _useAuth.getState().signOut();
-export const signIn = (token: TokenType) => _useAuth.getState().signIn(token);
+export const signout = () => _useAuth.getState().signout();
+export const signin = (token: TokenType) => _useAuth.getState().signin(token);
 export const hydrateAuth = () => _useAuth.getState().hydrate();
+export const setOnboarding = (bool: boolean) =>
+  _useAuth.getState().setOnboarding(bool);

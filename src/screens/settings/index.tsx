@@ -14,7 +14,7 @@ import { LanguageItem } from './language-item';
 import { ThemeItem } from './theme-item';
 
 export const Settings = () => {
-  const signOut = useAuth.use.signOut();
+  const signOut = useAuth.use.signout();
   const { colorScheme } = useColorScheme();
   const iconColor =
     colorScheme === 'dark' ? colors.neutral[400] : colors.neutral[500];

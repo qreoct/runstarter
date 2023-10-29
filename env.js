@@ -12,6 +12,7 @@
  * we use dotenv to load the correct variables from the .env file based on the APP_ENV variable (default is development)
  * APP_ENV is passed as an inline variable while executing the command, for example: APP_ENV=staging pnpm build:android
  */
+
 const z = require('zod');
 
 const packageJSON = require('./package.json');
@@ -74,6 +75,15 @@ const client = z.object({
 
   // ADD YOUR CLIENT ENV VARS HERE
   API_URL: z.string(),
+  REACT_APP_IOS_CLIENT_ID: z.string(),
+  REACT_APP_ANDROID_CLIENT_ID: z.string(),
+  REACT_APP_FIREBASE_API_KEY: z.string(),
+  REACT_APP_FIREBASE_AUTH_DOMAIN: z.string(),
+  REACT_APP_FIREBASE_PROJECT_ID: z.string(),
+  REACT_APP_FIREBASE_STORAGE_BUCKET: z.string(),
+  REACT_APP_FIREBASE_MESSAGING_SENDER_ID: z.string(),
+  REACT_APP_FIREBASE_APP_ID: z.string(),
+  REACT_APP_FIREBASE_MEASUREMENT_ID: z.string(),
 });
 
 const buildTime = z.object({
@@ -95,6 +105,18 @@ const _clientEnv = {
 
   // ADD YOUR ENV VARS HERE TOO
   API_URL: process.env.API_URL,
+  REACT_APP_IOS_CLIENT_ID: process.env.REACT_APP_IOS_CLIENT_ID,
+  REACT_APP_ANDROID_CLIENT_ID: process.env.REACT_APP_ANDROID_CLIENT_ID,
+  REACT_APP_FIREBASE_API_KEY: process.env.REACT_APP_FIREBASE_API_KEY,
+  REACT_APP_FIREBASE_AUTH_DOMAIN: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  REACT_APP_FIREBASE_PROJECT_ID: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  REACT_APP_FIREBASE_STORAGE_BUCKET:
+    process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  REACT_APP_FIREBASE_MESSAGING_SENDER_ID:
+    process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  REACT_APP_FIREBASE_APP_ID: process.env.REACT_APP_FIREBASE_APP_ID,
+  REACT_APP_FIREBASE_MEASUREMENT_ID:
+    process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
 /**

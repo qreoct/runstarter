@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import type { Option } from '@/ui';
 import { Input, Select, View } from '@/ui';
@@ -12,7 +12,7 @@ const options: Option[] = [
 ];
 
 export const InputVariants = () => {
-  const [value, setValue] = React.useState<string | number | undefined>();
+  const [value, setValue] = useState<string | number | undefined>();
   return (
     <>
       <Title text="Form" />
