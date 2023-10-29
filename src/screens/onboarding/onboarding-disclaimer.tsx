@@ -1,8 +1,8 @@
-import { auth } from '@/database/firebase-config';
 import React from 'react';
 import type { GestureResponderEvent } from 'react-native';
 
 import { setOnboarding } from '@/core';
+import { auth } from '@/database/firebase-config';
 import { finishUserOnboarding } from '@/database/firestore';
 import { Button, FocusAwareStatusBar, SafeAreaView, Text, View } from '@/ui';
 

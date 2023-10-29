@@ -1,9 +1,9 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/database/firebase-config';
 import React from 'react';
 import { Alert } from 'react-native';
 
 import { useSoftKeyboardEffect } from '@/core/keyboard';
+import { auth } from '@/database/firebase-config';
 import { FocusAwareStatusBar } from '@/ui';
 
 import { type LoginFormProps } from '../login/login-form';

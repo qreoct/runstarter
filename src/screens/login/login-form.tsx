@@ -7,7 +7,6 @@ import {
   onAuthStateChanged,
   signInWithCredential,
 } from 'firebase/auth';
-import { ANDROID_CLIENT_ID, auth, IOS_CLIENT_ID } from '@/database/firebase-config';
 import React, { useEffect, useState } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
@@ -16,6 +15,11 @@ import * as z from 'zod';
 
 import { signin } from '@/core';
 import { setOnboarding } from '@/core';
+import {
+  ANDROID_CLIENT_ID,
+  auth,
+  IOS_CLIENT_ID,
+} from '@/database/firebase-config';
 import { addUserIfNotExist, getUserOnboarding } from '@/database/firestore';
 import { Button, ControlledInput, Text, View } from '@/ui';
 

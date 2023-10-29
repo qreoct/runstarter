@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
-import { auth } from '@/database/firebase-config';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { useSoftKeyboardEffect } from '@/core/keyboard';
+import { auth } from '@/database/firebase-config';
 import { updateUserParticulars } from '@/database/firestore';
 import {
   Button,

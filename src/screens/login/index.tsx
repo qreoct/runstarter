@@ -1,10 +1,10 @@
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/database/firebase-config';
 import React from 'react';
 import { Alert } from 'react-native';
 
 import { useAuth } from '@/core';
 import { useSoftKeyboardEffect } from '@/core/keyboard';
+import { auth } from '@/database/firebase-config';
 import { addUserIfNotExist } from '@/database/firestore';
 import { FocusAwareStatusBar } from '@/ui';
 
