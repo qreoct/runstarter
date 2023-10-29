@@ -59,7 +59,7 @@ export const Select = (props: SelectProps) => {
           </Text>
         )}
         <TouchableOpacity
-          className={`mt-0 flex-row items-center justify-center border-[1px] py-3 px-2  ${borderColor} rounded-md ${bgColor} text-[16px]`}
+          className={`mt-0 flex-row items-center justify-center border-[1px] px-2 py-3  ${borderColor} rounded-md ${bgColor} text-[16px]`}
           disabled={disabled}
           onPress={modal.present}
         >

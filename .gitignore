@@ -20,3 +20,7 @@ android/local.properties
 
 # macOS
 .DS_Store
+
+# Firebase
+android/app/google-services.json
+android/app/client_secret*.json

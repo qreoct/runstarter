@@ -5,10 +5,12 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@env": ["./src/core/env.js"]
+      "@env": ["./src/core/env.js"],
+      "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"]
     },
     "esModuleInterop": true,
-    "checkJs": true
+    "checkJs": true,
+    "moduleResolution": "node"
   },
   "exclude": [
     "node_modules",
