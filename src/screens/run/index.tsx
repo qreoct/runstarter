@@ -11,7 +11,7 @@ import {
   setDoc,
 } from 'firebase/firestore';
 import WalkedPathMap from './WalkedPathMap';
-import { Audio } from 'expo-av';
+import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
 
 export interface Coords {
   latitude: number;
@@ -87,6 +87,24 @@ export const Run = (props: RunProps) => {
         setTimeElapsed((prevTime) => prevTime + 1);
       }, 1000);
 
+      // const testtimer = setInterval(() => {
+      //   playSound(0.5);
+      // }, 3000);
+
+      async function setAudioMode() {
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: false,
+          staysActiveInBackground: true,
+          interruptionModeIOS: InterruptionModeIOS.DuckOthers,
+          playsInSilentModeIOS: true,
+          shouldDuckAndroid: true,
+          interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
+          playThroughEarpieceAndroid: false,
+        });
+      }
+
+      setAudioMode();
+
       const watchId = Geolocation.watchPosition(
         (position) => {
           if (!previousPositionRef.current) {
@@ -144,6 +162,7 @@ export const Run = (props: RunProps) => {
       return () => {
         Geolocation.clearWatch(watchId);
         clearInterval(timer);
+        // clearInterval(testtimer);
       };
     }
   }, [isRunning]);
