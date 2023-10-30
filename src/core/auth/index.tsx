@@ -5,12 +5,20 @@ import { auth } from '@/database/firebase-config';
 
 import { createSelectors } from '../utils';
 import type { TokenType } from './utils';
-import { getToken, removeToken, setToken } from './utils';
+import {
+  getOnboardingToken,
+  getToken,
+  removeOnboardingToken,
+  removeToken,
+  setOnboardingToken,
+  setToken,
+} from './utils';
 
 interface AuthState {
   token: TokenType | null;
   status: 'idle' | 'signOut' | 'signIn';
   onboardingStatus: boolean;
+  onboardingToken: TokenType | null;
   signin: (data: TokenType) => void;
   signout: () => void;
   hydrate: () => void;
@@ -21,6 +29,7 @@ const _useAuth = create<AuthState>((set, get) => ({
   status: 'idle',
   token: null,
   onboardingStatus: false,
+  onboardingToken: null,
   signin: (token) => {
     setToken(token);
     set({ status: 'signIn', token });
@@ -38,6 +47,13 @@ const _useAuth = create<AuthState>((set, get) => ({
       } else {
         get().signout();
       }
+
+      const onboardingToken = getOnboardingToken();
+      if (onboardingToken !== null) {
+        get().setOnboarding(true);
+      } else {
+        get().setOnboarding(false);
+      }
     } catch (e) {
       // catch error here
       // Maybe sign_out user!
@@ -45,6 +61,14 @@ const _useAuth = create<AuthState>((set, get) => ({
   },
   setOnboarding: (bool) => {
     set({ onboardingStatus: bool });
+    if (bool) {
+      setOnboardingToken({
+        access: 'onboarding-access-token',
+        refresh: 'onboarding-refresh-token',
+      });
+    } else {
+      removeOnboardingToken();
+    }
   },
 }));
 
