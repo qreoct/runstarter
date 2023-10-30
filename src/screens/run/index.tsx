@@ -34,6 +34,7 @@ const audioFiles: { [key: number]: any } = {
   5.0: require('../../../assets/distances/5.0.wav'),
 };
 
+/* eslint-disable max-lines-per-function */
 export const Run = (props: RunProps) => {
   const [distance, setDistance] = useState<number>(0);
   const [timeElapsed, setTimeElapsed] = useState<number>(0);
@@ -42,6 +43,7 @@ export const Run = (props: RunProps) => {
   const [isRunning, setIsRunning] = useState<boolean>(true);
   const playedDistancesRef = useRef(new Set<number>());
 
+  /* eslint-disable max-params */
   const calculateDistance = (
     lat1: number,
     lon1: number,
@@ -60,6 +62,7 @@ export const Run = (props: RunProps) => {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   };
+  /* eslint-enable max-params */
 
   const playSound = async (dist: number) => {
     if (dist in audioFiles) {
@@ -257,3 +260,4 @@ export const Run = (props: RunProps) => {
     </>
   );
 };
+/* eslint-enable max-lines-per-function */
