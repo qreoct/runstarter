@@ -228,8 +228,15 @@ export const Run = (props: RunProps) => {
     }
   };
 
-  const avgPace =
-    timeElapsed && distance ? timeElapsed / 60 / (distance / 1000) : 0; // pace in min/km
+  function formatAvgPace() {
+    if (timeElapsed === 0 || distance === 0) {
+      return '0\'00"';
+    }
+    const avgPace = timeElapsed / 60 / (distance / 1000);
+    const minutes = Math.floor(avgPace);
+    const seconds = Math.round((avgPace - minutes) * 60);
+    return `${minutes}'${seconds.toString().padStart(2, '0')}"`;
+  }
 
   return (
     <>
@@ -244,7 +251,7 @@ export const Run = (props: RunProps) => {
             </View>
             <View className="items-center w-22">
               <Text className="text-2xl text-white font-bold">
-                {avgPace.toFixed(2)}
+                {formatAvgPace()}
               </Text>
               <Text className="text-white/50 font-semibold">Avg. Pace</Text>
             </View>
@@ -286,7 +293,7 @@ export const Run = (props: RunProps) => {
           </View>
         </View>
 
-        <View className="flex items-center pt-12">
+        <View className="flex items-center py-8">
           {isRunning ? (
             <TouchableOpacity
               className="bg-white w-20 h-20 rounded-full flex justify-center items-center"
@@ -317,26 +324,6 @@ export const Run = (props: RunProps) => {
             </View>
           )}
         </View>
-
-        {/* {positionRecords.length > 0 ? (
-          <WalkedPathMap coords={positionRecords.map((r) => r.coords)} />
-        ) : null} */}
-
-        {/* <WalkedPathMap
-          coords={[{ latitude: 42.785834, longitude: -123.99143 }]}
-        /> */}
-
-        {/* <View>
-          {positionRecords.map((record, index) => (
-            <View key={index}>
-              <Text>
-                Latitude: {record.coords.latitude}, Longitude:{' '}
-                {record.coords.longitude}
-              </Text>
-              <Text>Distance: {record.distance.toFixed(2)} meters</Text>
-            </View>
-          ))}
-        </View> */}
       </SafeAreaView>
     </>
   );
