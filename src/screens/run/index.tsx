@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   View,
   Pause as PauseIcon,
+  Image,
 } from '@/ui';
 
 export interface Coords {
@@ -86,6 +87,14 @@ export const Run = (props: RunProps) => {
       }
     }
   };
+
+  const profileImages = [
+    'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
+    'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
+    'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
+    'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
+    'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
+  ];
 
   useEffect(() => {
     if (isRunning) {
@@ -212,41 +221,59 @@ export const Run = (props: RunProps) => {
   return (
     <>
       <SafeAreaView className="h-full flex bg-black justify-between">
-        <View className="flex flex-row justify-center gap-x-4  h-1/5">
-          <View className="items-center w-22">
-            <Text className="text-2xl text-white font-bold">
-              {(distance / 1000).toFixed(2)}
-            </Text>
-            <Text className="text-white/50 font-semibold">kilometres</Text>
+        <View className="flex flex-1 flex-cols justify-between">
+          <View className="flex flex-row justify-center gap-x-4">
+            <View className="items-center w-22">
+              <Text className="text-2xl text-white font-bold">
+                {(distance / 1000).toFixed(2)}
+              </Text>
+              <Text className="text-white/50 font-semibold">kilometres</Text>
+            </View>
+            <View className="items-center w-22">
+              <Text className="text-2xl text-white font-bold">
+                {avgPace.toFixed(2)}
+              </Text>
+              <Text className="text-white/50 font-semibold">Avg. Pace</Text>
+            </View>
+            <View className="items-center w-22">
+              <Text className="text-2xl text-white font-bold">
+                {Math.floor(timeElapsed / 60)
+                  .toString()
+                  .padStart(2, '0')}
+                :{(timeElapsed % 60).toString().padStart(2, '0')}
+              </Text>
+              <Text className="text-white/50 font-semibold">Time</Text>
+            </View>
           </View>
-          <View className="items-center w-22">
-            <Text className="text-2xl text-white font-bold">
-              {avgPace.toFixed(2)}
-            </Text>
-            <Text className="text-white/50 font-semibold">Avg. Pace</Text>
-          </View>
-          <View className="items-center w-22">
-            <Text className="text-2xl text-white font-bold">
+
+          <View className="flex items-center">
+            <Text className="text-8xl text-white font-bold italic">
               {Math.floor(timeElapsed / 60)
                 .toString()
                 .padStart(2, '0')}
               :{(timeElapsed % 60).toString().padStart(2, '0')}
             </Text>
-            <Text className="text-white/50 font-semibold">Time</Text>
+            <Text className="text-xl text-white/50 font-semibold">Time</Text>
+          </View>
+
+          <View>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              className="px-6 flex gap-x-4"
+            >
+              {profileImages.map((image, index) => (
+                <Image
+                  key={index}
+                  source={{ uri: image }}
+                  className="w-20 h-20 rounded-full"
+                />
+              ))}
+            </ScrollView>
           </View>
         </View>
 
-        <View className="flex items-center">
-          <Text className="text-8xl text-white font-bold italic">
-            {Math.floor(timeElapsed / 60)
-              .toString()
-              .padStart(2, '0')}
-            :{(timeElapsed % 60).toString().padStart(2, '0')}
-          </Text>
-          <Text className="text-xl text-white/50 font-semibold">Time</Text>
-        </View>
-
-        <View className="flex items-center h-1/5">
+        <View className="flex items-center pt-12">
           {isRunning ? (
             <TouchableOpacity
               className="bg-white w-20 h-20 rounded-full flex justify-center items-center"
