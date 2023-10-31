@@ -3,15 +3,12 @@ import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 
 import { useAuth } from '@/core';
-import { translate } from '@/core';
-import { FocusAwareStatusBar, ScrollView, Text, View } from '@/ui';
-import { Github, Rate, Share, Support, Website } from '@/ui/icons';
+import { FocusAwareStatusBar, ScrollView, View } from '@/ui';
+import { Instagram, Rate, Share, Website } from '@/ui/icons';
 import colors from '@/ui/theme/colors';
 
 import { Item } from './item';
 import { ItemsContainer } from './items-container';
-import { LanguageItem } from './language-item';
-import { ThemeItem } from './theme-item';
 
 export const Settings = () => {
   const signOut = useAuth.use.signout();
@@ -23,15 +20,7 @@ export const Settings = () => {
       <FocusAwareStatusBar />
 
       <ScrollView>
-        <View className="flex-1 px-4 pt-16 ">
-          <Text variant="lg" className="font-bold">
-            {translate('settings.title')}
-          </Text>
-          <ItemsContainer title="settings.generale">
-            <LanguageItem />
-            <ThemeItem />
-          </ItemsContainer>
-
+        <View className="flex-1 px-4">
           <ItemsContainer title="settings.about">
             <Item text="settings.app_name" value={Env.NAME} />
             <Item text="settings.version" value={Env.VERSION} />
@@ -48,19 +37,12 @@ export const Settings = () => {
               icon={<Rate color={iconColor} />}
               onPress={() => {}}
             />
-            <Item
-              text="settings.support"
-              icon={<Support color={iconColor} />}
-              onPress={() => {}}
-            />
           </ItemsContainer>
 
           <ItemsContainer title="settings.links">
-            <Item text="settings.privacy" onPress={() => {}} />
-            <Item text="settings.terms" onPress={() => {}} />
             <Item
-              text="settings.github"
-              icon={<Github color={iconColor} />}
+              text="settings.instagram"
+              icon={<Instagram color={iconColor} />}
               onPress={() => {}}
             />
             <Item
