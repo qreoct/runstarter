@@ -6,7 +6,7 @@ import type { ComponentType } from 'react';
 import * as React from 'react';
 import type { SvgProps } from 'react-native-svg';
 
-import { Friends, NewRun } from '@/screens';
+import { NewRun } from '@/screens';
 import {
   colors,
   Controller as ControllerIcon,
@@ -14,6 +14,7 @@ import {
   Runner as RunnerIcon,
 } from '@/ui';
 
+import { FriendsNavigator } from './friends-navigator';
 import { ProfileNavigator } from './profile-navigator';
 
 type TabParamList = {
@@ -52,7 +53,7 @@ export type TabList<T extends keyof TabParamList> = {
 const tabs: TabType[] = [
   {
     name: 'Friends',
-    component: Friends,
+    component: FriendsNavigator,
     label: 'Friends',
   },
   // {
