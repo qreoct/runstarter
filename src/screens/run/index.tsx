@@ -2,10 +2,19 @@ import Geolocation from '@react-native-community/geolocation';
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import React, { useEffect, useRef, useState } from 'react';
-import { Button } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 import { auth, db } from '@/database/firebase-config';
-import { FocusAwareStatusBar, ScrollView, Text, View } from '@/ui';
+import {
+  Button,
+  FocusAwareStatusBar,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  Pause as PauseIcon,
+} from '@/ui';
 
 export interface Coords {
   latitude: number;
@@ -202,40 +211,72 @@ export const Run = (props: RunProps) => {
 
   return (
     <>
-      <FocusAwareStatusBar />
-      <ScrollView className="flex bg-black pt-16">
-        <View className="flex flex-row justify-center gap-x-4">
-          <View className="items-center">
-            <Text className="text-xl text-white">
+      <SafeAreaView className="h-full flex bg-black justify-between">
+        <View className="flex flex-row justify-center gap-x-4  h-1/5">
+          <View className="items-center w-22">
+            <Text className="text-2xl text-white font-bold">
               {(distance / 1000).toFixed(2)}
             </Text>
-            <Text className="text-white">kilometres</Text>
+            <Text className="text-white/50 font-semibold">kilometres</Text>
           </View>
-          <View className="items-center">
-            <Text className="text-xl text-white">
-              {avgPace.toFixed(2)} min/km
+          <View className="items-center w-22">
+            <Text className="text-2xl text-white font-bold">
+              {avgPace.toFixed(2)}
             </Text>
-            <Text className="text-white">Avg. Pace</Text>
+            <Text className="text-white/50 font-semibold">Avg. Pace</Text>
           </View>
-          <View className="items-center">
-            <Text className="text-xl text-white">
+          <View className="items-center w-22">
+            <Text className="text-2xl text-white font-bold">
               {Math.floor(timeElapsed / 60)
                 .toString()
                 .padStart(2, '0')}
               :{(timeElapsed % 60).toString().padStart(2, '0')}
             </Text>
-            <Text className="text-white">Time</Text>
+            <Text className="text-white/50 font-semibold">Time</Text>
           </View>
         </View>
 
-        {isRunning ? (
-          <Button title="Pause" onPress={() => setIsRunning(false)} />
-        ) : (
-          <View className="flex flex-col">
-            <Button title="Resume" onPress={() => setIsRunning(true)} />
-            <Button title="Finish" onPress={() => handleFinish()} />
-          </View>
-        )}
+        <View className="flex items-center">
+          <Text className="text-8xl text-white font-bold italic">
+            {Math.floor(timeElapsed / 60)
+              .toString()
+              .padStart(2, '0')}
+            :{(timeElapsed % 60).toString().padStart(2, '0')}
+          </Text>
+          <Text className="text-xl text-white/50 font-semibold">Time</Text>
+        </View>
+
+        <View className="flex items-center h-1/5">
+          {isRunning ? (
+            <TouchableOpacity
+              className="bg-white w-20 h-20 rounded-full flex justify-center items-center"
+              onPress={() => {
+                setIsRunning(false);
+              }}
+            >
+              <Ionicons name="ios-pause" size={32} color="black" />
+            </TouchableOpacity>
+          ) : (
+            <View className="flex flex-row gap-20">
+              <TouchableOpacity
+                className="bg-red-600 w-20 h-20 rounded-full flex justify-center items-center"
+                onPress={() => {
+                  handleFinish();
+                }}
+              >
+                <Ionicons name="ios-stop" size={32} color="black" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="bg-white w-20 h-20 rounded-full flex justify-center items-center"
+                onPress={() => {
+                  setIsRunning(true);
+                }}
+              >
+                <Ionicons name="ios-play" size={32} color="black" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
 
         {/* {positionRecords.length > 0 ? (
           <WalkedPathMap coords={positionRecords.map((r) => r.coords)} />
@@ -256,7 +297,7 @@ export const Run = (props: RunProps) => {
             </View>
           ))}
         </View> */}
-      </ScrollView>
+      </SafeAreaView>
     </>
   );
 };
