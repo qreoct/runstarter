@@ -2,12 +2,12 @@ import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { Avatar } from '@rneui/base';
 import { Button } from '@rneui/themed';
 import React, { useCallback, useRef, useState } from 'react';
-import { Modal, TouchableOpacity } from 'react-native';
+import { Modal } from 'react-native';
 
 import type { User } from '@/api';
 import { fetchUsersWithIds } from '@/api';
 import { useAuth } from '@/core';
-import { FocusAwareStatusBar, Text, View } from '@/ui';
+import { FocusAwareStatusBar, Text, View, TouchableOpacity } from '@/ui';
 
 import { Run } from '../run';
 import { RunReport } from '../run_report';
@@ -20,9 +20,7 @@ export const NewRun: React.FC = () => {
   const currentUser = useAuth().currentUser;
   const [isRunModalVisible, setRunModalVisibility] = useState(false);
   // const [runReportId, setRunReportId] = useState<string | null>(null);
-  const [runReportId, setRunReportId] = useState<string | null>(
-    'P4SMyWStH8jVBUlMHvdI'
-  );
+  const [runReportId, setRunReportId] = useState<string | null>(null);
 
   const handlePress = () => {
     setRunModalVisibility(!isRunModalVisible);

@@ -241,7 +241,7 @@ export const Run = (props: RunProps) => {
   return (
     <>
       <SafeAreaView className="h-full flex bg-black justify-between">
-        <View className="flex flex-1 flex-cols justify-between">
+        <View className="py-4 flex flex-1 flex-cols justify-between">
           <View className="flex flex-row justify-center gap-x-4">
             <View className="items-center w-22">
               <Text className="text-2xl text-white font-bold">
