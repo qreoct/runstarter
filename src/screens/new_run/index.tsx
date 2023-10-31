@@ -16,7 +16,7 @@ export const NewRun: React.FC = () => {
   const [roomID, setRoomID] = useState('');
   const [players, setPlayers] = useState([]);
   const [lastStatus, setLastStatus] = useState('');
-  const idDict = {'Jeff': 'kQysyUbEChPEt9gvEuLhoCuDaNl2',
+  const idDict = {'Jeff': 'VJZF29ubd4PqxRoCzlH6Gnvjsdf2',
                   'Kleon': 'D2zbDPVU39cR5FvA3ihQV21uYfL2',
                   'Dexter': 'vDLWFZf8FUNpqIa5qgupyg1Nmu83' };
 

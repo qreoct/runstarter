@@ -4,7 +4,7 @@ from flask import Flask, request
 from flask_socketio import SocketIO, emit, join_room, leave_room, close_room, rooms
 from flask_cors import CORS
 
-cred = credentials.Certificate('firebase_service_key.json')
+cred = credentials.Certificate('firebase-service-key.json')
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 app = Flask(__name__)
@@ -83,6 +83,26 @@ def end_game(game_id):
     emit('status_change', {'status': 'game ended'}, room=game_id)
     emit('game_ended', room=game_id)
 
+@socketio.on('connect')
+def on_connect():
+    firebase_uid = request.args.get('user_id')
+    socket_session_id = request.sid
+    users[firebase_uid] = {
+        "sid": socket_session_id,
+        "currentGame": None,
+        "invited": [],
+    }
+    print(users)
+
+@socketio.on('disconnect')
+def on_disconnect():
+    firebase_uid = request.args.get('user_id')
+    if firebase_uid in users:
+        if users[firebase_uid]["currentGame"]:
+            leave_room(users[firebase_uid]["currentGame"])
+        users.pop(firebase_uid)
+    print(users)
+
 @socketio.on('create_game')
 def create_game(data):
     user_id = data['user_id']
@@ -102,11 +122,7 @@ def create_game(data):
     print("Room:", game_id)
     print("User:", user_id)
     active_games[game_id] = game_state
-    users[user_id] = {
-        "sid": request.sid,
-        "currentGame": game_id,
-        "invited": [],
-    }
+    users[user_id]["currentGame"] = game_id
     join_room(game_id)
     emit('game_created', { 'game_id': game_id }, room=game_id)
     emit('player_change', {'players': active_games[game_id]["players"], 'player_names': active_games[game_id]["player_names"] } , room=game_id)
@@ -124,15 +140,11 @@ def invite_to_game(data):
         print('invitee_not_found')
         return
     
-    users[invitee_id] = {
-        "currentGame": None,
-        "invited": [game_id],
-    }
-
+    users[invitee_id]["invited"] = game_id
     active_games[game_id]["invited"].append(invitee_id)
-
+    print(active_games[game_id])
     inviter_name = get_user_data(user_id)["name"]
-
+    print("u:", users[invitee_id])
     emit('status_change', {'status': f'{invitee["name"]} invited'}, room=game_id)
     emit('game_invited', { 'inviter_name': inviter_name, 'game_id': game_id }, room=users[invitee_id]["sid"])
     return { 'user_id': user_id, 'invitee_id': invitee_id, 'game_id': game_id }
@@ -159,7 +171,9 @@ def leave_game(data):
     users[user_id]["currentGame"] = None
     name = get_user_data(user_id)["name"]
     leave_room(game_id)
-    emit('player_change', {'players': active_games[game_id]['players'], 'player_names': active_games[game_id]["player_names"]} , room=game_id)
+    emit('player_change', {'players': active_games[game_id]['players'] if active_games[game_id] else [], 
+                           'player_names': active_games[game_id]["player_names"] if active_games[game_id] else []} , 
+                           room=game_id)
     emit('status_change', {'status': f'{name} left game'}, room=game_id)
 
 @socketio.on('join_game')
@@ -167,6 +181,8 @@ def join_game(data):
     # After user accepts invitation
     user_id = data['user_id']
     game_id = data['game_id']
+    print("game:", game_id)
+    print(active_games[game_id])
     if user_id not in active_games[game_id]["invited"]:
         print(f'User {user_id} not invited to game {game_id}!')
         return

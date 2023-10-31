@@ -13,6 +13,7 @@ import {
   setOnboardingToken,
   setToken,
 } from './utils';
+import { deinitializeSocket, initializeSocket } from 'server/server-utils';
 
 interface AuthState {
   token: TokenType | null;
@@ -33,11 +34,14 @@ const _useAuth = create<AuthState>((set, get) => ({
   signin: (token) => {
     setToken(token);
     set({ status: 'signIn', token });
+    deinitializeSocket();
+    initializeSocket();
   },
   signout: () => {
     signOut(auth);
     removeToken();
     set({ status: 'signOut', token: null });
+    deinitializeSocket();
   },
   hydrate: () => {
     try {

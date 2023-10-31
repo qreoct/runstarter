@@ -2,40 +2,62 @@ import { auth } from '@/database';
 import { io } from 'socket.io-client';
 
 // Replace the IP address with your own public IP address for testing
-export const socket = io("http://172.25.109.164:5000", { transports: ["websocket"] });
+export let socket: any;
 
-socket.on('connect', () => {
-  console.log('Connected to server!'); 
-});
+// // const [user, setUser] = useState(auth.currentUser);
+// // export const [socket, setSocket] = useState(io);
+export const initializeSocket = () => {
+  if (!socket) {
+    socket = io("http://192.168.1.139:5000", { 
+      transports: ["websocket"],
+      query: {
+        user_id: auth.currentUser?.uid
+      }
+    });
 
-socket.on('disconnect', () => {
-  console.log('Disconnected from server!');
-});
+    // Event listeners
+    socket.on('connect', () => {
+      console.log('Connected to server!'); 
+    });
 
-socket.on('game_invited', (data: any) => {
-  console.log('You have been invited to a game by ' + data.inviter_name + '!');
-  console.log(data);
-});
+    socket.on('disconnect', () => {
+      console.log('Disconnected from server!');
+    });
+    
+    socket.on('game_invited', (data: any) => {
+      console.log('You have been invited to a game by ' + data.inviter_name + '!');
+      console.log(data);
+    });
+    
+    socket.on('game_started', (data: any) => { 
+      console.log('Game started on server!');
+      console.log(data);
+    });
+    
+    socket.on('game_ended', (data: any) => { 
+      console.log('Game ended on server!');
+      console.log(data);
+    });
+    
+    socket.on('game_paused', (data: any) => { 
+      console.log('Game paused on server by ' + data.pauser + ' !');
+      console.log(data);
+    });
+    
+    socket.on('game_resumed', (data: any) => { 
+      console.log('Game resumed on server!');
+      console.log(data);
+    });
+  }
+  return socket;
+}
 
-socket.on('game_started', (data: any) => { 
-  console.log('Game started on server!');
-  console.log(data);
-});
-
-socket.on('game_ended', (data: any) => { 
-  console.log('Game ended on server!');
-  console.log(data);
-});
-
-socket.on('game_paused', (data: any) => { 
-  console.log('Game paused on server by ' + data.pauser + ' !');
-  console.log(data);
-});
-
-socket.on('game_resumed', (data: any) => { 
-  console.log('Game resumed on server!');
-  console.log(data);
-});
+export const deinitializeSocket = () => {
+  if (socket) {
+    socket.disconnect();
+    socket = null;
+  }
+}
 
 export const createGame = () => {
   if (!auth.currentUser) {
