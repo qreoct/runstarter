@@ -1,6 +1,11 @@
 import Geolocation from '@react-native-community/geolocation';
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import {
+  FieldValue,
+  addDoc,
+  collection,
+  serverTimestamp,
+} from 'firebase/firestore';
 import React, { useEffect, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -22,13 +27,20 @@ export interface Coords {
   longitude: number;
 }
 
-interface PositionRecord {
+export interface PositionRecord {
   coords: Coords;
   distance: number;
 }
 
+export interface Run {
+  timeElapsed: number;
+  distance: number;
+  timestamp: FieldValue;
+  route: PositionRecord[];
+}
+
 export interface RunProps {
-  onFinish: () => void;
+  onFinish: (id: string | null) => void;
 }
 
 const audioFiles: { [key: number]: any } = {
@@ -49,7 +61,7 @@ export const Run = (props: RunProps) => {
   const [distance, setDistance] = useState<number>(0);
   const [timeElapsed, setTimeElapsed] = useState<number>(0);
   const previousPositionRef = useRef<Coords | null>(null);
-  const [_positionRecords, setPositionRecords] = useState<PositionRecord[]>([]);
+  const [positionRecords, setPositionRecords] = useState<PositionRecord[]>([]);
   const [isRunning, setIsRunning] = useState<boolean>(true);
   const playedDistancesRef = useRef(new Set<number>());
 
@@ -195,10 +207,11 @@ export const Run = (props: RunProps) => {
       }
 
       // Prepare data for Firestore
-      const runData = {
+      const runData: Run = {
         timeElapsed,
         distance,
         timestamp: serverTimestamp(),
+        route: positionRecords,
       };
 
       // Reference to the current user's runs sub-collection
@@ -208,11 +221,11 @@ export const Run = (props: RunProps) => {
       const docRef = await addDoc(runsCollectionRef, runData);
 
       console.log('Document saved with ID: ', docRef.id);
+      props.onFinish(docRef.id);
     } catch (error) {
       console.error('Error saving to Firestore: ', error);
+      props.onFinish(null);
     }
-
-    props.onFinish();
   };
 
   const avgPace =
@@ -247,7 +260,7 @@ export const Run = (props: RunProps) => {
           </View>
 
           <View className="flex items-center">
-            <Text className="text-8xl text-white font-bold italic">
+            <Text className="text-8xl text-white font-extrabold italic">
               {Math.floor(timeElapsed / 60)
                 .toString()
                 .padStart(2, '0')}

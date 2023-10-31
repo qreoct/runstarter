@@ -1,5 +1,4 @@
 import React from 'react';
-import { Dimensions } from 'react-native';
 import MapView, { Polyline } from 'react-native-maps';
 
 import type { Coords } from './index';
@@ -15,11 +14,6 @@ const WalkedPathMap = ({ coords: inputCoords }: { coords: Coords[] }) => {
   //   latitudeDelta: 0.005, // Adjust as needed
   //   longitudeDelta: 0.005, // Adjust as needed
   // };
-
-  const mapStyle = {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height * 0.4,
-  };
 
   const calculateRegion = (coords: Coords[]) => {
     console.log(coords.length);
@@ -54,11 +48,7 @@ const WalkedPathMap = ({ coords: inputCoords }: { coords: Coords[] }) => {
   };
 
   return (
-    <MapView
-      style={mapStyle}
-      region={calculateRegion(inputCoords) ?? undefined}
-      className="bg-red-200"
-    >
+    <MapView region={calculateRegion(inputCoords) ?? undefined}>
       <Polyline
         coordinates={inputCoords}
         strokeColor="#000" // Black color
