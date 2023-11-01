@@ -1,7 +1,7 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
 from flask import Flask, request
-from flask_socketio import SocketIO, emit, join_room, leave_room, close_room, rooms
+from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_cors import CORS
 
 cred = credentials.Certificate('firebase-service-key.json')
@@ -86,22 +86,27 @@ def end_game(game_id):
 @socketio.on('connect')
 def on_connect():
     firebase_uid = request.args.get('user_id')
+    if firebase_uid == 'undefined':
+        return
     socket_session_id = request.sid
-    users[firebase_uid] = {
-        "sid": socket_session_id,
-        "currentGame": None,
-        "invited": [],
-    }
+    if firebase_uid in users:
+        users[firebase_uid]["sid"] = socket_session_id
+    else:
+        users[firebase_uid] = {
+            "sid": socket_session_id,
+            "currentGame": None,
+            "invited": [],
+        }
     print(users)
 
 @socketio.on('disconnect')
 def on_disconnect():
     firebase_uid = request.args.get('user_id')
-    if firebase_uid in users:
-        if users[firebase_uid]["currentGame"]:
-            leave_room(users[firebase_uid]["currentGame"])
-        users.pop(firebase_uid)
-    print(users)
+    # if firebase_uid in users:
+    #     if users[firebase_uid]["currentGame"]:
+    #         leave_room(users[firebase_uid]["currentGame"])
+    #     users.pop(firebase_uid)
+    print(firebase_uid + ' disconnected')
 
 @socketio.on('create_game')
 def create_game(data):

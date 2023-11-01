@@ -1,14 +1,13 @@
 import { auth } from '@/database';
 import { io } from 'socket.io-client';
 
-// Replace the IP address with your own public IP address for testing
+
 export let socket: any;
 
-// // const [user, setUser] = useState(auth.currentUser);
-// // export const [socket, setSocket] = useState(io);
 export const initializeSocket = () => {
   if (!socket) {
-    socket = io("http://192.168.1.139:5000", { 
+    // Replace the IP address with your own public IP address for testing
+    socket = io("https://runsquad-02386feb1781.herokuapp.com", { 
       transports: ["websocket"],
       query: {
         user_id: auth.currentUser?.uid
