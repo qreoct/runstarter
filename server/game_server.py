@@ -6,6 +6,7 @@ from flask_cors import CORS
 
 cred = credentials.Certificate('firebase-service-key.json')
 firebase_admin.initialize_app(cred)
+print("firebase initialized:", firebase_admin.get_app())
 db = firestore.client()
 app = Flask(__name__)
 CORS(app, resources={r"/*":{"origins":"*"}})
@@ -33,13 +34,21 @@ active_games = {
 
 def get_user_data(user_id):
     # Reference to the users collection
+    print("querying user data from db")
     users_ref = db.collection('users')
+    print("fetched users ref:", users_ref)
     
     # Fetch the document with the given user_id
-    doc = users_ref.document(user_id).get()
+    try:
+        doc = users_ref.document(user_id).get()
+    except Exception as e:
+        print("error getting user data:", e)
+        return None
+    print("doc:", doc)
     
     # Check if the document exists and return its data
     if doc.exists:
+        print("doc exists:", doc.to_dict())
         return doc.to_dict()
     else:
         return None
@@ -110,9 +119,13 @@ def on_disconnect():
 
 @socketio.on('create_game')
 def create_game(data):
+    print("creating game")
     user_id = data['user_id']
+    print("uid:", user_id)
     name = get_user_data(user_id)["name"]
+    print("name:", name)
     games_ref = db.collection('games')
+    print("fetched games")
     game_state = {
         "creator": user_id,
         "players": [user_id],
@@ -122,7 +135,12 @@ def create_game(data):
         "paused": False,
         "pauser": None,
     }
-    _, new_game = games_ref.add(game_state)
+    try:
+        _, new_game = games_ref.add(game_state)
+    except Exception as e:
+        print("error adding game:", e)
+        return
+    print("added games")
     game_id = new_game.id
     print("Room:", game_id)
     print("User:", user_id)
