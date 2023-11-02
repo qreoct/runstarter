@@ -1,11 +1,11 @@
-import { SearchBar } from '@rneui/themed';
+import { Avatar, Button, SearchBar } from '@rneui/themed';
 import { FlashList } from '@shopify/flash-list';
 import * as React from 'react';
 import { Platform } from 'react-native';
 
 import useDebounce from '@/core/hooks/use-debounce';
 import type { User } from '@/database';
-import { fetchUsers } from '@/database';
+import { auth, fetchUsers } from '@/database';
 import { EmptyList, Text, View } from '@/ui';
 
 // interface User {
@@ -38,7 +38,9 @@ export const AddFriend = () => {
     async function makeAPICall() {
       setLoading(true);
       const users = await fetchUsers(debouncedSearch);
-      setResults(users);
+      if (auth.currentUser) {
+        setResults(users.filter((user) => user.id !== auth.currentUser?.uid));
+      }
       setLoading(false);
     }
     makeAPICall();
@@ -57,11 +59,18 @@ export const AddFriend = () => {
     ({ item }: { item: User }) => (
       <View className="flex-row items-center justify-between py-2">
         <View className="mr-2 flex-row items-center space-x-2">
-          {/* <Avatar size="medium" rounded source={{ uri: item.photoURL }} /> */}
+          <Avatar
+            size="medium"
+            rounded
+            source={{ uri: item.photoURL ?? 'https://picsum.photos/200' }}
+          />
           <View className="mb-1">
-            <Text className="font-bold">{item.name}</Text>
+            <Text className="font-bold">
+              {item.name} {item.id.slice(0, 5)}
+            </Text>
           </View>
         </View>
+        <Button type="clear">Add</Button>
       </View>
     ),
     []

@@ -1,4 +1,4 @@
-import { Avatar } from '@rneui/themed';
+import { Avatar, Button } from '@rneui/themed';
 import { FlashList } from '@shopify/flash-list';
 import * as React from 'react';
 
@@ -46,6 +46,10 @@ export const FriendRequests = () => {
           <View className="mb-1">
             <Text className="font-bold">{item.displayName}</Text>
           </View>
+        </View>
+        <View className="flex-row">
+          <Button type="solid">Accept</Button>
+          <Button type="clear">Reject</Button>
         </View>
       </View>
     ),
