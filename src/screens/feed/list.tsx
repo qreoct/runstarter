@@ -27,7 +27,7 @@ export const Feed = () => {
     );
   }
   return (
-    <View className="flex-1 ">
+    <View className="min-h-min flex-1">
       <FocusAwareStatusBar />
       <FlashList
         data={data}

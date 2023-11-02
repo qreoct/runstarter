@@ -54,7 +54,7 @@ export const FriendRequests = () => {
 
   return (
     <View className="flex-1 px-2">
-      <View className="mx-2 h-full">
+      <View className="mx-2 h-full min-h-min">
         <FlashList
           data={results}
           renderItem={renderItem}

@@ -89,7 +89,7 @@ export const FriendsFeed = () => {
     <>
       <FocusAwareStatusBar />
       <ScrollView>
-        <View className="h-full flex-1 px-2 pt-2">
+        <View className="h-full min-h-min flex-1 px-2 pt-2">
           <Button type="clear" onPress={() => navigate('FriendRequests')}>
             Friend Requests (1)
           </Button>
