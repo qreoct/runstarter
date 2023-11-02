@@ -1,8 +1,21 @@
-import { Tab, TabView, Text } from '@rneui/themed';
+import { Skeleton, Tab, TabView, Text } from '@rneui/themed';
 import React from 'react';
 
 import { fetchCurrentUser, type User } from '@/database';
 import { FocusAwareStatusBar, Image, ScrollView, View } from '@/ui';
+
+const EmptyState = () => {
+  return (
+    <View className="flex-1 pt-4">
+      <View className="items-center justify-center space-y-4">
+        <Skeleton circle width={208} height={208} />
+        <View>
+          <Skeleton width={300} height={40} />
+        </View>
+      </View>
+    </View>
+  );
+};
 
 export const Profile = () => {
   const [index, setIndex] = React.useState(0);
@@ -15,7 +28,7 @@ export const Profile = () => {
   return (
     <>
       <FocusAwareStatusBar />
-      {user === null && <Text>Loading...</Text>}
+      {user === null && <EmptyState />}
       {user && (
         <View className="flex-1 pt-4">
           <View className="items-center justify-center">
