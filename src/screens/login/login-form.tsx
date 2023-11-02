@@ -66,7 +66,11 @@ export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
         await addUserIfNotExist(user.uid);
         const userOnboardingState = await getUserOnboarding(user.uid);
         setOnboarding(userOnboardingState);
-        signin({ access: 'access-token', refresh: 'refresh-token' });
+        signin({
+          access: 'access-token',
+          refresh: 'refresh-token',
+          id: user.uid,
+        });
       } else {
         console.log('NO USER');
       }

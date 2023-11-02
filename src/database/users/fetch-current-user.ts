@@ -6,7 +6,7 @@ import { userConverter } from './users-converter';
 
 export async function fetchCurrentUser() {
   if (auth.currentUser == null) {
-    return null;
+    return Promise.reject();
   }
   const userRef = doc(db, 'users', auth.currentUser.uid).withConverter(
     userConverter

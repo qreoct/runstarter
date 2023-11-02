@@ -15,6 +15,7 @@ import {
 } from './utils';
 
 interface AuthState {
+  userId: string;
   token: TokenType | null;
   status: 'idle' | 'signOut' | 'signIn';
   onboardingStatus: boolean;
@@ -28,16 +29,18 @@ interface AuthState {
 const _useAuth = create<AuthState>((set, get) => ({
   status: 'idle',
   token: null,
+  userId: '',
   onboardingStatus: false,
   onboardingToken: null,
   signin: (token) => {
     setToken(token);
-    set({ status: 'signIn', token });
+    set({ status: 'signIn', token, userId: token.id });
+    console.log('token has been set to ', token);
   },
   signout: () => {
     signOut(auth);
     removeToken();
-    set({ status: 'signOut', token: null });
+    set({ status: 'signOut', token: null, userId: '' });
   },
   hydrate: () => {
     try {
@@ -65,6 +68,7 @@ const _useAuth = create<AuthState>((set, get) => ({
       setOnboardingToken({
         access: 'onboarding-access-token',
         refresh: 'onboarding-refresh-token',
+        id: 'onboarding-id',
       });
     } else {
       removeOnboardingToken();

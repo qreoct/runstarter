@@ -7,11 +7,13 @@ import { userConverter } from './users-converter';
 
 export const fetchUsers = async (name = '') => {
   const usersRef = collection(db, 'users').withConverter(userConverter);
-  const q = query(
-    usersRef,
+
+  const queryConstraints = [
     where('name', '>=', name),
-    where('name', '<=', name + '\uf8ff')
-  );
+    where('name', '<=', name + '\uf8ff'),
+  ];
+
+  const q = query(usersRef, ...queryConstraints);
   const docSnap = await getDocs(q);
 
   let res: User[] = [];

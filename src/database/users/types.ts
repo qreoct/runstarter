@@ -6,4 +6,9 @@ export type User = {
   gender: string;
   runningGoal: string;
   runningHabit: string;
+  friends: string[];
+  friendRequests: {
+    pending: string[];
+    received: string[];
+  };
 };

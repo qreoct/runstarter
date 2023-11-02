@@ -10,6 +10,8 @@ export const userConverter = {
     gender: user.gender,
     runningGoal: user.runningGoal,
     runningHabit: user.runningHabit,
+    friends: user.friends,
+    friendRequests: user.friendRequests,
   }),
   fromFirestore: (snapshot: any, options: any) => {
     const data = snapshot.data(options);
@@ -20,6 +22,8 @@ export const userConverter = {
       photoURL: data.photoURL,
       runningGoal: data.runningGoal,
       runningHabit: data.runningHabit,
+      friends: data.friends,
+      friendRequests: data.friendRequests,
     };
   },
 };
