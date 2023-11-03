@@ -54,7 +54,7 @@ export const NewRun: React.FC = () => {
 
   return (
     <>
-      <FocusAwareStatusBar />
+      <FocusAwareStatusBar hidden={isRunModalVisible}/>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <TouchableOpacity
           style={{

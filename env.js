@@ -84,6 +84,7 @@ const client = z.object({
   REACT_APP_FIREBASE_MESSAGING_SENDER_ID: z.string(),
   REACT_APP_FIREBASE_APP_ID: z.string(),
   REACT_APP_FIREBASE_MEASUREMENT_ID: z.string(),
+  GOOGLE_MAPS_API_KEY: z.string(),
 });
 
 const buildTime = z.object({
@@ -117,6 +118,7 @@ const _clientEnv = {
   REACT_APP_FIREBASE_APP_ID: process.env.REACT_APP_FIREBASE_APP_ID,
   REACT_APP_FIREBASE_MEASUREMENT_ID:
     process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
+  GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
 };
 
 /**
