@@ -24,25 +24,34 @@ export const AddFriend = () => {
   const currentUserUid = useAuth().userId;
 
   React.useEffect(() => {
-    fetchCurrentUser().then((res) => {
-      setCurrentUser(res);
-      setPendingIds(res.friendRequests?.pending ?? []);
-      setReceivedIds(res.friendRequests?.received ?? []);
-    });
+    fetchCurrentUser()
+      .then((res) => {
+        setCurrentUser(res);
+        setPendingIds(res.friendRequests?.pending ?? []);
+        setReceivedIds(res.friendRequests?.received ?? []);
+      })
+      .catch(() => {
+        showErrorMessage('Failed to fetch current user.');
+      });
   }, []);
 
   React.useEffect(() => {
     async function makeAPICall() {
       setLoading(true);
-      const users = await fetchUsers(debouncedSearch);
-      setResults(
-        users.filter(
-          (user) =>
-            user.id !== currentUserUid &&
-            !currentUser?.friends.includes(user.id)
-        )
-      );
-      setLoading(false);
+      await fetchUsers(debouncedSearch)
+        .then((users) => {
+          setResults(
+            users.filter(
+              (user) =>
+                user.id !== currentUserUid &&
+                !currentUser?.friends.includes(user.id)
+            )
+          );
+          setLoading(false);
+        })
+        .catch(() => {
+          showErrorMessage('Failed to fetch users.');
+        });
     }
     makeAPICall();
   }, [debouncedSearch, currentUserUid, currentUser?.friends]);

@@ -2,7 +2,13 @@ import { Skeleton, Tab, TabView, Text } from '@rneui/themed';
 import React from 'react';
 
 import { fetchCurrentUser, type User } from '@/database';
-import { FocusAwareStatusBar, Image, ScrollView, View } from '@/ui';
+import {
+  FocusAwareStatusBar,
+  Image,
+  ScrollView,
+  showErrorMessage,
+  View,
+} from '@/ui';
 
 const EmptyState = () => {
   return (
@@ -22,7 +28,11 @@ export const Profile = () => {
   const [user, setUser] = React.useState<User | null>(null);
 
   React.useEffect(() => {
-    fetchCurrentUser().then((res) => setUser(res));
+    fetchCurrentUser()
+      .then((res) => setUser(res))
+      .catch(() => {
+        showErrorMessage('Failed to fetch current user.');
+      });
   }, []);
 
   return (

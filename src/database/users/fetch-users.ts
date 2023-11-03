@@ -14,11 +14,12 @@ export const fetchUsers = async (name = '') => {
   ];
 
   const q = query(usersRef, ...queryConstraints);
-  const docSnap = await getDocs(q);
 
   let res: User[] = [];
-  docSnap.forEach((doc) => {
-    res.push({ id: doc.id, ...doc.data() });
+  await getDocs(q).then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+      res.push({ id: doc.id, ...doc.data() });
+    });
   });
   return res;
 };
