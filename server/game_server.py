@@ -1,16 +1,22 @@
-import firebase_admin
-from firebase_admin import credentials, firestore
+from gevent import monkey
+monkey.patch_all()
+
+import grpc.experimental.gevent as grpc_gevent
+grpc_gevent.init_gevent()
+
 from flask import Flask, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_cors import CORS
+import firebase_admin
+from firebase_admin import credentials, firestore
 
+app = Flask(__name__)
+CORS(app, resources={r"/*":{"origins":"*"}})
+socketio = SocketIO(app, cors_allowed_origins="*")
 cred = credentials.Certificate('firebase-service-key.json')
 firebase_admin.initialize_app(cred)
 print("firebase initialized:", firebase_admin.get_app())
 db = firestore.client()
-app = Flask(__name__)
-CORS(app, resources={r"/*":{"origins":"*"}})
-socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Storage and game state
 # These are only local storage, will be added to database only when game ends
