@@ -25,7 +25,7 @@ type Activity = {
 
 export const FriendsFeed = () => {
   const { navigate } = useNavigation();
-  const currentUser = useAuth().currentUser!;
+  const currentUser = useAuth().currentUser;
 
   const [activity, setActivity] = React.useState<Activity[]>([]);
 
@@ -39,23 +39,22 @@ export const FriendsFeed = () => {
   };
 
   useEffect(() => {
-    if (currentUser.friends.length === 0) return;
+    if (!currentUser || currentUser.friends?.length === 0) return;
     // fetchActivityForUsers(ids)
     fetchUsersWithIds(currentUser.friends).then((users) => {
+      let friendsActivity: Activity[] = [];
       users.forEach((user) => {
-        setActivity((prev) => [
-          ...prev,
-          {
-            user: user,
-            message: 'I ran 5.2km and won in Duck Duck Chase!',
-            avatar:
-              'https://images.pexels.com/photos/598745/pexels-photo-598745.jpeg?crop=faces&fit=crop&h=200&w=200&auto=compress&cs=tinysrgb',
-            timestamp: '5H',
-          },
-        ]);
+        friendsActivity.push({
+          user: user,
+          message: 'I ran 5.2km and won in Duck Duck Chase!',
+          avatar:
+            'https://images.pexels.com/photos/598745/pexels-photo-598745.jpeg?crop=faces&fit=crop&h=200&w=200&auto=compress&cs=tinysrgb',
+          timestamp: '5H',
+        });
+        setActivity(friendsActivity);
       });
     });
-  }, [currentUser.friends]);
+  }, [currentUser, currentUser?.friends]);
 
   const renderItem = React.useCallback(
     ({ item }: { item: Activity }) => (
