@@ -6,20 +6,22 @@ import type { ComponentType } from 'react';
 import * as React from 'react';
 import type { SvgProps } from 'react-native-svg';
 
-import { NewRun, Run, Settings } from '@/screens';
+import { Friends, NewRun } from '@/screens';
 import {
   colors,
-  Feed as FeedIcon,
-  Settings as SettingsIcon,
-  Style as StyleIcon,
+  Controller as ControllerIcon,
+  Profile as ProfileIcon,
+  Runner as RunnerIcon,
 } from '@/ui';
 
+import { ProfileNavigator } from './profile-navigator';
+
 type TabParamList = {
-  // Style: undefined;
-  Run: undefined;
-  // FeedNavigator: undefined;
+  Friends: undefined;
+  // Run: undefined;
+  ProfileNavigator: undefined;
   NewRun: undefined;
-  Settings: undefined;
+  // Settings: undefined;
 };
 
 type TabType = {
@@ -35,11 +37,11 @@ type TabIconsType = {
 const Tab = createBottomTabNavigator<TabParamList>();
 
 const tabsIcons: TabIconsType = {
-  // Style: (props: SvgProps) => <StyleIcon {...props} />,
-  Run: (props: SvgProps) => <StyleIcon {...props} />,
-  // FeedNavigator: (props: SvgProps) => <FeedIcon {...props} />,
-  NewRun: (props: SvgProps) => <FeedIcon {...props} />,
-  Settings: (props: SvgProps) => <SettingsIcon {...props} />,
+  Friends: (props: SvgProps) => <RunnerIcon {...props} />,
+  // Run: (props: SvgProps) => <StyleIcon {...props} />,
+  ProfileNavigator: (props: SvgProps) => <ProfileIcon {...props} />,
+  NewRun: (props: SvgProps) => <ControllerIcon {...props} />,
+  // Settings: (props: SvgProps) => <SettingsIcon {...props} />,
 };
 
 export type TabList<T extends keyof TabParamList> = {
@@ -48,25 +50,25 @@ export type TabList<T extends keyof TabParamList> = {
 };
 
 const tabs: TabType[] = [
-  // {
-  //   name: 'Style',
-  //   component: Style,
-  //   label: 'Style',
-  // },
   {
-    name: 'Run',
-    component: Run,
-    label: 'Run',
+    name: 'Friends',
+    component: Friends,
+    label: 'Friends',
   },
+  // {
+  //   name: 'Run',
+  //   component: Run,
+  //   label: 'Run',
+  // },
   {
     name: 'NewRun',
     component: NewRun,
-    label: 'NewRun',
+    label: 'Games',
   },
   {
-    name: 'Settings',
-    component: Settings,
-    label: 'Settings',
+    name: 'ProfileNavigator',
+    component: ProfileNavigator,
+    label: 'Profile',
   },
 ];
 

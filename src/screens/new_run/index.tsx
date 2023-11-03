@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Modal, Text, TouchableOpacity, View } from 'react-native';
 
+import { FocusAwareStatusBar } from '@/ui';
+
 import { Run } from '../run';
 import { Button } from '@/ui';
 import { createGame, leaveGame, inviteToGame, joinGame, startGame, pauseGame, resumeGame, socket } from 'server/server-utils';
@@ -34,20 +36,22 @@ export const NewRun: React.FC = () => {
   });
   
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <TouchableOpacity
-        style={{
-          backgroundColor: 'green',
-          width: 128,
-          height: 128,
-          borderRadius: 64,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-        onPress={handlePress}
-      >
-        <Text style={{ color: 'white', fontSize: 18 }}>Start</Text>
-      </TouchableOpacity>
+    <>
+      <FocusAwareStatusBar />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableOpacity
+          style={{
+            backgroundColor: 'green',
+            width: 128,
+            height: 128,
+            borderRadius: 64,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          onPress={handlePress}
+        >
+          <Text style={{ color: 'white', fontSize: 18 }}>Start</Text>
+        </TouchableOpacity>
 
       {/** Test buttons for client-server interaction */}
       <Button label="Create Game" onPress={() => {
