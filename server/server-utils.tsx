@@ -7,8 +7,7 @@ export let socket: any;
 export const initializeSocket = () => {
   if (!socket) {
     // Replace the IP address with your own public IP address for testing
-    // "https://runsquad-02386feb1781.herokuapp.com"
-    socket = io("http://172.25.105.124:5000", {
+    socket = io("https://runsquad-02386feb1781.herokuapp.com", {
       transports: ["websocket"],
       query: {
         user_id: auth.currentUser?.uid

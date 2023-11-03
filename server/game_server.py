@@ -12,7 +12,7 @@ from firebase_admin import credentials, firestore
 
 app = Flask(__name__)
 CORS(app, resources={r"/*":{"origins":"*"}})
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='gevent')
 cred = credentials.Certificate('firebase-service-key.json')
 firebase_admin.initialize_app(cred)
 print("firebase initialized:", firebase_admin.get_app())
@@ -40,9 +40,7 @@ active_games = {
 
 def get_user_data(user_id):
     # Reference to the users collection
-    print("querying user data from db")
     users_ref = db.collection('users')
-    print("fetched users ref:", users_ref)
     
     # Fetch the document with the given user_id
     try:
@@ -50,11 +48,9 @@ def get_user_data(user_id):
     except Exception as e:
         print("error getting user data:", e)
         return None
-    print("doc:", doc)
     
     # Check if the document exists and return its data
     if doc.exists:
-        print("doc exists:", doc.to_dict())
         return doc.to_dict()
     else:
         return None
@@ -125,13 +121,9 @@ def on_disconnect():
 
 @socketio.on('create_game')
 def create_game(data):
-    print("creating game")
     user_id = data['user_id']
-    print("uid:", user_id)
     name = get_user_data(user_id)["name"]
-    print("name:", name)
     games_ref = db.collection('games')
-    print("fetched games")
     game_state = {
         "creator": user_id,
         "players": [user_id],
@@ -146,10 +138,9 @@ def create_game(data):
     except Exception as e:
         print("error adding game:", e)
         return
-    print("added games")
     game_id = new_game.id
+    print("User creating game room:", user_id)
     print("Room:", game_id)
-    print("User:", user_id)
     active_games[game_id] = game_state
     users[user_id]["currentGame"] = game_id
     join_room(game_id)
@@ -171,9 +162,7 @@ def invite_to_game(data):
     
     users[invitee_id]["invited"] = game_id
     active_games[game_id]["invited"].append(invitee_id)
-    print(active_games[game_id])
     inviter_name = get_user_data(user_id)["name"]
-    print("u:", users[invitee_id])
     emit('status_change', {'status': f'{invitee["name"]} invited'}, room=game_id)
     emit('game_invited', { 'inviter_name': inviter_name, 'game_id': game_id }, room=users[invitee_id]["sid"])
     return { 'user_id': user_id, 'invitee_id': invitee_id, 'game_id': game_id }
@@ -210,8 +199,7 @@ def join_game(data):
     # After user accepts invitation
     user_id = data['user_id']
     game_id = data['game_id']
-    print("game:", game_id)
-    print(active_games[game_id])
+    print(f"User {user_id} joining game {game_id}")
     if user_id not in active_games[game_id]["invited"]:
         print(f'User {user_id} not invited to game {game_id}!')
         return
