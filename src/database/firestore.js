@@ -69,5 +69,10 @@ export async function finishUserOnboarding(uid) {
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     hasCompletedOnboarding: true,
+    friendRequests: {
+      received: [],
+      sent: [],
+    },
+    friends: [],
   });
 }

@@ -91,20 +91,6 @@ export const OnboardingRunning = () => {
         />
       </SafeAreaView>
 
-      {/* <SafeAreaView className="mt-6">
-        {options.map((option) => (
-          <Button
-            key={option}
-            label={option}
-            variant={selectedOption === option ? "primary" : "outline"}
-            onPress={() => {
-              console.log(option);
-              setSelectedOption(option);
-            }}
-          />
-        ))}
-      </SafeAreaView> */}
-
       <SafeAreaView className="mt-6">
         <Text variant="xl" style={{ fontWeight: 'bold' }}>
           What kind of runner do you want to be?

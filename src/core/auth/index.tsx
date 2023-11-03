@@ -1,6 +1,7 @@
 import { signOut } from 'firebase/auth';
 import { create } from 'zustand';
 
+import type { User } from '@/api';
 import { auth } from '@/database/firebase-config';
 
 import { createSelectors } from '../utils';
@@ -15,6 +16,7 @@ import {
 } from './utils';
 
 interface AuthState {
+  currentUser: User | undefined;
   userId: string;
   token: TokenType | null;
   status: 'idle' | 'signOut' | 'signIn';
@@ -24,9 +26,11 @@ interface AuthState {
   signout: () => void;
   hydrate: () => void;
   setOnboarding: (bool: boolean) => void;
+  setCurrentUser: (user: User | undefined) => void;
 }
 
 const _useAuth = create<AuthState>((set, get) => ({
+  currentUser: undefined,
   status: 'idle',
   token: null,
   userId: '',
@@ -74,6 +78,9 @@ const _useAuth = create<AuthState>((set, get) => ({
       removeOnboardingToken();
     }
   },
+  setCurrentUser: (user: User | undefined) => {
+    set((state) => ({ ...state, currentUser: user }));
+  },
 }));
 
 export const useAuth = createSelectors(_useAuth);
@@ -83,3 +90,5 @@ export const signin = (token: TokenType) => _useAuth.getState().signin(token);
 export const hydrateAuth = () => _useAuth.getState().hydrate();
 export const setOnboarding = (bool: boolean) =>
   _useAuth.getState().setOnboarding(bool);
+export const setCurrentUser = (user: User | undefined) =>
+  _useAuth.getState().setCurrentUser(user);

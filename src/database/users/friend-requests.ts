@@ -13,14 +13,10 @@ export const sendFriendRequest = async (
   const receiverRef = doc(db, 'users', receiver.id);
 
   await updateDoc(senderRef, {
-    friendRequests: {
-      pending: arrayUnion(receiver.id),
-    },
+    'friendRequests.pending': arrayUnion(receiver.id),
   });
   await updateDoc(receiverRef, {
-    friendRequests: {
-      received: arrayUnion(senderId),
-    },
+    'friendRequests.received': arrayUnion(senderId),
   });
 };
 
@@ -35,14 +31,27 @@ export const acceptFriendRequest = async (
 
   await updateDoc(senderRef, {
     friends: arrayUnion(receiverId),
-    friendRequests: {
-      pending: arrayRemove(receiverId),
-    },
+    'friendRequests.pending': arrayRemove(receiverId),
   });
   await updateDoc(receiverRef, {
     friends: arrayUnion(senderId),
-    friendRequests: {
-      receiverId: arrayRemove(senderId),
-    },
+    'friendRequests.received': arrayRemove(senderId),
+  });
+};
+
+// Reject a friend request
+export const rejectFriendRequest = async (
+  senderId: string,
+  receiverId: string
+): Promise<void> => {
+  // Remove senderId from the receiver's friendRequests list and vice versa
+  const senderRef = doc(db, 'users', senderId);
+  const receiverRef = doc(db, 'users', receiverId);
+
+  await updateDoc(senderRef, {
+    'friendRequests.pending': arrayRemove(receiverId),
+  });
+  await updateDoc(receiverRef, {
+    'friendRequests.received': arrayRemove(senderId),
   });
 };
