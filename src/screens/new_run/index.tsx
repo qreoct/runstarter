@@ -20,7 +20,10 @@ export const NewRun: React.FC = () => {
   const currentUser = useAuth().currentUser;
   const [isRunModalVisible, setRunModalVisibility] = useState(false);
   // const [runReportId, setRunReportId] = useState<string | null>(null);
-  const [runReportId, setRunReportId] = useState<string | null>(null);
+  const [runReportId, setRunReportId] = useState<string | null>(
+    // 'P4SMyWStH8jVBUlMHvdI'
+    null
+  );
 
   const handlePress = () => {
     setRunModalVisibility(!isRunModalVisible);

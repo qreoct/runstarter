@@ -168,7 +168,7 @@ export const RunReport = ({ runId, onFinish }: RunReportProps) => {
                   <Text className="text-sm text-neutral-600">Avg. Pace</Text>
                 </View>
                 <View className="w-22">
-                  <Text className="text-2xl font-bold">
+                  <Text className="text-2xl font-semibold">
                     {Math.floor(runData.timeElapsed / 60)
                       .toString()
                       .padStart(2, '0')}
@@ -236,8 +236,11 @@ export const RunReport = ({ runId, onFinish }: RunReportProps) => {
               <View className="pt-4">
                 <Text className="text-lg font-bold">Leaderboard</Text>
                 <View>
-                  {leaderboardData.map((entry) => (
-                    <View className="flex flex-row items-center py-2 border-b border-gray-200">
+                  {leaderboardData.map((entry, index) => (
+                    <View
+                      key={index}
+                      className="flex flex-row items-center py-2 border-b border-gray-200"
+                    >
                       <Text className="text-lg font-semibold mr-4">
                         {entry.rank}
                       </Text>

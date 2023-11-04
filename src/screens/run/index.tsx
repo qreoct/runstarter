@@ -1,15 +1,3 @@
-import Geolocation from '@react-native-community/geolocation';
-import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
-import {
-  FieldValue,
-  addDoc,
-  collection,
-  serverTimestamp,
-} from 'firebase/firestore';
-import React, { useEffect, useRef, useState } from 'react';
-import { Ionicons } from '@expo/vector-icons';
-
-import { auth, db } from '@/database/firebase-config';
 import {
   Button,
   FocusAwareStatusBar,
@@ -21,246 +9,227 @@ import {
   Pause as PauseIcon,
   Image,
 } from '@/ui';
-
-export interface Coords {
-  latitude: number;
-  longitude: number;
-}
-
-export interface PositionRecord {
-  coords: Coords;
-  distance: number;
-}
-
-export interface Run {
-  timeElapsed: number;
-  distance: number;
-  timestamp: FieldValue;
-  route: PositionRecord[];
-}
+import React, { useEffect, useRef, useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import Geolocation from '@react-native-community/geolocation';
 
 export interface RunProps {
   onFinish: (id: string | null) => void;
 }
 
-const audioFiles: { [key: number]: any } = {
-  0.5: require('../../../assets/distances/0.5.wav'),
-  1.0: require('../../../assets/distances/1.0.wav'),
-  1.5: require('../../../assets/distances/1.5.wav'),
-  2.0: require('../../../assets/distances/2.0.wav'),
-  2.5: require('../../../assets/distances/2.5.wav'),
-  3.0: require('../../../assets/distances/3.0.wav'),
-  3.5: require('../../../assets/distances/3.5.wav'),
-  4.0: require('../../../assets/distances/4.0.wav'),
-  4.5: require('../../../assets/distances/4.5.wav'),
-  5.0: require('../../../assets/distances/5.0.wav'),
+export interface Interval {
+  durationSeconds: number;
+  distanceMeters: number;
+  route: Coord[];
+}
+
+export interface Coord {
+  latitude: number;
+  longitude: number;
+}
+
+const calculateDistance = (
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number => {
+  const R = 6371e3;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
 };
 
+const profileImages = [
+  'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
+  'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
+  'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
+  'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
+  'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
+];
+
+function calculateRouteDistanceMeters(route: Coord[]): number {
+  if (route.length === 0) {
+    return 0;
+  }
+  let totalMeters = 0;
+  let prevCoord = route[0];
+  for (let coord of route) {
+    totalMeters += calculateDistance(
+      prevCoord.latitude,
+      prevCoord.longitude,
+      coord.latitude,
+      coord.longitude
+    );
+    prevCoord = coord;
+  }
+  return totalMeters;
+}
+
+function formatAvgPace(timeMs: number, distanceMeters: number) {
+  if (timeMs <= 0 || distanceMeters <= 0) {
+    return '0\'00"';
+  }
+  const avgPace = timeMs / 1000 / 60 / (distanceMeters / 1000);
+  const minutes = Math.floor(avgPace);
+  const seconds = Math.round((avgPace - minutes) * 60);
+  return `${minutes}'${seconds.toString().padStart(2, '0')}"`;
+}
+
+function formatTimeElapsed(milliseconds: number) {
+  const minutes = Math.floor(milliseconds / 1000 / 60)
+    .toString()
+    .padStart(2, '0');
+  const seconds = ((milliseconds / 1000) % 60).toString().padStart(2, '0');
+  return `${minutes}:${seconds}`;
+}
+
+// TODO: end when TOTAL_INTERVALS is hit
+// TODO: fix pace calculation when paused.
+// TODO: save to firebase and show report.
 /* eslint-disable max-lines-per-function */
 export const Run = (props: RunProps) => {
-  const [distance, setDistance] = useState<number>(0);
-  const [timeElapsed, setTimeElapsed] = useState<number>(0);
-  const previousPositionRef = useRef<Coords | null>(null);
-  const [positionRecords, setPositionRecords] = useState<PositionRecord[]>([]);
-  const [isRunning, setIsRunning] = useState<boolean>(true);
-  const playedDistancesRef = useRef(new Set<number>());
+  const REST_DURATION_MS = 5_000;
+  const INTERVAL_DURATION_MS = 10_000;
+  const TOTAL_INTERVALS = 8;
 
-  /* eslint-disable max-params */
-  const calculateDistance = (
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number
-  ): number => {
-    const R = 6371e3;
-    const dLat = ((lat2 - lat1) * Math.PI) / 180;
-    const dLon = ((lon2 - lon1) * Math.PI) / 180;
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  };
-  /* eslint-enable max-params */
-
-  const playSound = async (dist: number) => {
-    if (dist in audioFiles) {
-      let soundFile = audioFiles[dist];
-      const soundObject = new Audio.Sound();
-      try {
-        await soundObject.loadAsync(soundFile, { shouldPlay: true });
-        await soundObject.setPositionAsync(0);
-        await soundObject.playAsync();
-      } catch (error) {
-        console.log('Error playing sound:', error);
-      }
-    }
-  };
-
-  const profileImages = [
-    'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-    'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-    'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-    'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-    'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-  ];
+  const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [millisecondsLeft, setMillisecondsLeft] = useState(REST_DURATION_MS);
+  const [route, setRoute] = useState<Coord[]>([]);
+  const [previousIntervals, setPreviousIntervals] = useState<Interval[]>([]);
+  const currentCoordsRef = useRef<Coord | null>(null);
 
   useEffect(() => {
-    if (isRunning) {
-      const timer = setInterval(() => {
-        setTimeElapsed((prevTime) => prevTime + 1);
-      }, 1000);
-
-      // const testtimer = setInterval(() => {
-      //   playSound(0.5);
-      // }, 3000);
-
-      async function setAudioMode() {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: false,
-          staysActiveInBackground: true,
-          interruptionModeIOS: InterruptionModeIOS.DuckOthers,
-          playsInSilentModeIOS: true,
-          shouldDuckAndroid: true,
-          interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
-          playThroughEarpieceAndroid: false,
-        });
-      }
-
-      setAudioMode();
-
+    if (isRunning && !isPaused) {
       const watchId = Geolocation.watchPosition(
         (position) => {
-          if (!previousPositionRef.current) {
-            previousPositionRef.current = {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            };
-          } else {
-            const dist = calculateDistance(
-              previousPositionRef.current.latitude,
-              previousPositionRef.current.longitude,
-              position.coords.latitude,
-              position.coords.longitude
-            );
-            setDistance((prevDistance) => {
-              const updatedDistance = prevDistance + dist;
-              const updatedKm = updatedDistance / 1000; // Convert to kilometers
-              const prevKm = prevDistance / 1000; // Convert to kilometers
-
-              // Check in reverse from updatedKm to prevKm for the furthest milestone crossed
-              for (
-                let milestone = Math.floor(updatedKm * 2) / 2;
-                milestone >= prevKm;
-                milestone -= 0.5
-              ) {
-                if (!playedDistancesRef.current.has(milestone)) {
-                  playSound(milestone);
-                  playedDistancesRef.current.add(milestone);
-                  break; // Exit once the latest milestone sound is played
-                }
-              }
-              return updatedDistance;
-            });
-            previousPositionRef.current = {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            };
-            setPositionRecords((prevRecords) => {
-              const newRecord = {
-                coords: {
-                  latitude: position.coords.latitude,
-                  longitude: position.coords.longitude,
-                },
-                distance: dist,
-              };
-              return [...prevRecords, newRecord];
-            });
-
-            console.log('position', position, 'distance', dist);
-          }
+          const { latitude, longitude } = position.coords;
+          currentCoordsRef.current = { latitude, longitude };
         },
         (error) => console.warn(error),
         { enableHighAccuracy: true, distanceFilter: 10 }
       );
       return () => {
         Geolocation.clearWatch(watchId);
-        clearInterval(timer);
-        // clearInterval(testtimer);
       };
+    } else {
+      currentCoordsRef.current = null;
     }
-  }, [isRunning]);
+  }, [isRunning, isPaused]);
 
-  const handleFinish = async () => {
-    try {
-      // Stop tracking
-      setIsRunning(false);
-
-      // Get current user's UID
-      const uid = auth.currentUser?.uid;
-      if (!uid) {
-        console.error('No user logged in.');
-        return;
-      }
-
-      // Prepare data for Firestore
-      const runData: Run = {
-        timeElapsed,
-        distance,
-        timestamp: serverTimestamp(),
-        route: positionRecords,
-      };
-
-      // Reference to the current user's runs sub-collection
-      const runsCollectionRef = collection(db, 'users', uid, 'runs');
-
-      // Save to Firestore
-      const docRef = await addDoc(runsCollectionRef, runData);
-
-      console.log('Document saved with ID: ', docRef.id);
-      props.onFinish(docRef.id);
-    } catch (error) {
-      console.error('Error saving to Firestore: ', error);
-      props.onFinish(null);
+  function lastAvgPace() {
+    console.log('LAST AVG PACE', isRunning);
+    if (isRunning) {
+      const distanceMeters = calculateRouteDistanceMeters(route);
+      return formatAvgPace(
+        INTERVAL_DURATION_MS - millisecondsLeft,
+        distanceMeters
+      );
+    } else if (previousIntervals.length > 0) {
+      const interval = previousIntervals[previousIntervals.length - 1];
+      console.log('INTERVAL AT REST', interval);
+      return formatAvgPace(INTERVAL_DURATION_MS, interval.distanceMeters);
+    } else {
+      return formatAvgPace(0, 0);
     }
-  };
-
-  function formatAvgPace() {
-    if (timeElapsed === 0 || distance === 0) {
-      return '0\'00"';
-    }
-    const avgPace = timeElapsed / 60 / (distance / 1000);
-    const minutes = Math.floor(avgPace);
-    const seconds = Math.round((avgPace - minutes) * 60);
-    return `${minutes}'${seconds.toString().padStart(2, '0')}"`;
   }
+
+  useEffect(() => {
+    if (isPaused) {
+      return;
+    }
+
+    if (isRunning) {
+      const pollMs = 1000;
+      const timer = setTimeout(() => {
+        const newMillisecondsLeft = millisecondsLeft - pollMs;
+        if (newMillisecondsLeft >= 0) {
+          // interval still happening
+          setMillisecondsLeft(newMillisecondsLeft);
+          setRoute((route) => {
+            if (currentCoordsRef.current) {
+              return [...route, currentCoordsRef.current];
+            } else {
+              return route;
+            }
+          });
+
+          const distanceMeters = calculateRouteDistanceMeters(route);
+          console.log('RUN', {
+            currentInterval: previousIntervals.length + 1,
+            newMillisecondsLeft,
+            route,
+            distance: distanceMeters,
+            pace: formatAvgPace(
+              INTERVAL_DURATION_MS - newMillisecondsLeft,
+              distanceMeters
+            ),
+          });
+        } else {
+          // interval ended. transition to rest or end the run.
+          const distanceMeters = calculateRouteDistanceMeters(route);
+          const interval: Interval = {
+            durationSeconds: INTERVAL_DURATION_MS,
+            distanceMeters,
+            route,
+          };
+          setPreviousIntervals((intervals) => [...intervals, interval]);
+          setIsRunning(false);
+          setRoute([]);
+          currentCoordsRef.current = null;
+          setMillisecondsLeft(REST_DURATION_MS);
+        }
+      }, pollMs);
+      return () => {
+        clearInterval(timer);
+      };
+    } else {
+      // is resting
+      const pollMs = 1000;
+      const timer = setTimeout(() => {
+        const newMillisecondsLeft = millisecondsLeft - pollMs;
+        if (newMillisecondsLeft >= 0) {
+          // rest still happening
+          console.log('REST', { newMillisecondsLeft });
+          setMillisecondsLeft(newMillisecondsLeft);
+        } else {
+          // rest ended. transition to interval.
+          setIsRunning(true);
+          setMillisecondsLeft(INTERVAL_DURATION_MS);
+        }
+      }, pollMs);
+      return () => clearInterval(timer);
+    }
+  }, [isRunning, isPaused, millisecondsLeft]);
 
   return (
     <>
       <SafeAreaView className="h-full flex bg-black justify-between">
         <View className="py-4 flex flex-1 flex-cols justify-between">
-          <View className="flex flex-row justify-center gap-x-4">
+          <View className="px-8 flex flex-row justify-between gap-x-4">
             <View className="items-center w-22">
               <Text className="text-2xl text-white font-bold">
-                {(distance / 1000).toFixed(2)}
+                {lastAvgPace()}
               </Text>
-              <Text className="text-white/50 font-semibold">kilometres</Text>
+              <Text className="text-white/50 font-semibold">Pace</Text>
             </View>
             <View className="items-center w-22">
               <Text className="text-2xl text-white font-bold">
-                {formatAvgPace()}
+                {previousIntervals.length + 1}
               </Text>
-              <Text className="text-white/50 font-semibold">Avg. Pace</Text>
+              <Text className="text-white/50 font-semibold">Interval</Text>
             </View>
             <View className="items-center w-22">
               <Text className="text-2xl text-white font-bold">
-                {Math.floor(timeElapsed / 60)
-                  .toString()
-                  .padStart(2, '0')}
-                :{(timeElapsed % 60).toString().padStart(2, '0')}
+                {formatTimeElapsed(millisecondsLeft)}
               </Text>
               <Text className="text-white/50 font-semibold">Time</Text>
             </View>
@@ -268,12 +237,11 @@ export const Run = (props: RunProps) => {
 
           <View className="flex items-center">
             <Text className="text-8xl text-white font-extrabold italic">
-              {Math.floor(timeElapsed / 60)
-                .toString()
-                .padStart(2, '0')}
-              :{(timeElapsed % 60).toString().padStart(2, '0')}
+              {formatTimeElapsed(millisecondsLeft)}
             </Text>
-            <Text className="text-xl text-white/50 font-semibold">Time</Text>
+            <Text className="text-xl text-white/50 font-semibold">
+              {isRunning ? 'Time' : 'Rest'}
+            </Text>
           </View>
 
           <View>
@@ -294,11 +262,11 @@ export const Run = (props: RunProps) => {
         </View>
 
         <View className="flex items-center py-8">
-          {isRunning ? (
+          {!isPaused ? (
             <TouchableOpacity
               className="bg-white w-20 h-20 rounded-full flex justify-center items-center"
               onPress={() => {
-                setIsRunning(false);
+                setIsPaused(true);
               }}
             >
               <Ionicons name="ios-pause" size={32} color="black" />
@@ -307,16 +275,15 @@ export const Run = (props: RunProps) => {
             <View className="flex flex-row gap-20">
               <TouchableOpacity
                 className="bg-red-600 w-20 h-20 rounded-full flex justify-center items-center"
-                onPress={() => {
-                  handleFinish();
-                }}
+                onPress={() => {}}
               >
                 <Ionicons name="ios-stop" size={32} color="black" />
               </TouchableOpacity>
               <TouchableOpacity
                 className="bg-white w-20 h-20 rounded-full flex justify-center items-center"
                 onPress={() => {
-                  setIsRunning(true);
+                  console.log('YEE');
+                  setIsPaused(false);
                 }}
               >
                 <Ionicons name="ios-play" size={32} color="black" />
@@ -328,4 +295,3 @@ export const Run = (props: RunProps) => {
     </>
   );
 };
-/* eslint-enable max-lines-per-function */
