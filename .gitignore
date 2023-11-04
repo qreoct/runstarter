@@ -25,3 +25,4 @@ android/app/*.json
 # Firebase
 android/app/google-services.json
 android/app/client_secret*.json
+server/firebase-service-key.json

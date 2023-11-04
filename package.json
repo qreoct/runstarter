@@ -1,6 +1,6 @@
 {
   "name": "runstarter",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "scripts": {
     "start": "cross-env EXPO_NO_DOTENV=1 expo start",
@@ -92,6 +92,8 @@
     "react-native-svg": "13.9.0",
     "react-native-web": "~0.19.7",
     "react-query-kit": "^1.4.6",
+    "socket.io": "^4.7.2",
+    "socket.io-client": "^4.7.2",
     "zod": "^3.21.4",
     "zustand": "^4.3.6"
   },

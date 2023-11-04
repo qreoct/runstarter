@@ -86,7 +86,7 @@ export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
       </Text>
 
       <Image
-        source={require('/assets/logo-large.png')}
+        source={require('/assets/icon.png')}
         style={{ width: 150, height: 150, alignSelf: 'center' }}
       />
 
