@@ -26,6 +26,11 @@ export interface Interval {
 export interface Coord {
   latitude: number;
   longitude: number;
+  altitude: number | null;
+  accuracy: number;
+  altitudeAccuracy: number | null;
+  heading: number | null;
+  speed: number | null;
 }
 
 const calculateDistance = (
@@ -47,6 +52,10 @@ const calculateDistance = (
   return R * c;
 };
 
+function calcDistance(a: Coord, b: Coord): number {
+  return calculateDistance(a.latitude, a.longitude, b.latitude, b.longitude);
+}
+
 const profileImages = [
   'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
   'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
@@ -54,24 +63,6 @@ const profileImages = [
   'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
   'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
 ];
-
-function calculateRouteDistanceMeters(route: Coord[]): number {
-  if (route.length === 0) {
-    return 0;
-  }
-  let totalMeters = 0;
-  let prevCoord = route[0];
-  for (let coord of route) {
-    totalMeters += calculateDistance(
-      prevCoord.latitude,
-      prevCoord.longitude,
-      coord.latitude,
-      coord.longitude
-    );
-    prevCoord = coord;
-  }
-  return totalMeters;
-}
 
 function formatAvgPace(timeMs: number, distanceMeters: number) {
   if (timeMs <= 0 || distanceMeters <= 0) {
@@ -92,27 +83,34 @@ function formatTimeElapsed(milliseconds: number) {
 }
 
 // TODO: end when TOTAL_INTERVALS is hit
-// TODO: fix pace calculation when paused.
 // TODO: save to firebase and show report.
 /* eslint-disable max-lines-per-function */
 export const Run = (props: RunProps) => {
   const REST_DURATION_MS = 5_000;
-  const INTERVAL_DURATION_MS = 10_000;
+  const INTERVAL_DURATION_MS = 5_000;
   const TOTAL_INTERVALS = 8;
 
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [millisecondsLeft, setMillisecondsLeft] = useState(REST_DURATION_MS);
   const [route, setRoute] = useState<Coord[]>([]);
+  const [distanceMeters, setDistanceMeters] = useState(0);
   const [previousIntervals, setPreviousIntervals] = useState<Interval[]>([]);
-  const currentCoordsRef = useRef<Coord | null>(null);
+  const latestCoordsRef = useRef<Coord | null>(null);
 
   useEffect(() => {
     if (isRunning && !isPaused) {
       const watchId = Geolocation.watchPosition(
         (position) => {
-          const { latitude, longitude } = position.coords;
-          currentCoordsRef.current = { latitude, longitude };
+          const oldCoords = latestCoordsRef.current;
+          const newCoords = position.coords;
+          latestCoordsRef.current = newCoords;
+          setRoute((route) => [...route, newCoords]);
+          if (oldCoords) {
+            setDistanceMeters(
+              (distance) => distance + calcDistance(oldCoords, newCoords)
+            );
+          }
         },
         (error) => console.warn(error),
         { enableHighAccuracy: true, distanceFilter: 10 }
@@ -121,25 +119,40 @@ export const Run = (props: RunProps) => {
         Geolocation.clearWatch(watchId);
       };
     } else {
-      currentCoordsRef.current = null;
+      latestCoordsRef.current = null;
     }
   }, [isRunning, isPaused]);
 
   function lastAvgPace() {
-    console.log('LAST AVG PACE', isRunning);
     if (isRunning) {
-      const distanceMeters = calculateRouteDistanceMeters(route);
-      return formatAvgPace(
-        INTERVAL_DURATION_MS - millisecondsLeft,
-        distanceMeters
-      );
+      // use the pace from the API when possible
+      if (latestCoordsRef.current && latestCoordsRef.current.speed) {
+        const metersPerSecond = latestCoordsRef.current.speed;
+        return formatAvgPace(1000, metersPerSecond);
+      } else {
+        // else calculate it manually.
+        return formatAvgPace(
+          INTERVAL_DURATION_MS - millisecondsLeft,
+          distanceMeters
+        );
+      }
     } else if (previousIntervals.length > 0) {
       const interval = previousIntervals[previousIntervals.length - 1];
-      console.log('INTERVAL AT REST', interval);
       return formatAvgPace(INTERVAL_DURATION_MS, interval.distanceMeters);
     } else {
       return formatAvgPace(0, 0);
     }
+  }
+
+  function lastDistance() {
+    let meters = 0;
+    if (isRunning) {
+      meters = distanceMeters;
+    } else if (previousIntervals.length > 0) {
+      const interval = previousIntervals[previousIntervals.length - 1];
+      meters = interval.distanceMeters;
+    }
+    return (meters / 1000).toFixed(2);
   }
 
   useEffect(() => {
@@ -154,28 +167,15 @@ export const Run = (props: RunProps) => {
         if (newMillisecondsLeft >= 0) {
           // interval still happening
           setMillisecondsLeft(newMillisecondsLeft);
-          setRoute((route) => {
-            if (currentCoordsRef.current) {
-              return [...route, currentCoordsRef.current];
-            } else {
-              return route;
-            }
-          });
-
-          const distanceMeters = calculateRouteDistanceMeters(route);
           console.log('RUN', {
             currentInterval: previousIntervals.length + 1,
             newMillisecondsLeft,
-            route,
             distance: distanceMeters,
-            pace: formatAvgPace(
-              INTERVAL_DURATION_MS - newMillisecondsLeft,
-              distanceMeters
-            ),
+            pace: lastAvgPace(),
+            route: route.length,
           });
         } else {
           // interval ended. transition to rest or end the run.
-          const distanceMeters = calculateRouteDistanceMeters(route);
           const interval: Interval = {
             durationSeconds: INTERVAL_DURATION_MS,
             distanceMeters,
@@ -184,7 +184,8 @@ export const Run = (props: RunProps) => {
           setPreviousIntervals((intervals) => [...intervals, interval]);
           setIsRunning(false);
           setRoute([]);
-          currentCoordsRef.current = null;
+          setDistanceMeters(0);
+          latestCoordsRef.current = null;
           setMillisecondsLeft(REST_DURATION_MS);
         }
       }, pollMs);
@@ -229,9 +230,9 @@ export const Run = (props: RunProps) => {
             </View>
             <View className="items-center w-22">
               <Text className="text-2xl text-white font-bold">
-                {formatTimeElapsed(millisecondsLeft)}
+                {lastDistance()}
               </Text>
-              <Text className="text-white/50 font-semibold">Time</Text>
+              <Text className="text-white/50 font-semibold">kilometres</Text>
             </View>
           </View>
 
