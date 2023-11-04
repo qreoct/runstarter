@@ -41,7 +41,7 @@ export const fetchUserWithId = async (id: string) => {
 export const fetchUsersWithIds = async (ids: string[]) => {
   const promises: Promise<DocumentSnapshot>[] = [];
 
-  if (ids.length === 0) return [];
+  if (!ids || ids.length === 0) return [];
 
   ids.forEach((id) =>
     promises.push(getDoc(doc(db, 'users', id).withConverter(userConverter)))

@@ -8,6 +8,7 @@ import * as React from 'react';
 import type { SvgProps } from 'react-native-svg';
 
 import { useAuth } from '@/core/auth';
+import { auth } from '@/database/firebase-config';
 import { db } from '@/database';
 import { userConverter } from '@/database/users/users-converter';
 import { NewRun } from '@/screens';
@@ -90,9 +91,13 @@ const BarIcon = ({ color, name, ...reset }: BarIconType) => {
 export const TabNavigator = () => {
   /* query and set store for user */
   const setUser = useAuth((state) => state.setCurrentUser);
-  const currentUserId = useAuth().userId;
+  const currentUserId = auth.currentUser?.uid;
 
   React.useEffect(() => {
+    if (!currentUserId) {
+      return;
+    }
+
     const userRef = doc(db, 'users', currentUserId).withConverter(
       userConverter
     );
