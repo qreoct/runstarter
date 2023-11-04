@@ -1,4 +1,5 @@
 import { signOut } from 'firebase/auth';
+import { deinitializeSocket, initializeSocket } from 'server/server-utils';
 import { create } from 'zustand';
 
 import { auth } from '@/database/firebase-config';
@@ -33,11 +34,14 @@ const _useAuth = create<AuthState>((set, get) => ({
   signin: (token) => {
     setToken(token);
     set({ status: 'signIn', token });
+    deinitializeSocket();
+    initializeSocket();
   },
   signout: () => {
     signOut(auth);
     removeToken();
     set({ status: 'signOut', token: null });
+    deinitializeSocket();
   },
   hydrate: () => {
     try {
