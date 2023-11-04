@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
   doc,
   addDoc,
@@ -9,18 +9,112 @@ import {
 import { auth, db } from '@/database/firebase-config';
 import { Image, SafeAreaView, ScrollView, Text, View } from '@/ui';
 import { ModalHeader } from '@/ui/core/modal/modal-header';
-import WalkedPathMap from '../run/walked-path-map';
 import MapView, { Callout, Marker, Polyline } from 'react-native-maps';
-import { Coords, PositionRecord, Run } from '../run';
 import { dismiss } from 'expo-auth-session';
+import { Coord, IntervalRun } from '../run';
 
 export interface RunReportProps {
   runId: string;
   onFinish: () => void;
 }
 
+function formatTotalDistance(run: IntervalRun) {
+  let meters = 0;
+  for (let interval of run.intervals) {
+    meters += interval.distanceMeters;
+  }
+  return (meters / 1000).toFixed(2);
+}
+
+function formatRunAvgPace(run: IntervalRun) {
+  let timeMs = 0;
+  let distanceMeters = 0;
+  for (let interval of run.intervals) {
+    timeMs += interval.durationMs;
+    distanceMeters += interval.distanceMeters;
+  }
+  return formatAvgPace(timeMs, distanceMeters);
+}
+
+function formatRunTime(run: IntervalRun) {
+  let timeMs = 0;
+  for (let interval of run.intervals) {
+    timeMs += interval.durationMs;
+  }
+  return formatTimeElapsed(timeMs);
+}
+
+function formatTimeElapsed(milliseconds: number) {
+  const minutes = Math.floor(milliseconds / 1000 / 60)
+    .toString()
+    .padStart(2, '0');
+  const seconds = ((milliseconds / 1000) % 60).toString().padStart(2, '0');
+  return `${minutes}:${seconds}`;
+}
+
+function formatAvgPace(timeMs: number, distanceMeters: number) {
+  if (timeMs <= 0 || distanceMeters <= 0) {
+    return '0\'00"';
+  }
+  const avgPace = timeMs / 1000 / 60 / (distanceMeters / 1000);
+  const minutes = Math.floor(avgPace);
+  const seconds = Math.round((avgPace - minutes) * 60);
+  return `${minutes}'${seconds.toString().padStart(2, '0')}"`;
+}
+
+function formatMeters(meters: number) {
+  return meters
+    .toFixed(1)
+    .toString()
+    .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,'); // commas every third digit
+}
+
+function calculateRunRegion(run: IntervalRun) {
+  let coords: Coord[] = [];
+  for (let interval of run.intervals) {
+    for (let coord of interval.route) {
+      coords.push(coord);
+    }
+  }
+  if (coords.length == 0) {
+    return null;
+  }
+  return _calculateRegion(coords);
+}
+
+function _calculateRegion(coords: Coord[]) {
+  // Define initial min and max lat and lon values
+  if (coords.length === 0) {
+    return null;
+  }
+  let minLat = coords[0].latitude;
+  let maxLat = coords[0].latitude;
+  let minLon = coords[0].longitude;
+  let maxLon = coords[0].longitude;
+
+  // Iterate through path to find min and max lat and lon values
+  for (let point of coords) {
+    minLat = Math.min(minLat, point.latitude);
+    maxLat = Math.max(maxLat, point.latitude);
+    minLon = Math.min(minLon, point.longitude);
+    maxLon = Math.max(maxLon, point.longitude);
+  }
+
+  const midLat = (minLat + maxLat) / 2;
+  const midLon = (minLon + maxLon) / 2;
+  const latDelta = maxLat - minLat + 0.001; // Added a little padding
+  const lonDelta = maxLon - minLon + 0.001; // Added a little padding
+
+  return {
+    latitude: midLat,
+    longitude: midLon,
+    latitudeDelta: latDelta,
+    longitudeDelta: lonDelta,
+  };
+}
+
 export const RunReport = ({ runId, onFinish }: RunReportProps) => {
-  const [runData, setRunData] = useState<Run | null>(null);
+  const [run, setRun] = useState<IntervalRun | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<any>(null);
 
@@ -69,7 +163,9 @@ export const RunReport = ({ runId, onFinish }: RunReportProps) => {
         const runDocRef = doc(db, 'users', uid, 'runs', runId);
         const runSnapshot = await getDoc(runDocRef);
         if (runSnapshot.exists()) {
-          setRunData(runSnapshot.data() as Run);
+          const run = runSnapshot.data() as IntervalRun;
+          console.log(run);
+          setRun(run);
           // onFinish();
         } else {
           throw new Error('Run not found.');
@@ -85,62 +181,30 @@ export const RunReport = ({ runId, onFinish }: RunReportProps) => {
     fetchRunData();
   }, [runId]);
 
-  const calculateRegion = (coords: Coords[]) => {
-    console.log(coords.length);
-    // Define initial min and max lat and lon values
-    if (coords.length === 0) {
-      return null;
-    }
-    let minLat = coords[0].latitude;
-    let maxLat = coords[0].latitude;
-    let minLon = coords[0].longitude;
-    let maxLon = coords[0].longitude;
+  // const getKmMarkers = (records: PositionRecord[]): Coords[] => {
+  //   let lastKm = 1;
+  //   let distance = 0;
+  //   const markers: Coords[] = [];
+  //   for (let record of records) {
+  //     distance += record.distance;
+  //     if (distance / 1000 > lastKm) {
+  //       markers.push(record.coords);
+  //       lastKm++;
+  //     }
+  //   }
+  //   console.log(markers);
+  //   return markers;
+  // };
 
-    // Iterate through path to find min and max lat and lon values
-    for (let point of coords) {
-      minLat = Math.min(minLat, point.latitude);
-      maxLat = Math.max(maxLat, point.latitude);
-      minLon = Math.min(minLon, point.longitude);
-      maxLon = Math.max(maxLon, point.longitude);
-    }
-
-    const midLat = (minLat + maxLat) / 2;
-    const midLon = (minLon + maxLon) / 2;
-    const latDelta = maxLat - minLat + 0.005; // Added a little padding
-    const lonDelta = maxLon - minLon + 0.005; // Added a little padding
-
-    return {
-      latitude: midLat,
-      longitude: midLon,
-      latitudeDelta: latDelta,
-      longitudeDelta: lonDelta,
-    };
-  };
-
-  const getKmMarkers = (records: PositionRecord[]): Coords[] => {
-    let lastKm = 1;
-    let distance = 0;
-    const markers: Coords[] = [];
-    for (let record of records) {
-      distance += record.distance;
-      if (distance / 1000 > lastKm) {
-        markers.push(record.coords);
-        lastKm++;
-      }
-    }
-    console.log(markers);
-    return markers;
-  };
-
-  function formatAvgPace(run: Run) {
-    if (run.timeElapsed === 0 || run.distance === 0) {
-      return '0\'00"';
-    }
-    const avgPace = run.timeElapsed / 60 / (run.distance / 1000);
-    const minutes = Math.floor(avgPace);
-    const seconds = Math.round((avgPace - minutes) * 60);
-    return `${minutes}'${seconds.toString().padStart(2, '0')}"`;
-  }
+  // function formatAvgPace(run: IntervalRun) {
+  //   if (run.timeElapsed === 0 || run.distance === 0) {
+  //     return '0\'00"';
+  //   }
+  //   const avgPace = run.timeElapsed / 60 / (run.distance / 1000);
+  //   const minutes = Math.floor(avgPace);
+  //   const seconds = Math.round((avgPace - minutes) * 60);
+  //   return `${minutes}'${seconds.toString().padStart(2, '0')}"`;
+  // }
 
   return (
     <SafeAreaView>
@@ -152,27 +216,24 @@ export const RunReport = ({ runId, onFinish }: RunReportProps) => {
       />
       <ScrollView className="flex h-full">
         <View className="flex-1 mb-60">
-          {runData ? (
+          {run ? (
             <View className="p-4 flex gap-y-4">
               <View className="pt-4 flex">
                 <Text className="text-6xl font-extrabold italic">
-                  {(runData.distance / 1000).toFixed(2)}
+                  {formatTotalDistance(run)}
                 </Text>
                 <Text className="text-md text-neutral-600">Kilometres</Text>
               </View>
               <View className="flex flex-row gap-x-8">
                 <View className="w-22">
                   <Text className="text-2xl font-semibold">
-                    {formatAvgPace(runData)}
+                    {formatRunAvgPace(run)}
                   </Text>
                   <Text className="text-sm text-neutral-600">Avg. Pace</Text>
                 </View>
                 <View className="w-22">
                   <Text className="text-2xl font-semibold">
-                    {Math.floor(runData.timeElapsed / 60)
-                      .toString()
-                      .padStart(2, '0')}
-                    :{(runData.timeElapsed % 60).toString().padStart(2, '0')}
+                    {formatRunTime(run)}
                   </Text>
                   <Text className="text-sm text-neutral-600">Time</Text>
                 </View>
@@ -180,56 +241,73 @@ export const RunReport = ({ runId, onFinish }: RunReportProps) => {
 
               <View className="flex max-h-72">
                 <MapView
-                  region={
-                    runData.route.length > 0
-                      ? calculateRegion(runData.route.map((r) => r.coords))!
-                      : undefined
-                  }
+                  region={calculateRunRegion(run) ?? undefined}
                   scrollEnabled={false}
                   zoomEnabled={false}
                   style={{ width: '100%', height: '100%', borderRadius: 4 }}
                 >
-                  <Polyline
-                    coordinates={runData.route.map((r) => r.coords)}
-                    strokeColor="#3b82f6" // Black color
-                    strokeWidth={8}
-                  />
                   {/* Start Marker (Green) */}
-                  {runData.route.length > 0 && (
-                    <Marker
-                      coordinate={runData.route[0].coords}
-                      pinColor="green"
-                    />
-                  )}
+                  {run.intervals.length > 0 &&
+                    run.intervals[0].route.length > 0 && (
+                      <Marker
+                        coordinate={run.intervals[0].route[0]}
+                        pinColor="green"
+                      />
+                    )}
 
                   {/* End Marker (Red) */}
-                  {runData.route.length > 0 && (
-                    <Marker
-                      coordinate={
-                        runData.route[runData.route.length - 1].coords
-                      }
-                      pinColor="red"
-                    />
-                  )}
+                  {run.intervals.length > 0 &&
+                    run.intervals[run.intervals.length - 1].route.length >
+                      0 && (
+                      <Marker
+                        coordinate={
+                          run.intervals[run.intervals.length - 1].route[
+                            run.intervals[run.intervals.length - 1].route
+                              .length - 1
+                          ]
+                        }
+                        pinColor="red"
+                      />
+                    )}
 
-                  {getKmMarkers(runData.route).map((coords, index) => (
-                    <Marker coordinate={coords} key={index}>
-                      <View
-                        className="bg-white rounded-md px-1"
-                        style={{
-                          shadowColor: '#000',
-                          shadowOffset: { width: 0, height: 1 },
-                          shadowOpacity: 0.3,
-                          shadowRadius: 2,
-                          elevation: 5, // for android
-                        }}
-                      >
-                        <Text className="text-xs font-medium">{`${
-                          index + 1
-                        } km`}</Text>
-                      </View>
-                    </Marker>
-                  ))}
+                  {/* path and lap no. markers */}
+                  {run.intervals.map((interval, index) => {
+                    if (interval.route.length === 0) {
+                      return;
+                    }
+                    return (
+                      <Fragment key={index}>
+                        <Polyline
+                          coordinates={interval.route}
+                          strokeColor="#3b82f6"
+                          strokeWidth={6}
+                        />
+                        {index < run.intervals.length - 1 ? ( // don't draw lap no. for the last lap
+                          <Marker
+                            coordinate={
+                              interval.route[interval.route.length - 1]
+                            }
+                            key={index}
+                          >
+                            <View
+                              className="bg-white rounded-lg px-2"
+                              style={{
+                                shadowColor: '#000',
+                                shadowOffset: { width: 0, height: 1 },
+                                shadowOpacity: 0.3,
+                                shadowRadius: 2,
+                                elevation: 5, // for android
+                              }}
+                            >
+                              <Text className="text-xs font-medium">{`${
+                                index + 1
+                              }`}</Text>
+                            </View>
+                          </Marker>
+                        ) : null}
+                      </Fragment>
+                    );
+                  })}
                 </MapView>
               </View>
 
@@ -283,43 +361,26 @@ export const RunReport = ({ runId, onFinish }: RunReportProps) => {
                       Avg. Pace
                     </Text>
                   </View>
-                  {/* Mock Data */}
-                  {[
-                    // Just an example, you'd populate with real data
-                    {
-                      lap: 1,
-                      distance: 712,
-                      time: '05:00',
-                      avgPace: '7\'01"',
-                    },
-                    {
-                      lap: 2,
-                      distance: 700,
-                      time: '04:50',
-                      avgPace: '6\'52"',
-                    },
-                    {
-                      lap: 3,
-                      distance: 715,
-                      time: '05:05',
-                      avgPace: '7\'05"',
-                    },
-                  ].map((interval, index) => (
+                  {/* Data */}
+                  {run.intervals.map((interval, index) => (
                     <View
                       key={index}
                       className="flex flex-row items-center gap-x-1 py-4 border-b border-gray-200"
                     >
-                      <Text className="flex-1 text-sm font-semibold">
-                        {interval.lap}
+                      <Text className="flex-1 text-md font-semibold">
+                        {index + 1}
                       </Text>
-                      <Text className="w-20 text-sm  font-semibold">
-                        {interval.distance} m
+                      <Text className="w-20 text-md  font-semibold">
+                        {formatMeters(interval.distanceMeters)} m
                       </Text>
-                      <Text className="w-20 text-sm font-semibold">
-                        {interval.time}
+                      <Text className="w-20 text-md font-semibold">
+                        {formatTimeElapsed(interval.durationMs)}
                       </Text>
-                      <Text className="w-24 text-sm font-semibold">
-                        {interval.avgPace}
+                      <Text className="w-24 text-md font-semibold">
+                        {formatAvgPace(
+                          interval.durationMs,
+                          interval.distanceMeters
+                        )}
                       </Text>
                     </View>
                   ))}

@@ -10,15 +10,22 @@ import {
   Image,
 } from '@/ui';
 import React, { useEffect, useRef, useState } from 'react';
+import { auth, db } from '@/database/firebase-config';
 import { Ionicons } from '@expo/vector-icons';
 import Geolocation from '@react-native-community/geolocation';
+import { addDoc, collection } from 'firebase/firestore';
 
 export interface RunProps {
   onFinish: (id: string | null) => void;
 }
 
+export interface IntervalRun {
+  intervals: Interval[];
+  createdAt: number;
+}
+
 export interface Interval {
-  durationSeconds: number;
+  durationMs: number;
   distanceMeters: number;
   route: Coord[];
 }
@@ -82,13 +89,13 @@ function formatTimeElapsed(milliseconds: number) {
   return `${minutes}:${seconds}`;
 }
 
-// TODO: end when TOTAL_INTERVALS is hit
-// TODO: save to firebase and show report.
+// TODO: show meters instead of kilometers
+// TODO: implement end run
 /* eslint-disable max-lines-per-function */
 export const Run = (props: RunProps) => {
-  const REST_DURATION_MS = 5_000;
-  const INTERVAL_DURATION_MS = 5_000;
-  const TOTAL_INTERVALS = 8;
+  const REST_DURATION_MS = 1_000;
+  const INTERVAL_DURATION_MS = 15_000;
+  const TOTAL_INTERVALS = 4;
 
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -152,7 +159,10 @@ export const Run = (props: RunProps) => {
       const interval = previousIntervals[previousIntervals.length - 1];
       meters = interval.distanceMeters;
     }
-    return (meters / 1000).toFixed(2);
+    return meters
+      .toFixed(1)
+      .toString()
+      .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,'); // commas every third digit
   }
 
   useEffect(() => {
@@ -167,26 +177,50 @@ export const Run = (props: RunProps) => {
         if (newMillisecondsLeft >= 0) {
           // interval still happening
           setMillisecondsLeft(newMillisecondsLeft);
-          console.log('RUN', {
-            currentInterval: previousIntervals.length + 1,
-            newMillisecondsLeft,
-            distance: distanceMeters,
-            pace: lastAvgPace(),
-            route: route.length,
-          });
+          // console.log('RUN', {
+          //   currentInterval: previousIntervals.length + 1,
+          //   newMillisecondsLeft,
+          //   distance: distanceMeters,
+          //   pace: lastAvgPace(),
+          //   route: route.length,
+          // });
         } else {
           // interval ended. transition to rest or end the run.
           const interval: Interval = {
-            durationSeconds: INTERVAL_DURATION_MS,
+            durationMs: INTERVAL_DURATION_MS,
             distanceMeters,
             route,
           };
-          setPreviousIntervals((intervals) => [...intervals, interval]);
-          setIsRunning(false);
-          setRoute([]);
-          setDistanceMeters(0);
-          latestCoordsRef.current = null;
-          setMillisecondsLeft(REST_DURATION_MS);
+
+          if (previousIntervals.length + 1 < TOTAL_INTERVALS) {
+            setPreviousIntervals((intervals) => [...intervals, interval]);
+            setIsRunning(false);
+            setRoute([]);
+            setDistanceMeters(0);
+            latestCoordsRef.current = null;
+            setMillisecondsLeft(REST_DURATION_MS);
+          }
+
+          // TODO: implement an end state
+          if (previousIntervals.length + 1 == TOTAL_INTERVALS) {
+            async function save() {
+              const intervals = [...previousIntervals, interval];
+              const run: IntervalRun = {
+                intervals,
+                createdAt: Date.now(),
+              };
+              const uid = auth.currentUser?.uid;
+              if (!uid) {
+                console.error('No user logged in.');
+                return;
+              }
+              const collectionRef = collection(db, 'users', uid, 'runs');
+              const docRef = await addDoc(collectionRef, run);
+              console.log('Document saved with ID: ', docRef.id);
+              props.onFinish(docRef.id);
+            }
+            save();
+          }
         }
       }, pollMs);
       return () => {
@@ -199,7 +233,7 @@ export const Run = (props: RunProps) => {
         const newMillisecondsLeft = millisecondsLeft - pollMs;
         if (newMillisecondsLeft >= 0) {
           // rest still happening
-          console.log('REST', { newMillisecondsLeft });
+          // console.log('REST', { newMillisecondsLeft });
           setMillisecondsLeft(newMillisecondsLeft);
         } else {
           // rest ended. transition to interval.
@@ -232,7 +266,7 @@ export const Run = (props: RunProps) => {
               <Text className="text-2xl text-white font-bold">
                 {lastDistance()}
               </Text>
-              <Text className="text-white/50 font-semibold">kilometres</Text>
+              <Text className="text-white/50 font-semibold">Metres</Text>
             </View>
           </View>
 
@@ -283,7 +317,6 @@ export const Run = (props: RunProps) => {
               <TouchableOpacity
                 className="bg-white w-20 h-20 rounded-full flex justify-center items-center"
                 onPress={() => {
-                  console.log('YEE');
                   setIsPaused(false);
                 }}
               >
