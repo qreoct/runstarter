@@ -20,7 +20,7 @@ export const Login = () => {
     signInWithEmailAndPassword(auth, data.email, data.password)
       .then(() => {
         if (auth.currentUser) {
-          addUserIfNotExist(auth.currentUser.uid);
+          addUserIfNotExist(auth.currentUser);
         }
         signIn({
           access: 'access-token',

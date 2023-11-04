@@ -63,7 +63,7 @@ export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
       if (user) {
         console.log('USER: ' + JSON.stringify(user));
         setUserInfo(user);
-        await addUserIfNotExist(user.uid);
+        await addUserIfNotExist(user);
         const userOnboardingState = await getUserOnboarding(user.uid);
         setOnboarding(userOnboardingState);
         signin({

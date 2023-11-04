@@ -1,16 +1,16 @@
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-
 import { db } from '@/database/firebase-config';
 
 /**
- * @param {string} uid
+ * @param {any} user
  */
-export async function addUserIfNotExist(uid) {
-  const userRef = doc(db, 'users', uid);
+export async function addUserIfNotExist(user) {
+  const userRef = doc(db, 'users', user.uid);
   const docSnap = await getDoc(userRef);
   if (!docSnap.exists()) {
     await setDoc(userRef, {
       hasCompletedOnboarding: false,
+      photoURL: user.photoURL,
     });
   }
 }
