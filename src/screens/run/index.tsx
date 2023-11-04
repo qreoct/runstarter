@@ -89,8 +89,6 @@ function formatTimeElapsed(milliseconds: number) {
   return `${minutes}:${seconds}`;
 }
 
-// TODO: show meters instead of kilometers
-// TODO: implement end run
 /* eslint-disable max-lines-per-function */
 export const Run = (props: RunProps) => {
   const REST_DURATION_MS = 1_000;
@@ -165,6 +163,18 @@ export const Run = (props: RunProps) => {
       .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,'); // commas every third digit
   }
 
+  async function saveAndEndRun(run: IntervalRun) {
+    const uid = auth.currentUser?.uid;
+    if (!uid) {
+      console.error('No user logged in.');
+      return;
+    }
+    const collectionRef = collection(db, 'users', uid, 'runs');
+    const docRef = await addDoc(collectionRef, run);
+    console.log('Document saved with ID: ', docRef.id);
+    props.onFinish(docRef.id);
+  }
+
   useEffect(() => {
     if (isPaused) {
       return;
@@ -203,23 +213,12 @@ export const Run = (props: RunProps) => {
 
           // TODO: implement an end state
           if (previousIntervals.length + 1 == TOTAL_INTERVALS) {
-            async function save() {
-              const intervals = [...previousIntervals, interval];
-              const run: IntervalRun = {
-                intervals,
-                createdAt: Date.now(),
-              };
-              const uid = auth.currentUser?.uid;
-              if (!uid) {
-                console.error('No user logged in.');
-                return;
-              }
-              const collectionRef = collection(db, 'users', uid, 'runs');
-              const docRef = await addDoc(collectionRef, run);
-              console.log('Document saved with ID: ', docRef.id);
-              props.onFinish(docRef.id);
-            }
-            save();
+            const intervals = [...previousIntervals, interval];
+            const run: IntervalRun = {
+              intervals,
+              createdAt: Date.now(),
+            };
+            saveAndEndRun(run);
           }
         }
       }, pollMs);
@@ -310,7 +309,19 @@ export const Run = (props: RunProps) => {
             <View className="flex flex-row gap-20">
               <TouchableOpacity
                 className="bg-red-600 w-20 h-20 rounded-full flex justify-center items-center"
-                onPress={() => {}}
+                onPress={() => {
+                  const interval: Interval = {
+                    durationMs: INTERVAL_DURATION_MS,
+                    distanceMeters,
+                    route,
+                  };
+                  const intervals = [...previousIntervals, interval];
+                  const run: IntervalRun = {
+                    intervals,
+                    createdAt: Date.now(),
+                  };
+                  saveAndEndRun(run);
+                }}
               >
                 <Ionicons name="ios-stop" size={32} color="black" />
               </TouchableOpacity>
