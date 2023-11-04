@@ -2,27 +2,31 @@ import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { Avatar } from '@rneui/base';
 import { Button } from '@rneui/themed';
 import React, { useCallback, useRef, useState } from 'react';
-import { Modal, TouchableOpacity } from 'react-native';
+import { Modal } from 'react-native';
 
 import type { User } from '@/api';
 import { fetchUsersWithIds } from '@/api';
 import { useAuth } from '@/core';
-import { FocusAwareStatusBar, Text, View } from '@/ui';
+import { FocusAwareStatusBar, Text, View, TouchableOpacity } from '@/ui';
 
 import { Run } from '../run';
+import { RunReport } from '../run_report';
 
 export const NewRun: React.FC = () => {
   // state to control modal visibility
-  const [isModalVisible, setModalVisibility] = useState(false);
   const [friends, setFriends] = useState<User[]>([]);
-
   // hook for friend invites bottom sheet
   const sheetRef = useRef<BottomSheet>(null);
-
   const currentUser = useAuth().currentUser;
+  const [isRunModalVisible, setRunModalVisibility] = useState(false);
+  // const [runReportId, setRunReportId] = useState<string | null>(null);
+  const [runReportId, setRunReportId] = useState<string | null>(
+    null
+    // 'HdXuDf8HYUc1Z9vZFyqw'
+  );
 
   const handlePress = () => {
-    setModalVisibility(!isModalVisible);
+    setRunModalVisibility(!isRunModalVisible);
   };
 
   const renderFriendInviteRow = ({ item }: { item: User }) => {
@@ -53,7 +57,7 @@ export const NewRun: React.FC = () => {
 
   return (
     <>
-      <FocusAwareStatusBar />
+      <FocusAwareStatusBar hidden={isRunModalVisible}/>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <TouchableOpacity
           style={{
@@ -81,16 +85,32 @@ export const NewRun: React.FC = () => {
           Open Invite Modal
         </Button>
         <Modal
-          visible={isModalVisible}
+          visible={isRunModalVisible}
           transparent={false}
           animationType="slide"
           onRequestClose={handlePress} // for Android back button
         >
           <View>
             <Run
+              onFinish={(runId) => {
+                setRunModalVisibility(false);
+                setRunReportId(runId);
+              }}
+            />
+          </View>
+        </Modal>
+
+        <Modal
+          visible={!!runReportId}
+          transparent={false}
+          animationType="slide"
+          // onRequestClose={handlePress} // for Android back button
+        >
+          <View>
+            <RunReport
+              runId={runReportId!}
               onFinish={() => {
-                console.log('YO');
-                setModalVisibility(false);
+                setRunReportId(null);
               }}
             />
           </View>
