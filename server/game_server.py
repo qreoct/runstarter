@@ -160,12 +160,13 @@ def invite_to_game(data):
         print('invitee_not_found')
         return
     
-    users[invitee_id]["invited"] = game_id
-    active_games[game_id]["invited"].append(invitee_id)
-    inviter_name = get_user_data(user_id)["name"]
-    emit('status_change', {'status': f'{invitee["name"]} invited'}, room=game_id)
-    emit('game_invited', { 'inviter_name': inviter_name, 'game_id': game_id }, room=users[invitee_id]["sid"])
-    return { 'user_id': user_id, 'invitee_id': invitee_id, 'game_id': game_id }
+    if game_id not in users[invitee_id]["invited"]:
+        users[invitee_id]["invited"].append(game_id)
+        active_games[game_id]["invited"].append(invitee_id)
+        inviter_name = get_user_data(user_id)["name"]
+        emit('status_change', {'status': f'{invitee["name"]} invited'}, room=game_id)
+        emit('game_invited', { 'inviter_name': inviter_name, 'game_id': game_id }, room=users[invitee_id]["sid"])
+        return { 'user_id': user_id, 'invitee_id': invitee_id, 'game_id': game_id }
 
 @socketio.on('leave_game')
 def leave_game(data):
@@ -216,6 +217,9 @@ def join_game(data):
 def start_game(data):
     user_id = data['user_id']
     game_id = data['game_id']
+    if not game_id or game_id not in active_games:
+        print(f'Invalid game ID!')
+        return
     if user_id != active_games[game_id]["creator"]:
         print(f'User {user_id} is not the creator of game {game_id}!')
         return
@@ -227,6 +231,9 @@ def start_game(data):
 def pause_game(data):
     user_id = data['user_id']
     game_id = data['game_id']
+    if not game_id or game_id not in active_games:
+        print(f'Invalid game ID!')
+        return False
     if active_games[game_id]["paused"]:
         print(f'Game {game_id} is already paused!')
         return False

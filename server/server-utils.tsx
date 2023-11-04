@@ -31,8 +31,8 @@ export const initializeSocket = () => {
     socket.on('game_started', (data: any) => { 
       console.log('Game started on server!');
       console.log(data);
-    });
-    
+    });        
+            
     socket.on('game_ended', (data: any) => { 
       console.log('Game ended on server!');
       console.log(data);
