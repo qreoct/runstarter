@@ -91,9 +91,9 @@ function formatTimeElapsed(milliseconds: number) {
 
 /* eslint-disable max-lines-per-function */
 export const Run = (props: RunProps) => {
-  const REST_DURATION_MS = 1_000;
-  const INTERVAL_DURATION_MS = 15_000;
-  const TOTAL_INTERVALS = 4;
+  const REST_DURATION_MS = 60_000;
+  const INTERVAL_DURATION_MS = 60_000;
+  const TOTAL_INTERVALS = 8;
 
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
