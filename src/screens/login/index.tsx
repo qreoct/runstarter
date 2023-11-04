@@ -22,7 +22,11 @@ export const Login = () => {
         if (auth.currentUser) {
           addUserIfNotExist(auth.currentUser.uid);
         }
-        signIn({ access: 'access-token', refresh: 'refresh-token' });
+        signIn({
+          access: 'access-token',
+          refresh: 'refresh-token',
+          id: auth.currentUser?.uid || '',
+        });
       })
       .catch((error) => {
         const errorCode = error.code;

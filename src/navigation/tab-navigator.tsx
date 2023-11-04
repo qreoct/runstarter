@@ -1,12 +1,16 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { useColorScheme } from 'nativewind';
 import type { ComponentType } from 'react';
 import * as React from 'react';
 import type { SvgProps } from 'react-native-svg';
 
-import { Friends, NewRun } from '@/screens';
+import { useAuth } from '@/core/auth';
+import { db } from '@/database';
+import { userConverter } from '@/database/users/users-converter';
+import { NewRun } from '@/screens';
 import {
   colors,
   Controller as ControllerIcon,
@@ -14,6 +18,7 @@ import {
   Runner as RunnerIcon,
 } from '@/ui';
 
+import { FriendsNavigator } from './friends-navigator';
 import { ProfileNavigator } from './profile-navigator';
 
 type TabParamList = {
@@ -52,7 +57,7 @@ export type TabList<T extends keyof TabParamList> = {
 const tabs: TabType[] = [
   {
     name: 'Friends',
-    component: Friends,
+    component: FriendsNavigator,
     label: 'Friends',
   },
   // {
@@ -83,6 +88,31 @@ const BarIcon = ({ color, name, ...reset }: BarIconType) => {
 };
 
 export const TabNavigator = () => {
+  /* query and set store for user */
+  const setUser = useAuth((state) => state.setCurrentUser);
+  const currentUserId = useAuth().userId;
+
+  React.useEffect(() => {
+    const userRef = doc(db, 'users', currentUserId).withConverter(
+      userConverter
+    );
+    const unsubscribe = onSnapshot(userRef, (snapshot) => {
+      const data = snapshot.data();
+      if (data) {
+        setUser({
+          ...data,
+          id: currentUserId,
+        });
+      }
+    });
+
+    // cleanup & unsubscribe
+    return () => {
+      setUser(undefined);
+      unsubscribe();
+    };
+  }, [setUser, currentUserId]);
+
   const { colorScheme } = useColorScheme();
   return (
     <Tab.Navigator

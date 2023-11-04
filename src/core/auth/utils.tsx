@@ -6,6 +6,7 @@ const ONBOARDING_TOKEN = 'onboarding';
 export type TokenType = {
   access: string;
   refresh: string;
+  id: string;
 };
 
 export const getToken = () => getItem<TokenType>(TOKEN);

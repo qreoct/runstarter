@@ -1,3 +1,4 @@
+export * from './add-friend';
 export * from './arrow-right';
 export * from './controller';
 export * from './feed';
