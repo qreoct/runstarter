@@ -167,6 +167,9 @@ dependencies:
   react-query-kit:
     specifier: ^1.4.6
     version: 1.5.2(@tanstack/react-query@4.36.1)
+  rneui:
+    specifier: 1.0.0-stable.0
+    version: 1.0.0-stable.0(react-native-safe-area-context@4.6.3)(react-native-vector-icons@10.0.1)(react-native@0.72.5)(react@18.2.0)
   socket.io:
     specifier: ^4.7.2
     version: 4.7.2
@@ -13152,6 +13155,18 @@ packages:
     hasBin: true
     dependencies:
       glob: 7.2.3
+
+  /rneui@1.0.0-stable.0(react-native-safe-area-context@4.6.3)(react-native-vector-icons@10.0.1)(react-native@0.72.5)(react@18.2.0):
+    resolution: {integrity: sha512-W0gmyt1gTHt/4B5+pznOLyPOXs4F/7AJqXMozvLNz1G3cxMXT4Ayi1UNb+OKsgeFuz701xgxSVcI2cVWV6ehNA==}
+    dependencies:
+      '@rneui/base': 4.0.0-rc.8(react-native-safe-area-context@4.6.3)(react-native-vector-icons@10.0.1)(react-native@0.72.5)(react@18.2.0)
+      '@rneui/themed': 4.0.0-rc.8(@rneui/base@4.0.0-rc.8)
+    transitivePeerDependencies:
+      - react
+      - react-native
+      - react-native-safe-area-context
+      - react-native-vector-icons
+    dev: false
 
   /rtl-detect@1.1.2:
     resolution: {integrity: sha512-PGMBq03+TTG/p/cRB7HCLKJ1MgDIi07+QU1faSjiYRfmY5UsAttV9Hs08jDAHVwcOwmVLcSJkpwyfXszVjWfIQ==}
