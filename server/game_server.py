@@ -184,9 +184,11 @@ def leave_game(data):
     elif user_id == active_games[game_id]["creator"]:
         # Remove the current user from the game and make another one the creator
         active_games[game_id]["players"].remove(user_id)
+        active_games[game_id]["player_names"].remove(get_user_data(user_id)["name"])
         active_games[game_id]["creator"] = active_games[game_id]["players"][0]
     else:
         active_games[game_id]["players"].remove(user_id)
+        active_games[game_id]["player_names"].remove(get_user_data(user_id)["name"])
     users[user_id]["currentGame"] = None
     name = get_user_data(user_id)["name"]
     leave_room(game_id)
@@ -206,6 +208,7 @@ def join_game(data):
         return
     active_games[game_id]["invited"].remove(user_id)
     active_games[game_id]["players"].append(user_id)
+    active_games[game_id]["player_names"].append(get_user_data(user_id)["name"])
     users[user_id]["invited"].remove(game_id)
     users[user_id]["currentGame"] = game_id
     join_room(game_id)
