@@ -1,4 +1,5 @@
 import { signOut } from 'firebase/auth';
+import { deinitializeSocket, initializeSocket } from 'server/server-utils';
 import { create } from 'zustand';
 
 import { auth } from '@/database/firebase-config';
@@ -13,7 +14,6 @@ import {
   setOnboardingToken,
   setToken,
 } from './utils';
-import { deinitializeSocket, initializeSocket } from 'server/server-utils';
 
 interface AuthState {
   token: TokenType | null;
