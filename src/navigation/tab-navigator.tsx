@@ -8,8 +8,8 @@ import * as React from 'react';
 import type { SvgProps } from 'react-native-svg';
 
 import { useAuth } from '@/core/auth';
-import { auth } from '@/database/firebase-config';
 import { db } from '@/database';
+import { auth } from '@/database/firebase-config';
 import { userConverter } from '@/database/users/users-converter';
 import { NewRun } from '@/screens';
 import {
