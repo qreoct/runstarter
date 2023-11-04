@@ -1,19 +1,17 @@
+import { Ionicons } from '@expo/vector-icons';
+import Geolocation from '@react-native-community/geolocation';
+import { addDoc, collection } from 'firebase/firestore';
+import React, { useEffect, useRef, useState } from 'react';
+
+import { auth, db } from '@/database/firebase-config';
 import {
-  Button,
-  FocusAwareStatusBar,
+  Image,
   SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
-  Pause as PauseIcon,
-  Image,
 } from '@/ui';
-import React, { useEffect, useRef, useState } from 'react';
-import { auth, db } from '@/database/firebase-config';
-import { Ionicons } from '@expo/vector-icons';
-import Geolocation from '@react-native-community/geolocation';
-import { addDoc, collection } from 'firebase/firestore';
 
 export interface RunProps {
   onFinish: (id: string | null) => void;
@@ -212,7 +210,7 @@ export const Run = (props: RunProps) => {
           }
 
           // TODO: implement an end state
-          if (previousIntervals.length + 1 == TOTAL_INTERVALS) {
+          if (previousIntervals.length + 1 === TOTAL_INTERVALS) {
             const intervals = [...previousIntervals, interval];
             const run: IntervalRun = {
               intervals,
@@ -246,34 +244,34 @@ export const Run = (props: RunProps) => {
 
   return (
     <>
-      <SafeAreaView className="h-full flex bg-black justify-between">
-        <View className="py-4 flex flex-1 flex-cols justify-between">
-          <View className="px-8 flex flex-row justify-between gap-x-4">
-            <View className="items-center w-22">
-              <Text className="text-2xl text-white font-bold">
+      <SafeAreaView className="flex h-full justify-between bg-black">
+        <View className="flex-cols flex flex-1 justify-between py-4">
+          <View className="flex flex-row justify-between gap-x-4 px-8">
+            <View className="w-22 items-center">
+              <Text className="text-2xl font-bold text-white">
                 {lastAvgPace()}
               </Text>
-              <Text className="text-white/50 font-semibold">Pace</Text>
+              <Text className="font-semibold text-white/50">Pace</Text>
             </View>
-            <View className="items-center w-22">
-              <Text className="text-2xl text-white font-bold">
+            <View className="w-22 items-center">
+              <Text className="text-2xl font-bold text-white">
                 {previousIntervals.length + 1}
               </Text>
-              <Text className="text-white/50 font-semibold">Interval</Text>
+              <Text className="font-semibold text-white/50">Interval</Text>
             </View>
-            <View className="items-center w-22">
-              <Text className="text-2xl text-white font-bold">
+            <View className="w-22 items-center">
+              <Text className="text-2xl font-bold text-white">
                 {lastDistance()}
               </Text>
-              <Text className="text-white/50 font-semibold">Metres</Text>
+              <Text className="font-semibold text-white/50">Metres</Text>
             </View>
           </View>
 
           <View className="flex items-center">
-            <Text className="text-8xl text-white font-extrabold italic">
+            <Text className="text-8xl font-extrabold italic text-white">
               {formatTimeElapsed(millisecondsLeft)}
             </Text>
-            <Text className="text-xl text-white/50 font-semibold">
+            <Text className="text-xl font-semibold text-white/50">
               {isRunning ? 'Time' : 'Rest'}
             </Text>
           </View>
@@ -282,13 +280,13 @@ export const Run = (props: RunProps) => {
             <ScrollView
               horizontal={true}
               showsHorizontalScrollIndicator={false}
-              className="px-6 flex gap-x-4"
+              className="flex gap-x-4 px-6"
             >
               {profileImages.map((image, index) => (
                 <Image
                   key={index}
                   source={{ uri: image }}
-                  className="w-20 h-20 rounded-full"
+                  className="h-20 w-20 rounded-full"
                 />
               ))}
             </ScrollView>
@@ -298,7 +296,7 @@ export const Run = (props: RunProps) => {
         <View className="flex items-center py-8">
           {!isPaused ? (
             <TouchableOpacity
-              className="bg-white w-20 h-20 rounded-full flex justify-center items-center"
+              className="flex h-20 w-20 items-center justify-center rounded-full bg-white"
               onPress={() => {
                 setIsPaused(true);
               }}
@@ -308,7 +306,7 @@ export const Run = (props: RunProps) => {
           ) : (
             <View className="flex flex-row gap-20">
               <TouchableOpacity
-                className="bg-red-600 w-20 h-20 rounded-full flex justify-center items-center"
+                className="flex h-20 w-20 items-center justify-center rounded-full bg-red-600"
                 onPress={() => {
                   const interval: Interval = {
                     durationMs: INTERVAL_DURATION_MS,
@@ -326,7 +324,7 @@ export const Run = (props: RunProps) => {
                 <Ionicons name="ios-stop" size={32} color="black" />
               </TouchableOpacity>
               <TouchableOpacity
-                className="bg-white w-20 h-20 rounded-full flex justify-center items-center"
+                className="flex h-20 w-20 items-center justify-center rounded-full bg-white"
                 onPress={() => {
                   setIsPaused(false);
                 }}

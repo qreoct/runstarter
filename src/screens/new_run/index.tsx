@@ -7,7 +7,7 @@ import { Modal } from 'react-native';
 import type { User } from '@/api';
 import { fetchUsersWithIds } from '@/api';
 import { useAuth } from '@/core';
-import { FocusAwareStatusBar, Text, View, TouchableOpacity } from '@/ui';
+import { FocusAwareStatusBar, Text, TouchableOpacity, View } from '@/ui';
 
 import { Run } from '../run';
 import { RunReport } from '../run_report';
@@ -57,7 +57,7 @@ export const NewRun: React.FC = () => {
 
   return (
     <>
-      <FocusAwareStatusBar hidden={isRunModalVisible}/>
+      <FocusAwareStatusBar hidden={isRunModalVisible} />
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <TouchableOpacity
           style={{
