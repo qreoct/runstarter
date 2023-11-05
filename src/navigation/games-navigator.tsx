@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 
-import { NewRun } from '@/screens';
+import { Invites, NewRun } from '@/screens';
 import { Pressable, Text, View } from '@/ui';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -16,17 +16,13 @@ const Stack = createNativeStackNavigator<GamesStackParamList>();
 const GoToInvites = () => {
   const { navigate } = useNavigation();
   return (
-    <Pressable onPress={() => navigate('AddFriend')} className="p-2">
+    <Pressable onPress={() => navigate('Invites')} className="p-2">
       <Ionicons name="mail-open-outline" size={24} />
       <View className="absolute -top-[0.5] -right-[0.5] bg-red-600 rounded-full w-4 h-4 justify-center items-center">
         <Text className="text-white text-xs font-bold">1</Text>
       </View>
     </Pressable>
   );
-};
-
-const Invites = () => {
-  return <></>;
 };
 
 export const GamesNavigator = () => {

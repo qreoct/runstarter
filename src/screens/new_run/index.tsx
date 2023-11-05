@@ -1,23 +1,12 @@
-import BottomSheet, {
-  BottomSheetBackgroundProps,
-  BottomSheetFlatList,
-} from '@gorhom/bottom-sheet';
-import { Avatar, Button, Tab, TabView } from '@rneui/themed';
-import React, {
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { Modal, StyleSheet } from 'react-native';
+import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
+import { Avatar, Button } from '@rneui/themed';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Modal } from 'react-native';
 
 import type { User } from '@/api';
 import { fetchUsersWithIds } from '@/api';
 import { useAuth } from '@/core';
 import {
-  FocusAwareStatusBar,
   Text,
   View,
   TouchableOpacity,
@@ -28,11 +17,6 @@ import {
 
 import { Run } from '../run';
 import { RunReport } from '../run_report';
-import Animated, {
-  interpolateColor,
-  useAnimatedStyle,
-} from 'react-native-reanimated';
-import { CustomBackground } from './CustomBackground';
 import { createGame, inviteToGame, socket } from 'server/server-utils';
 
 export const NewRun: React.FC = () => {
@@ -104,7 +88,7 @@ export const NewRun: React.FC = () => {
   };
 
   return (
-    <SafeAreaView className="h-full flex">
+    <View className="h-full flex">
       <View className="flex-1 flex justify-center items-center">
         <Text className="text-5xl font-extrabold italic">8x1 minute</Text>
         <Text className="text-4xl font-extrabold">intervals</Text>
@@ -202,6 +186,6 @@ export const NewRun: React.FC = () => {
           contentContainerStyle={{ paddingHorizontal: 16 }}
         />
       </BottomSheet>
-    </SafeAreaView>
+    </View>
   );
 };
