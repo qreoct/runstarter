@@ -17,6 +17,8 @@ import {
   Controller as ControllerIcon,
   Profile as ProfileIcon,
   Runner as RunnerIcon,
+  Text,
+  View,
 } from '@/ui';
 
 import { FriendsNavigator } from './friends-navigator';
@@ -47,7 +49,16 @@ const tabsIcons: TabIconsType = {
   Friends: (props: SvgProps) => <RunnerIcon {...props} />,
   // Run: (props: SvgProps) => <StyleIcon {...props} />,
   ProfileNavigator: (props: SvgProps) => <ProfileIcon {...props} />,
-  GamesNavigator: (props: SvgProps) => <ControllerIcon {...props} />,
+  GamesNavigator: (props: SvgProps) => {
+    return (
+      <View>
+        <ControllerIcon {...props} />
+        <View className="absolute -top-1 -right-2 bg-red-600 rounded-full w-4 h-4 justify-center items-center">
+          <Text className="text-white text-xs font-bold">1</Text>
+        </View>
+      </View>
+    );
+  },
   // Settings: (props: SvgProps) => <SettingsIcon {...props} />,
 };
 
