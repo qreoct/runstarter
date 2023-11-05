@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import Geolocation from '@react-native-community/geolocation';
 import { addDoc, collection } from 'firebase/firestore';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { auth, db } from '@/database/firebase-config';
+import type { Coord, Interval, PreSavedIntervalRun } from '@/database/runs';
 import {
   Image,
   SafeAreaView,
@@ -17,32 +18,12 @@ export interface RunProps {
   onFinish: (id: string | null) => void;
 }
 
-export interface IntervalRun {
-  intervals: Interval[];
-  createdAt: number;
-}
-
-export interface Interval {
-  durationMs: number;
-  distanceMeters: number;
-  route: Coord[];
-}
-
-export interface Coord {
-  latitude: number;
-  longitude: number;
-  altitude: number | null;
-  accuracy: number;
-  altitudeAccuracy: number | null;
-  heading: number | null;
-  speed: number | null;
-}
-
 const calculateDistance = (
   lat1: number,
   lon1: number,
   lat2: number,
   lon2: number
+  // eslint-disable-next-line max-params
 ): number => {
   const R = 6371e3;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -108,7 +89,7 @@ export const Run = (props: RunProps) => {
           const oldCoords = latestCoordsRef.current;
           const newCoords = position.coords;
           latestCoordsRef.current = newCoords;
-          setRoute((route) => [...route, newCoords]);
+          setRoute((routeToSet) => [...routeToSet, newCoords]);
           if (oldCoords) {
             setDistanceMeters(
               (distance) => distance + calcDistance(oldCoords, newCoords)
@@ -161,17 +142,20 @@ export const Run = (props: RunProps) => {
       .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,'); // commas every third digit
   }
 
-  async function saveAndEndRun(run: IntervalRun) {
-    const uid = auth.currentUser?.uid;
-    if (!uid) {
-      console.error('No user logged in.');
-      return;
-    }
-    const collectionRef = collection(db, 'users', uid, 'runs');
-    const docRef = await addDoc(collectionRef, run);
-    console.log('Document saved with ID: ', docRef.id);
-    props.onFinish(docRef.id);
-  }
+  const saveAndEndRun = useCallback(
+    async (run: PreSavedIntervalRun) => {
+      const uid = auth.currentUser?.uid;
+      if (!uid) {
+        console.error('No user logged in.');
+        return;
+      }
+      const collectionRef = collection(db, 'users', uid, 'runs');
+      const docRef = await addDoc(collectionRef, run);
+      console.log('Document saved with ID: ', docRef.id);
+      props.onFinish(docRef.id);
+    },
+    [props]
+  );
 
   useEffect(() => {
     if (isPaused) {
@@ -212,7 +196,7 @@ export const Run = (props: RunProps) => {
           // TODO: implement an end state
           if (previousIntervals.length + 1 === TOTAL_INTERVALS) {
             const intervals = [...previousIntervals, interval];
-            const run: IntervalRun = {
+            const run: PreSavedIntervalRun = {
               intervals,
               createdAt: Date.now(),
             };
@@ -240,7 +224,15 @@ export const Run = (props: RunProps) => {
       }, pollMs);
       return () => clearInterval(timer);
     }
-  }, [isRunning, isPaused, millisecondsLeft]);
+  }, [
+    isRunning,
+    isPaused,
+    millisecondsLeft,
+    distanceMeters,
+    route,
+    previousIntervals,
+    saveAndEndRun,
+  ]);
 
   return (
     <>
@@ -314,7 +306,7 @@ export const Run = (props: RunProps) => {
                     route,
                   };
                   const intervals = [...previousIntervals, interval];
-                  const run: IntervalRun = {
+                  const run: PreSavedIntervalRun = {
                     intervals,
                     createdAt: Date.now(),
                   };

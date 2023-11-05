@@ -5,7 +5,7 @@ export * from './new_run';
 export * from './onboarding';
 export * from './profile';
 export * from './run';
-export * from './run_report';
+export * from './run_report/run-report';
 export * from './server_interaction_example';
 export * from './settings';
 export * from './signup';
