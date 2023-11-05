@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Geolocation from '@react-native-community/geolocation';
 import { addDoc, collection } from 'firebase/firestore';
 import React, { useEffect, useRef, useState } from 'react';
+import { pauseGame, resumeGame, socket } from 'server/server-utils';
 
 import { auth, db } from '@/database/firebase-config';
 import {
@@ -12,7 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from '@/ui';
-import { pauseGame, resumeGame, socket } from 'server/server-utils';
 
 export interface RunProps {
   gameId: string;
@@ -285,7 +285,11 @@ export const Run = (props: RunProps) => {
               {formatTimeElapsed(millisecondsLeft)}
             </Text>
             <Text className="text-xl font-semibold text-white/50">
-              {isRunning ? (isPaused ? pauser + ' has paused the game' : 'Time') : 'Rest'}
+              {isRunning
+                ? isPaused
+                  ? pauser + ' has paused the game'
+                  : 'Time'
+                : 'Rest'}
             </Text>
           </View>
 

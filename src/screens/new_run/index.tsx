@@ -2,22 +2,29 @@ import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { Avatar, Button } from '@rneui/themed';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Modal } from 'react-native';
+import {
+  createGame,
+  endGame,
+  inviteToGame,
+  joinGame,
+  socket,
+  startGame,
+} from 'server/server-utils';
 
 import type { User } from '@/api';
 import { fetchUsersWithIds } from '@/api';
 import { useAuth } from '@/core';
 import {
   FocusAwareStatusBar,
-  Text,
-  View,
-  TouchableOpacity,
   Image,
   ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from '@/ui';
 
 import { Run } from '../run';
 import { RunReport } from '../run_report';
-import { createGame, endGame, inviteToGame, joinGame, socket, startGame } from 'server/server-utils';
 
 export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
   // state to control modal visibility
@@ -114,26 +121,26 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
   };
 
   return (
-    <View className="h-full flex">
+    <View className="flex h-full">
       <FocusAwareStatusBar hidden={isRunModalVisible} />
-      <View className="flex-1 flex justify-center items-center">
+      <View className="flex flex-1 items-center justify-center">
         <Text className="text-5xl font-extrabold italic">8x1 minute</Text>
         <Text className="text-4xl font-extrabold">intervals</Text>
       </View>
-      <View className="flex justify-center items-center">
+      <View className="flex items-center justify-center">
         <ScrollView
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          className="px-4 flex gap-x-4"
+          className="flex gap-x-4 px-4"
         >
           {players.map((player, index) => (
             <View
               key={index}
-              className="flex justify-center items-center gap-2 w-24"
+              className="flex w-24 items-center justify-center gap-2"
             >
               <Image
                 source={{ uri: player.photoURL ?? 'https://picsum.photos/200' }}
-                className="w-20 h-20 rounded-full"
+                className="h-20 w-20 rounded-full"
               />
               <Text className="text-xs font-normal" numberOfLines={1}>
                 {player.name}
@@ -142,19 +149,19 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
           ))}
         </ScrollView>
       </View>
-      <View className="py-8 flex items-center">
+      <View className="flex items-center py-8">
         <TouchableOpacity
-          className="bg-neutral-100 rounded-full flex justify-center items-center"
+          className="flex items-center justify-center rounded-full bg-neutral-100"
           onPress={() => {
             sheetRef.current?.expand();
           }}
         >
-          <Text className="px-4 py-2 text-md font-medium">Invite Friend</Text>
+          <Text className="text-md px-4 py-2 font-medium">Invite Friend</Text>
         </TouchableOpacity>
       </View>
-      <View className="pb-8 flex items-center">
+      <View className="flex items-center pb-8">
         <TouchableOpacity
-          className="bg-green-400 w-28 h-28 rounded-full flex justify-center items-center"
+          className="flex h-28 w-28 items-center justify-center rounded-full bg-green-400"
           onPress={() => {
             startGame(roomID);
           }}

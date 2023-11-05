@@ -177,4 +177,4 @@ export const endGame = (gameID: string) => {
     }
   );
   console.log('Ending game...');
-}
+};

@@ -1,2 +1,2 @@
-export * from './types';
 export * from './fetch-games';
+export * from './types';

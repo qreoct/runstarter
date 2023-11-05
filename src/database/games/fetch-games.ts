@@ -1,17 +1,9 @@
-import type { DocumentSnapshot } from 'firebase/firestore';
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-} from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 
 import { db } from '@/database/firebase-config';
 
-import type { Game } from './types';
 import { gameConverter } from './games-converter';
+import type { Game } from './types';
 
 export const fetchGameWithId = async (id: string) => {
   const userRef = doc(db, 'games', id).withConverter(gameConverter);

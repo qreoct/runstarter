@@ -1,15 +1,17 @@
-import { ScrollView, Text, View, TouchableOpacity } from '@/ui';
-import { Avatar } from '@rneui/themed';
 import { Ionicons } from '@expo/vector-icons';
-import { Modal, RefreshControl, SafeAreaView } from 'react-native';
+import { Avatar } from '@rneui/themed';
+import { doc, onSnapshot } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { NewRun } from '../new_run';
-import { ModalHeader } from '@/ui/core/modal/modal-header';
-import { db } from '@/database/firebase-config'; 
-import { onSnapshot, doc } from 'firebase/firestore';
-import { useAuth } from '@/core';
-import { Game, fetchGameWithId } from '@/database/games';
+import { Modal, RefreshControl, SafeAreaView } from 'react-native';
+
 import { fetchUsersWithIds } from '@/api';
+import { useAuth } from '@/core';
+import { db } from '@/database/firebase-config';
+import { fetchGameWithId } from '@/database/games';
+import { ScrollView, Text, TouchableOpacity, View } from '@/ui';
+import { ModalHeader } from '@/ui/core/modal/modal-header';
+
+import { NewRun } from '../new_run';
 
 const wait = (timeout: number) => {
   return new Promise((resolve) => {
@@ -65,29 +67,35 @@ export const Invites = () => {
         setInvitedGames([]);
         return;
       }
-  
+
       try {
         // Fetch all game details simultaneously with Promise.all
-        const gameDetailsPromises = invitedGameIDs.map(gameId => fetchGameWithId(gameId));
+        const gameDetailsPromises = invitedGameIDs.map((gameId) =>
+          fetchGameWithId(gameId)
+        );
         const gameDetails = await Promise.all(gameDetailsPromises);
-  
+
         // Now that we have all game details, fetch user details for each game
-        const gamesWithUserDetails = await Promise.all(gameDetails.map(async (game) => {
-          if (game.players) {
-            const userDetailPromises = game.players.map(userId => fetchUsersWithIds([userId]));
-            const userDetails = await Promise.all(userDetailPromises);
-            return { ...game, players: userDetails.flat() }; // flat() is used in case fetchUsersWithIds returns an array for each user
-          }
-          return game;
-        }));
-  
+        const gamesWithUserDetails = await Promise.all(
+          gameDetails.map(async (game) => {
+            if (game.players) {
+              const userDetailPromises = game.players.map((userId) =>
+                fetchUsersWithIds([userId])
+              );
+              const userDetails = await Promise.all(userDetailPromises);
+              return { ...game, players: userDetails.flat() }; // flat() is used in case fetchUsersWithIds returns an array for each user
+            }
+            return game;
+          })
+        );
+
         setInvitedGames(gamesWithUserDetails);
       } catch (error) {
         // Handle errors, e.g., show an error message
         console.error('Failed to fetch game details:', error);
       }
     };
-  
+
     fetchGames();
   }, [invitedGameIDs]);
 
@@ -106,15 +114,15 @@ export const Invites = () => {
         }
         // className can be added here if you're using a utility like Tailwind CSS or Styled Components
       >
-        {invitedGameIDs.length == 0 ? (
-          <View className="p-10 flex justify-center items-center">
+        {invitedGameIDs.length === 0 ? (
+          <View className="flex items-center justify-center p-10">
             <Ionicons
               name="mail-outline"
               size={50}
               color="gray"
               className="mb-4"
             />
-            <Text className="text-lg font-semibold mb-2">No Invites Yet!</Text>
+            <Text className="mb-2 text-lg font-semibold">No Invites Yet!</Text>
             <Text className="text-center text-sm text-gray-600">
               Looks like you have no game invites. Swipe down to refresh or ask
               a friend to invite you to a game!
@@ -122,29 +130,33 @@ export const Invites = () => {
           </View>
         ) : (
           // Render your list of invites here
-          <View className="py-2 flex gap-y-1">
+          <View className="flex gap-y-1 py-2">
             {invitedGames.map((game, index) => {
               // Fetch game data from firebase
               const friends = game.players ?? [];
               return (
                 <TouchableOpacity
                   key={index}
-                  className="p-4 flex flex-row items-center justify-between"
+                  className="flex flex-row items-center justify-between p-4"
                   onPress={() => {
                     openNewRunModal();
                   }}
                 >
                   <View>
-                    <Text className="text-lg font-bold"> {/** Change to game id / settings? */}
+                    <Text className="text-lg font-bold">
+                      {' '}
+                      {/** Change to game id / settings? */}
                       8x1 minute intervals
                     </Text>
-                    <View className="pt-2 flex flex-row">
+                    <View className="flex flex-row pt-2">
                       {friends.map((friend: any, index: any) => (
                         <Avatar
                           key={index}
                           size="small"
                           rounded
-                          source={{ uri: friend.photoURL ?? 'https://picsum.photos/200' }}
+                          source={{
+                            uri: friend.photoURL ?? 'https://picsum.photos/200',
+                          }}
                           containerStyle={{
                             marginLeft: index === 0 ? 0 : -10, // Overlap effect here, adjust as necessary
                             zIndex: 4 - index, // Ensures the leftmost avatar is on top
@@ -156,7 +168,9 @@ export const Invites = () => {
                       ))}
                     </View>
                     <Text className="pt-2 text-sm font-medium text-neutral-600">
-                      {renderFriendText(friends.map((friend: any) => friend.name))}
+                      {renderFriendText(
+                        friends.map((friend: any) => friend.name)
+                      )}
                     </Text>
                   </View>
                   <View>

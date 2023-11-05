@@ -3,9 +3,9 @@ import type { RouteProp as NRouteProp } from '@react-navigation/native';
 import type { AuthStackParamList } from './auth-navigator';
 import type { FeedStackParamList } from './feed-navigator';
 import type { FriendsStackParamList } from './friends-navigator';
+import type { GamesStackParamList } from './games-navigator';
 import type { OnboardingStackParamList } from './onboarding-navigator';
 import type { ProfileStackParamList } from './profile-navigator';
-import { GamesStackParamList } from './games-navigator';
 
 export type RootStackParamList = AuthStackParamList &
   FeedStackParamList &

@@ -21,8 +21,8 @@ import {
 } from '@/ui';
 
 import { FriendsNavigator } from './friends-navigator';
-import { ProfileNavigator } from './profile-navigator';
 import { GamesNavigator } from './games-navigator';
+import { ProfileNavigator } from './profile-navigator';
 
 type TabParamList = {
   Friends: undefined;
@@ -52,8 +52,8 @@ const tabsIcons: TabIconsType = {
     return (
       <View>
         <ControllerIcon {...props} />
-        <View className="absolute -top-1 -right-2 bg-red-600 rounded-full w-4 h-4 justify-center items-center">
-          <Text className="text-white text-xs font-bold">1</Text>
+        <View className="absolute -right-2 -top-1 h-4 w-4 items-center justify-center rounded-full bg-red-600">
+          <Text className="text-xs font-bold text-white">1</Text>
         </View>
       </View>
     );
