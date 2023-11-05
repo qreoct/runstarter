@@ -5,12 +5,14 @@ import type { FeedStackParamList } from './feed-navigator';
 import type { FriendsStackParamList } from './friends-navigator';
 import type { OnboardingStackParamList } from './onboarding-navigator';
 import type { ProfileStackParamList } from './profile-navigator';
+import { GamesStackParamList } from './games-navigator';
 
 export type RootStackParamList = AuthStackParamList &
   FeedStackParamList &
   ProfileStackParamList &
   OnboardingStackParamList &
-  FriendsStackParamList;
+  FriendsStackParamList &
+  GamesStackParamList;
 // very important to type check useNavigation hook
 declare global {
   namespace ReactNavigation {
