@@ -1,7 +1,17 @@
-import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  BottomSheetBackgroundProps,
+  BottomSheetFlatList,
+} from '@gorhom/bottom-sheet';
 import { Avatar, Button, Tab, TabView } from '@rneui/themed';
-import React, { useCallback, useRef, useState } from 'react';
-import { Modal } from 'react-native';
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { Modal, StyleSheet } from 'react-native';
 
 import type { User } from '@/api';
 import { fetchUsersWithIds } from '@/api';
@@ -18,6 +28,12 @@ import {
 
 import { Run } from '../run';
 import { RunReport } from '../run_report';
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
+import { CustomBackground } from './CustomBackground';
+import { createGame, inviteToGame, socket } from 'server/server-utils';
 
 export const NewRun: React.FC = () => {
   // state to control modal visibility
@@ -31,14 +47,23 @@ export const NewRun: React.FC = () => {
     null
     // 'HdXuDf8HYUc1Z9vZFyqw'
   );
+  const [roomID, setRoomID] = useState('');
+  const [players, setPlayers] = useState<User[]>([]);
+  const [invitedIds, setInvitedIds] = useState<string[]>([]);
 
-  const profileImages = [
-    'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-    // 'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-    // 'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-    // 'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-    // 'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-  ];
+  useEffect(() => {
+    createGame();
+  }, []);
+
+  socket.on('game_created', (data: any) => {
+    setRoomID(data.game_id);
+    console.log('game_created', data);
+  });
+
+  socket.on('player_change', async (data: any) => {
+    const players = await fetchUsersWithIds(data.players);
+    setPlayers(players);
+  });
 
   const handleSheetChange = useCallback(() => {
     if (!currentUser || currentUser.friends?.length === 0) return;
@@ -47,6 +72,7 @@ export const NewRun: React.FC = () => {
   }, [currentUser]);
 
   const renderFriendInviteRow = ({ item }: { item: User }) => {
+    const isInvited = invitedIds.includes(item.id);
     return (
       <View className="flex-row items-center justify-between py-2">
         <View className="mr-2 flex-row items-center space-x-2">
@@ -61,7 +87,18 @@ export const NewRun: React.FC = () => {
             </Text>
           </View>
         </View>
-        <Button type="solid">Invite</Button>
+        <Button
+          type="solid"
+          onPress={() => {
+            if (roomID) {
+              inviteToGame(item.id, roomID);
+              setInvitedIds((ids) => [...ids, item.id]);
+            }
+          }}
+          disabled={isInvited}
+        >
+          {isInvited ? 'Pending' : 'Invite'}
+        </Button>
       </View>
     );
   };
@@ -78,17 +115,17 @@ export const NewRun: React.FC = () => {
           showsHorizontalScrollIndicator={false}
           className="px-4 flex gap-x-4"
         >
-          {profileImages.map((image, index) => (
+          {players.map((player, index) => (
             <View
               key={index}
               className="flex justify-center items-center gap-2 w-24"
             >
               <Image
-                source={{ uri: image }}
+                source={{ uri: player.photoURL ?? 'https://picsum.photos/200' }}
                 className="w-20 h-20 rounded-full"
               />
               <Text className="text-xs font-normal" numberOfLines={1}>
-                You
+                {player.name}
               </Text>
             </View>
           ))}
