@@ -39,7 +39,12 @@ export const FriendsFeed = () => {
   };
 
   useEffect(() => {
-    if (!currentUser || currentUser.friends?.length === 0) return;
+    if (
+      !currentUser ||
+      !currentUser.friends ||
+      currentUser.friends?.length === 0
+    )
+      return;
     // fetchActivityForUsers(ids)
     fetchUsersWithIds(currentUser.friends).then((users) => {
       let friendsActivity: Activity[] = [];
@@ -48,6 +53,7 @@ export const FriendsFeed = () => {
           user: user,
           message: 'I ran 5.2km and won in Duck Duck Chase!',
           avatar:
+            user.photoURL?.toString() ||
             'https://images.pexels.com/photos/598745/pexels-photo-598745.jpeg?crop=faces&fit=crop&h=200&w=200&auto=compress&cs=tinysrgb',
           timestamp: '5H',
         });

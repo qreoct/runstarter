@@ -1,17 +1,12 @@
+import { doc, getDoc } from 'firebase/firestore';
 import React, { Fragment, useEffect, useState } from 'react';
-import {
-  doc,
-  addDoc,
-  collection,
-  serverTimestamp,
-  getDoc,
-} from 'firebase/firestore';
+import MapView, { Marker, Polyline } from 'react-native-maps';
+
 import { auth, db } from '@/database/firebase-config';
 import { Image, SafeAreaView, ScrollView, Text, View } from '@/ui';
 import { ModalHeader } from '@/ui/core/modal/modal-header';
-import MapView, { Callout, Marker, Polyline } from 'react-native-maps';
-import { dismiss } from 'expo-auth-session';
-import { Coord, IntervalRun } from '../run';
+
+import type { Coord, IntervalRun } from '../run';
 
 export interface RunReportProps {
   runId: string;
@@ -76,7 +71,7 @@ function calculateRunRegion(run: IntervalRun) {
       coords.push(coord);
     }
   }
-  if (coords.length == 0) {
+  if (coords.length === 0) {
     return null;
   }
   return _calculateRegion(coords);
@@ -115,8 +110,8 @@ function _calculateRegion(coords: Coord[]) {
 
 export const RunReport = ({ runId, onFinish }: RunReportProps) => {
   const [run, setRun] = useState<IntervalRun | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<any>(null);
+  const [_isLoading, setIsLoading] = useState(true);
+  const [_error, setError] = useState<any>(null);
 
   const leaderboardData = [
     {
@@ -215,10 +210,10 @@ export const RunReport = ({ runId, onFinish }: RunReportProps) => {
         }}
       />
       <ScrollView className="flex h-full">
-        <View className="flex-1 mb-60">
+        <View className="mb-60 flex-1">
           {run ? (
-            <View className="p-4 flex gap-y-4">
-              <View className="pt-4 flex">
+            <View className="flex gap-y-4 p-4">
+              <View className="flex pt-4">
                 <Text className="text-6xl font-extrabold italic">
                   {formatTotalDistance(run)}
                 </Text>
@@ -290,7 +285,7 @@ export const RunReport = ({ runId, onFinish }: RunReportProps) => {
                             key={index}
                           >
                             <View
-                              className="bg-white rounded-lg px-2"
+                              className="rounded-lg bg-white px-2"
                               style={{
                                 shadowColor: '#000',
                                 shadowOffset: { width: 0, height: 1 },
@@ -317,14 +312,14 @@ export const RunReport = ({ runId, onFinish }: RunReportProps) => {
                   {leaderboardData.map((entry, index) => (
                     <View
                       key={index}
-                      className="flex flex-row items-center py-2 border-b border-gray-200"
+                      className="flex flex-row items-center border-b border-gray-200 py-2"
                     >
-                      <Text className="text-lg font-semibold mr-4">
+                      <Text className="mr-4 text-lg font-semibold">
                         {entry.rank}
                       </Text>
                       <Image
                         source={{ uri: entry.profilePic }}
-                        className="w-8 h-8 rounded-full mr-4"
+                        className="mr-4 h-8 w-8 rounded-full"
                       />
                       <View style={{ flex: 2 }}>
                         <Text
@@ -334,7 +329,7 @@ export const RunReport = ({ runId, onFinish }: RunReportProps) => {
                           {entry.name}
                         </Text>
                       </View>
-                      <View className="w-20 ml-4">
+                      <View className="ml-4 w-20">
                         <Text className="text-md font-bold">
                           {entry.distance.toFixed(2)} km
                         </Text>
@@ -351,7 +346,7 @@ export const RunReport = ({ runId, onFinish }: RunReportProps) => {
                 <Text className="text-lg font-bold">Your Intervals</Text>
                 <View className="pt-2">
                   {/* Table Header */}
-                  <View className="flex flex-row items-center gap-x-1 py-2 border-b border-gray-200">
+                  <View className="flex flex-row items-center gap-x-1 border-b border-gray-200 py-2">
                     <Text className="flex-1 text-sm text-neutral-600">Lap</Text>
                     <Text className="w-20 text-sm text-neutral-600">
                       Distance
@@ -365,18 +360,18 @@ export const RunReport = ({ runId, onFinish }: RunReportProps) => {
                   {run.intervals.map((interval, index) => (
                     <View
                       key={index}
-                      className="flex flex-row items-center gap-x-1 py-4 border-b border-gray-200"
+                      className="flex flex-row items-center gap-x-1 border-b border-gray-200 py-4"
                     >
-                      <Text className="flex-1 text-md font-semibold">
+                      <Text className="text-md flex-1 font-semibold">
                         {index + 1}
                       </Text>
-                      <Text className="w-20 text-md  font-semibold">
+                      <Text className="text-md w-20  font-semibold">
                         {formatMeters(interval.distanceMeters)} m
                       </Text>
-                      <Text className="w-20 text-md font-semibold">
+                      <Text className="text-md w-20 font-semibold">
                         {formatTimeElapsed(interval.durationMs)}
                       </Text>
-                      <Text className="w-24 text-md font-semibold">
+                      <Text className="text-md w-24 font-semibold">
                         {formatAvgPace(
                           interval.durationMs,
                           interval.distanceMeters

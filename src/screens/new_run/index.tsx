@@ -7,6 +7,7 @@ import type { User } from '@/api';
 import { fetchUsersWithIds } from '@/api';
 import { useAuth } from '@/core';
 import {
+  FocusAwareStatusBar,
   Text,
   View,
   TouchableOpacity,
@@ -89,6 +90,7 @@ export const NewRun: React.FC = () => {
 
   return (
     <View className="h-full flex">
+      <FocusAwareStatusBar hidden={isRunModalVisible} />
       <View className="flex-1 flex justify-center items-center">
         <Text className="text-5xl font-extrabold italic">8x1 minute</Text>
         <Text className="text-4xl font-extrabold">intervals</Text>

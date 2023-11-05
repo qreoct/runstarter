@@ -13,7 +13,7 @@ type ModalHeaderProps = {
 export const ModalHeader = React.memo(
   ({ title, dismiss }: ModalHeaderProps) => {
     return (
-      <View className="flex-row px-4 py-4 border-b-[1px] border-b-slate-200">
+      <View className="flex-row border-b-[1px] border-b-slate-200 p-4">
         <View className="h-[24px] w-[24px]" />
         <View className="flex-1">
           <Text className="text-center text-[16px] font-bold text-[#26313D]">
