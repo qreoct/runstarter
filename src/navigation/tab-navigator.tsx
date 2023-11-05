@@ -11,7 +11,6 @@ import { useAuth } from '@/core/auth';
 import { db } from '@/database';
 import { auth } from '@/database/firebase-config';
 import { userConverter } from '@/database/users/users-converter';
-import { NewRun } from '@/screens';
 import {
   colors,
   Controller as ControllerIcon,

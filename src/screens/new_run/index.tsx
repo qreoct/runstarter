@@ -11,16 +11,15 @@ import {
   Text,
   View,
   TouchableOpacity,
-  SafeAreaView,
   Image,
   ScrollView,
 } from '@/ui';
 
 import { Run } from '../run';
 import { RunReport } from '../run_report';
-import { createGame, inviteToGame, socket } from 'server/server-utils';
+import { createGame, inviteToGame, joinGame, socket } from 'server/server-utils';
 
-export const NewRun: React.FC = () => {
+export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
   // state to control modal visibility
   const [friends, setFriends] = useState<User[]>([]);
   // hook for friend invites bottom sheet
@@ -37,13 +36,32 @@ export const NewRun: React.FC = () => {
   const [invitedIds, setInvitedIds] = useState<string[]>([]);
 
   useEffect(() => {
-    createGame();
-  }, []);
+    if (!gameId) {
+      createGame();
+    } else {
+      // If a gameId is passed, use it as the roomID
+      setRoomID(gameId);
+      joinGame(gameId);
+    }
+  }, [gameId]);
 
-  socket.on('game_created', (data: any) => {
-    setRoomID(data.game_id);
-    console.log('game_created', data);
-  });
+  // Only set up the socket listener for game creation if we are creating a new game
+  useEffect(() => {
+    if (!gameId) {
+      const handleGameCreated = (data: any) => {
+        setRoomID(data.game_id);
+        console.log('game_created', data);
+      };
+
+      // Listen for game creation events
+      socket.on('game_created', handleGameCreated);
+
+      // Clean up the listener when the component is unmounted or if the gameId changes
+      return () => {
+        socket.off('game_created', handleGameCreated);
+      };
+    }
+  }, [gameId]);
 
   socket.on('player_change', async (data: any) => {
     const players = await fetchUsersWithIds(data.players);
@@ -146,6 +164,7 @@ export const NewRun: React.FC = () => {
       >
         <View>
           <Run
+            gameId={roomID}
             onFinish={(runId) => {
               setRunModalVisibility(false);
               setRunReportId(runId);

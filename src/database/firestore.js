@@ -12,6 +12,8 @@ export async function addUserIfNotExist(user) {
     await setDoc(userRef, {
       hasCompletedOnboarding: false,
       photoURL: user.photoURL,
+      currentGame: null,
+      invitedGames: [],
     });
   }
 }

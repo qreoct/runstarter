@@ -12,8 +12,10 @@ import {
   TouchableOpacity,
   View,
 } from '@/ui';
+import { pauseGame, resumeGame, socket } from 'server/server-utils';
 
 export interface RunProps {
+  gameId: string;
   onFinish: (id: string | null) => void;
 }
 
@@ -95,11 +97,22 @@ export const Run = (props: RunProps) => {
 
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [pauser, setPauser] = useState('');
   const [millisecondsLeft, setMillisecondsLeft] = useState(REST_DURATION_MS);
   const [route, setRoute] = useState<Coord[]>([]);
   const [distanceMeters, setDistanceMeters] = useState(0);
   const [previousIntervals, setPreviousIntervals] = useState<Interval[]>([]);
   const latestCoordsRef = useRef<Coord | null>(null);
+
+  socket.on('game_paused', (data: any) => {
+    setIsPaused(true);
+    setPauser(data.pauser);
+  });
+
+  socket.on('game_resumed', (data: any) => {
+    setIsPaused(false);
+    setPauser('');
+  });
 
   useEffect(() => {
     if (isRunning && !isPaused) {
@@ -272,7 +285,7 @@ export const Run = (props: RunProps) => {
               {formatTimeElapsed(millisecondsLeft)}
             </Text>
             <Text className="text-xl font-semibold text-white/50">
-              {isRunning ? 'Time' : 'Rest'}
+              {isRunning ? (isPaused ? pauser + ' has paused the game' : 'Time') : 'Rest'}
             </Text>
           </View>
 
@@ -299,6 +312,7 @@ export const Run = (props: RunProps) => {
               className="flex h-20 w-20 items-center justify-center rounded-full bg-white"
               onPress={() => {
                 setIsPaused(true);
+                pauseGame(props.gameId);
               }}
             >
               <Ionicons name="ios-pause" size={32} color="black" />
@@ -327,6 +341,7 @@ export const Run = (props: RunProps) => {
                 className="flex h-20 w-20 items-center justify-center rounded-full bg-white"
                 onPress={() => {
                   setIsPaused(false);
+                  resumeGame(props.gameId);
                 }}
               >
                 <Ionicons name="ios-play" size={32} color="black" />
