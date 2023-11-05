@@ -4,6 +4,7 @@ import React from 'react';
 import { useAuth } from '@/core';
 import { FocusAwareStatusBar, Image, ScrollView, View } from '@/ui';
 
+import AchievementsPage from './achievements-list';
 import { RunHistory } from './run-history';
 
 const EmptyState = () => {
@@ -66,14 +67,17 @@ export const Profile = () => {
             <TabView.Item>
               <ScrollView className="w-screen px-4 pt-4">
                 <Text h4>Your Run History</Text>
-                <View className="min-h-20">
+                <View className="min-h-20 pb-8">
                   <RunHistory user={user} />
                 </View>
               </ScrollView>
             </TabView.Item>
             <TabView.Item>
-              <ScrollView className="px-4">
-                <Text h1>Achievements</Text>
+              <ScrollView className="w-screen p-4">
+                <Text h4>Your Achievements</Text>
+                <View className="min-h-20 pb-8">
+                  <AchievementsPage />
+                </View>
               </ScrollView>
             </TabView.Item>
           </TabView>

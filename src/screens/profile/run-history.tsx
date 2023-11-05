@@ -66,12 +66,14 @@ export const RunHistory = ({ user }: RunHistoryProps) => {
   }
 
   return (
-    <FlashList
-      data={runs}
-      renderItem={renderItem}
-      keyExtractor={(_, index) => `item-${index}`}
-      ListEmptyComponent={<EmptyList isLoading={user === undefined} />}
-      estimatedItemSize={15}
-    />
+    <View className="min-h-4">
+      <FlashList
+        data={runs}
+        renderItem={renderItem}
+        keyExtractor={(_, index) => `item-${index}`}
+        ListEmptyComponent={<EmptyList isLoading={user === undefined} />}
+        estimatedItemSize={15}
+      />
+    </View>
   );
 };
