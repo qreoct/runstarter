@@ -108,6 +108,7 @@ function _calculateRegion(coords: Coord[]) {
   };
 }
 
+/*eslint-disable max-lines-per-function */
 export const RunReport = ({ runId, onFinish }: RunReportProps) => {
   const [run, setRun] = useState<IntervalRun | null>(null);
   const [_isLoading, setIsLoading] = useState(true);
@@ -158,9 +159,9 @@ export const RunReport = ({ runId, onFinish }: RunReportProps) => {
         const runDocRef = doc(db, 'users', uid, 'runs', runId);
         const runSnapshot = await getDoc(runDocRef);
         if (runSnapshot.exists()) {
-          const run = runSnapshot.data() as IntervalRun;
-          console.log(run);
-          setRun(run);
+          const runData = runSnapshot.data() as IntervalRun;
+          console.log(runData);
+          setRun(runData);
           // onFinish();
         } else {
           throw new Error('Run not found.');

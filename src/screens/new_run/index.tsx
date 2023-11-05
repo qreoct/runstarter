@@ -12,6 +12,7 @@ import { FocusAwareStatusBar, Text, TouchableOpacity, View } from '@/ui';
 import { Run } from '../run';
 import { RunReport } from '../run_report';
 
+/* eslint-disable max-lines-per-function */
 export const NewRun: React.FC = () => {
   // state to control modal visibility
   const [friends, setFriends] = useState<User[]>([]);

@@ -21,6 +21,8 @@ export const Profile = () => {
   const [index, setIndex] = React.useState(0);
   const user = useAuth().currentUser;
 
+  console.log('user received on profile page is ', user);
+
   return (
     <>
       <FocusAwareStatusBar />

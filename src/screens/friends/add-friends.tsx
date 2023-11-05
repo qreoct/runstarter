@@ -7,7 +7,7 @@ import { showMessage } from 'react-native-flash-message';
 import { useAuth } from '@/core';
 import useDebounce from '@/core/hooks/use-debounce';
 import type { User } from '@/database';
-import { fetchUsers } from '@/database';
+import { fetchUsers, generateProfilePicture } from '@/database';
 import {
   acceptFriendRequest,
   rejectFriendRequest,
@@ -119,7 +119,9 @@ export const AddFriend = () => {
         <Avatar
           size="medium"
           rounded
-          source={{ uri: item.photoURL ?? 'https://picsum.photos/200' }}
+          source={{
+            uri: item.photoURL ?? generateProfilePicture(item.id),
+          }}
         />
         <View className="mb-1">
           <Text className="font-bold">
