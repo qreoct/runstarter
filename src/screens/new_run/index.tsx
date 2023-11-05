@@ -17,7 +17,7 @@ import {
 
 import { Run } from '../run';
 import { RunReport } from '../run_report';
-import { createGame, inviteToGame, joinGame, socket } from 'server/server-utils';
+import { createGame, endGame, inviteToGame, joinGame, socket, startGame } from 'server/server-utils';
 
 export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
   // state to control modal visibility
@@ -67,6 +67,13 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
     const players = await fetchUsersWithIds(data.players);
     setPlayers(players);
   });
+
+  socket.on('game_started', async (data: any) => {
+    // TODO: Play game-start sound and start 5 sec countdown
+    setRunModalVisibility(true);
+  });
+
+  // No need listen for game_ended event because it only involves server cleanup
 
   const handleSheetChange = useCallback(() => {
     if (!currentUser || currentUser.friends?.length === 0) return;
@@ -149,7 +156,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
         <TouchableOpacity
           className="bg-green-400 w-28 h-28 rounded-full flex justify-center items-center"
           onPress={() => {
-            setRunModalVisibility(true);
+            startGame(roomID);
           }}
         >
           <Text className="text-xl font-extrabold italic">START</Text>
@@ -168,6 +175,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
             onFinish={(runId) => {
               setRunModalVisibility(false);
               setRunReportId(runId);
+              endGame(roomID);
             }}
           />
         </View>

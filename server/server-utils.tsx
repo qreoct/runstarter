@@ -163,3 +163,18 @@ export const resumeGame = (gameID: string) => {
   );
   console.log('Resuming game...');
 };
+
+export const endGame = (gameID: string) => {
+  if (!auth.currentUser) {
+    console.log('NO USER FOUND!');
+    return;
+  }
+  socket.emit(
+    'user_end_game',
+    { user_id: auth.currentUser.uid, game_id: gameID },
+    (data: any) => {
+      console.log(data);
+    }
+  );
+  console.log('Ending game...');
+}
