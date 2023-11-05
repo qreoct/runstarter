@@ -21,12 +21,13 @@ import {
 
 import { FriendsNavigator } from './friends-navigator';
 import { ProfileNavigator } from './profile-navigator';
+import { GamesNavigator } from './games-navigator';
 
 type TabParamList = {
   Friends: undefined;
   // Run: undefined;
   ProfileNavigator: undefined;
-  NewRun: undefined;
+  GamesNavigator: undefined;
   // Settings: undefined;
 };
 
@@ -46,7 +47,7 @@ const tabsIcons: TabIconsType = {
   Friends: (props: SvgProps) => <RunnerIcon {...props} />,
   // Run: (props: SvgProps) => <StyleIcon {...props} />,
   ProfileNavigator: (props: SvgProps) => <ProfileIcon {...props} />,
-  NewRun: (props: SvgProps) => <ControllerIcon {...props} />,
+  GamesNavigator: (props: SvgProps) => <ControllerIcon {...props} />,
   // Settings: (props: SvgProps) => <SettingsIcon {...props} />,
 };
 
@@ -67,8 +68,8 @@ const tabs: TabType[] = [
   //   label: 'Run',
   // },
   {
-    name: 'NewRun',
-    component: NewRun,
+    name: 'GamesNavigator',
+    component: GamesNavigator,
     label: 'Games',
   },
   {
