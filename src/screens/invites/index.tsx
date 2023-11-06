@@ -151,7 +151,7 @@ export const Invites = () => {
                     <Text className="text-lg font-bold">
                       {' '}
                       {/** Change to game id / settings? */}
-                      8x1 minute intervals
+                      8x1 minute intervals ({game.id.slice(0, 5)})
                     </Text>
                     <View className="flex flex-row pt-2">
                       {friends.map((friend: any, index: any) => (
