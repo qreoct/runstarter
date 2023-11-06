@@ -285,10 +285,10 @@ export const Run = (props: RunProps) => {
               {formatTimeElapsed(millisecondsLeft)}
             </Text>
             <Text className="text-xl font-semibold text-white/50">
-              {isRunning
-                ? isPaused
-                  ? pauser + ' has paused the game'
-                  : 'Time'
+              {isPaused
+                ? pauser + ' has paused the game'
+                : isRunning
+                ? 'Time'
                 : 'Rest'}
             </Text>
           </View>

@@ -10,5 +10,5 @@ export const fetchGameWithId = async (id: string) => {
   const docSnap = await getDoc(gameRef);
   const game = docSnap.data() as Game;
   game.id = id;
-  return game; 
+  return game;
 };
