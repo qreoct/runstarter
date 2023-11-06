@@ -89,10 +89,11 @@ export const Run = (props: RunProps) => {
   const INTERVAL_DURATION_MS = 60_000;
   const TOTAL_INTERVALS = 8;
 
-  const [isRunning, setIsRunning] = useState(false);
+  const [isRunning, setIsRunning] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [pauser, setPauser] = useState('');
-  const [millisecondsLeft, setMillisecondsLeft] = useState(REST_DURATION_MS);
+  const [millisecondsLeft, setMillisecondsLeft] =
+    useState(INTERVAL_DURATION_MS);
   const [route, setRoute] = useState<Coord[]>([]);
   const [distanceMeters, setDistanceMeters] = useState(0);
   const [previousIntervals, setPreviousIntervals] = useState<Interval[]>([]);
