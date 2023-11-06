@@ -25,9 +25,11 @@ export const Invites = () => {
   const [isNewRunModalVisible, setNewRunModalVisible] = useState(false);
   const [invitedGameIDs, setInvitedGameIDs] = useState<string[]>([]);
   const [invitedGames, setInvitedGames] = useState<any[]>([]);
+  const [selectedGameID, setSelectedGameID] = useState<any>('');
 
   // Function to handle the opening of the NewRun modal
-  const openNewRunModal = () => {
+  const openNewRunModal = (game_id: any) => {
+    setSelectedGameID(game_id);
     setNewRunModalVisible(true);
   };
 
@@ -139,7 +141,7 @@ export const Invites = () => {
                   key={index}
                   className="flex flex-row items-center justify-between p-4"
                   onPress={() => {
-                    openNewRunModal();
+                    openNewRunModal(game.id);
                   }}
                 >
                   <View>
@@ -195,7 +197,7 @@ export const Invites = () => {
             }}
           />
           <View style={{ flex: 1 }}>
-            <NewRun />
+            <NewRun gameId={selectedGameID} />
           </View>
         </SafeAreaView>
       </Modal>
