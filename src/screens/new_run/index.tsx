@@ -127,6 +127,9 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
       <View className="flex flex-1 items-center justify-center">
         <Text className="text-5xl font-extrabold italic">8x1 minute</Text>
         <Text className="text-4xl font-extrabold">intervals</Text>
+        <Text className="p-4 text-xl font-extrabold italic">
+          Room: {roomID.slice(0, 5)}
+        </Text>
       </View>
       <View className="flex items-center justify-center">
         <ScrollView
