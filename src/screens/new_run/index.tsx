@@ -81,7 +81,13 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
     setRunModalVisibility(true);
   });
 
-  // No need listen for game_ended event because it only involves server cleanup
+  const exitGame = () => {
+    // Reset game room
+    setRoomID('');
+    setPlayers([]);
+    setInvitedIds([]);
+    gameId = createGame();
+  }
 
   const handleSheetChange = useCallback(() => {
     if (!currentUser || currentUser.friends?.length === 0) return;
@@ -187,6 +193,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
               setRunModalVisibility(false);
               setRunReportId(runId);
               endGame(roomID);
+              exitGame();
             }}
           />
         </View>
