@@ -189,6 +189,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
         <View>
           <Run
             gameId={roomID}
+            players={players}
             onFinish={(runId) => {
               setRunModalVisibility(false);
               setRunReportId(runId);
