@@ -12,6 +12,7 @@ import { ScrollView, Text, TouchableOpacity, View } from '@/ui';
 import { ModalHeader } from '@/ui/core/modal/modal-header';
 
 import { NewRun } from '../new_run';
+import { set } from 'lodash';
 
 const wait = (timeout: number) => {
   return new Promise((resolve) => {
@@ -25,10 +26,11 @@ export const Invites = () => {
   const [isNewRunModalVisible, setNewRunModalVisible] = useState(false);
   const [invitedGameIDs, setInvitedGameIDs] = useState<string[]>([]);
   const [invitedGames, setInvitedGames] = useState<any[]>([]);
-  const [selectedGameID, setSelectedGameID] = useState<any>('');
+  const [selectedGameID, setSelectedGameID] = useState<any>(null);
 
   // Function to handle the opening of the NewRun modal
   const openNewRunModal = (game_id: any) => {
+    console.log("Game Model:", game_id);
     setSelectedGameID(game_id);
     setNewRunModalVisible(true);
   };
@@ -141,6 +143,7 @@ export const Invites = () => {
                   key={index}
                   className="flex flex-row items-center justify-between p-4"
                   onPress={() => {
+                    console.log("Game:", game);
                     openNewRunModal(game.id);
                   }}
                 >
@@ -194,6 +197,7 @@ export const Invites = () => {
             title=""
             dismiss={() => {
               setNewRunModalVisible(false);
+              setSelectedGameID(null);
             }}
           />
           <View style={{ flex: 1 }}>

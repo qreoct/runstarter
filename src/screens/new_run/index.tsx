@@ -43,6 +43,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
   const [invitedIds, setInvitedIds] = useState<string[]>([]);
 
   useEffect(() => {
+    console.log('gameId', gameId);
     if (!gameId) {
       createGame();
     } else {
