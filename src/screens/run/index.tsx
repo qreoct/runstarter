@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import Geolocation from '@react-native-community/geolocation';
 import { addDoc, collection } from 'firebase/firestore';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { auth, db } from '@/database/firebase-config';
 import {
@@ -38,6 +38,7 @@ export interface Coord {
   speed: number | null;
 }
 
+/* eslint-disable max-params */
 const calculateDistance = (
   lat1: number,
   lon1: number,
@@ -108,7 +109,7 @@ export const Run = (props: RunProps) => {
           const oldCoords = latestCoordsRef.current;
           const newCoords = position.coords;
           latestCoordsRef.current = newCoords;
-          setRoute((route) => [...route, newCoords]);
+          setRoute((routeToSet) => [...routeToSet, newCoords]);
           if (oldCoords) {
             setDistanceMeters(
               (distance) => distance + calcDistance(oldCoords, newCoords)
@@ -161,17 +162,20 @@ export const Run = (props: RunProps) => {
       .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,'); // commas every third digit
   }
 
-  async function saveAndEndRun(run: IntervalRun) {
-    const uid = auth.currentUser?.uid;
-    if (!uid) {
-      console.error('No user logged in.');
-      return;
-    }
-    const collectionRef = collection(db, 'users', uid, 'runs');
-    const docRef = await addDoc(collectionRef, run);
-    console.log('Document saved with ID: ', docRef.id);
-    props.onFinish(docRef.id);
-  }
+  const saveAndEndRun = useCallback(
+    async (run: IntervalRun) => {
+      const uid = auth.currentUser?.uid;
+      if (!uid) {
+        console.error('No user logged in.');
+        return;
+      }
+      const collectionRef = collection(db, 'users', uid, 'runs');
+      const docRef = await addDoc(collectionRef, run);
+      console.log('Document saved with ID: ', docRef.id);
+      props.onFinish(docRef.id);
+    },
+    [props]
+  );
 
   useEffect(() => {
     if (isPaused) {
@@ -185,13 +189,6 @@ export const Run = (props: RunProps) => {
         if (newMillisecondsLeft >= 0) {
           // interval still happening
           setMillisecondsLeft(newMillisecondsLeft);
-          // console.log('RUN', {
-          //   currentInterval: previousIntervals.length + 1,
-          //   newMillisecondsLeft,
-          //   distance: distanceMeters,
-          //   pace: lastAvgPace(),
-          //   route: route.length,
-          // });
         } else {
           // interval ended. transition to rest or end the run.
           const interval: Interval = {
@@ -240,7 +237,15 @@ export const Run = (props: RunProps) => {
       }, pollMs);
       return () => clearInterval(timer);
     }
-  }, [isRunning, isPaused, millisecondsLeft]);
+  }, [
+    isRunning,
+    isPaused,
+    millisecondsLeft,
+    distanceMeters,
+    route,
+    previousIntervals,
+    saveAndEndRun,
+  ]);
 
   return (
     <>

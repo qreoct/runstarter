@@ -46,3 +46,13 @@ export const extractError = (data: unknown): string => {
   }
   return 'Something went wrong ';
 };
+
+export const generateProfilePicture = (name: string) => {
+  // generate integer from 0-6 based on name
+  const num = name
+    .split('')
+    .map((char) => char.charCodeAt(0))
+    .reduce((acc, curr) => acc + curr, 0);
+
+  return `https://storage.googleapis.com/runsquad-images/${num % 6}.png`;
+};

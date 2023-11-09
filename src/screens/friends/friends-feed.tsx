@@ -54,7 +54,7 @@ export const FriendsFeed = () => {
           message: 'I ran 5.2km and won in Duck Duck Chase!',
           avatar:
             user.photoURL?.toString() ||
-            'https://images.pexels.com/photos/598745/pexels-photo-598745.jpeg?crop=faces&fit=crop&h=200&w=200&auto=compress&cs=tinysrgb',
+            'https://storage.googleapis.com/runsquad-images/0.png',
           timestamp: '5H',
         });
         setActivity(friendsActivity);

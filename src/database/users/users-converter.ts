@@ -1,3 +1,4 @@
+import { generateProfilePicture } from '../utils';
 import type { User } from './types';
 
 // Firestore data converter
@@ -6,7 +7,7 @@ export const userConverter = {
     id: user.id,
     name: user.name,
     age: user.age,
-    photoURL: user.photoURL || '',
+    photoURL: user.photoURL,
     gender: user.gender,
     runningGoal: user.runningGoal,
     runningHabit: user.runningHabit,
@@ -19,7 +20,7 @@ export const userConverter = {
       name: data.name,
       age: data.age,
       gender: data.gender,
-      photoURL: data.photoURL,
+      photoURL: data.photoURL || generateProfilePicture(data.name),
       runningGoal: data.runningGoal,
       runningHabit: data.runningHabit,
       friends: data.friends,
