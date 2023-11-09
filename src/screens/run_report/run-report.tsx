@@ -6,6 +6,7 @@ import { auth, db } from '@/database/firebase-config';
 import { fetchGameLeaderboard } from '@/database/games';
 import type { Coord, IntervalRun } from '@/database/runs';
 import { Image, ScrollView, Text, View } from '@/ui';
+import { socket } from 'server/server-utils';
 
 export interface RunReportProps {
   gameId: string;
@@ -112,8 +113,13 @@ export const RunReport = ({ gameId, runId }: RunReportProps) => {
   const [run, setRun] = useState<IntervalRun | null>(null);
   const [_isLoading, setIsLoading] = useState(true);
   const [_error, setError] = useState<any>(null);
+  const [gameEnded, setGameEnded] = useState(false);
 
   const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
+
+  socket.on('game_ended', async (data: any) => {
+    setGameEnded(true);
+  });
 
   useEffect(() => {
     const fetchLeaderboardData = async () => {
@@ -134,7 +140,7 @@ export const RunReport = ({ gameId, runId }: RunReportProps) => {
     };
 
     fetchLeaderboardData();
-  }, [runId]);
+  }, [gameEnded]);
 
   // const leaderboardData = [
   //   {
