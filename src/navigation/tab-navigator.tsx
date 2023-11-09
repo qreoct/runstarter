@@ -1,6 +1,8 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import type { RouteProp } from '@react-navigation/native';
+import { StackActions } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Badge, Icon as IconComponent } from '@rneui/base';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { useColorScheme } from 'nativewind';
 import type { ComponentType } from 'react';
@@ -13,10 +15,8 @@ import { auth } from '@/database/firebase-config';
 import { userConverter } from '@/database/users/users-converter';
 import {
   colors,
-  Controller as ControllerIcon,
   Profile as ProfileIcon,
   Runner as RunnerIcon,
-  Text,
   View,
 } from '@/ui';
 
@@ -26,10 +26,8 @@ import { ProfileNavigator } from './profile-navigator';
 
 type TabParamList = {
   Friends: undefined;
-  // Run: undefined;
   ProfileNavigator: undefined;
   GamesNavigator: undefined;
-  // Settings: undefined;
 };
 
 type TabType = {
@@ -45,23 +43,42 @@ type TabIconsType = {
 const Tab = createBottomTabNavigator<TabParamList>();
 
 const tabsIcons: TabIconsType = {
-  Friends: (props: SvgProps) => <RunnerIcon {...props} />,
-  // Run: (props: SvgProps) => <StyleIcon {...props} />,
-  ProfileNavigator: (props: SvgProps) => <ProfileIcon {...props} />,
-  GamesNavigator: (props: SvgProps) => {
+  Friends: (props: SvgProps) => {
+    const requests = useAuth().currentUser?.friendRequests.pending || [];
     return (
       <View>
-        <ControllerIcon {...props} />
-        <View className="absolute -right-2 -top-1 h-4 w-4 items-center justify-center rounded-full bg-red-600">
-          <Text className="text-xs font-bold text-white">1</Text>
-        </View>
+        <RunnerIcon {...props} />
+        {requests.length > 0 && (
+          <Badge
+            status="primary"
+            value={requests.length}
+            containerStyle={{ position: 'absolute', top: 0, left: 20 }}
+          />
+        )}
       </View>
     );
   },
-  // Settings: (props: SvgProps) => <SettingsIcon {...props} />,
+  GamesNavigator: (props: SvgProps) => {
+    const invitedGames = useAuth().currentUser?.invitedGames || [];
+    return (
+      <View>
+        <IconComponent
+          name="game-controller"
+          type="ionicon"
+          color={props.color}
+        />
+        {invitedGames.length > 0 && (
+          <Badge
+            status="primary"
+            value={invitedGames.length}
+            containerStyle={{ position: 'absolute', top: 0, left: 20 }}
+          />
+        )}
+      </View>
+    );
+  },
+  ProfileNavigator: (props: SvgProps) => <ProfileIcon {...props} />,
 };
-
-import { StackActions } from '@react-navigation/native';
 
 // from https://stackoverflow.com/a/67895977
 const resetStacksOnTabClicks = ({ navigation }: any) => ({
@@ -92,11 +109,6 @@ const tabs: TabType[] = [
     component: FriendsNavigator,
     label: 'Friends',
   },
-  // {
-  //   name: 'Run',
-  //   component: Run,
-  //   label: 'Run',
-  // },
   {
     name: 'GamesNavigator',
     component: GamesNavigator,
@@ -120,7 +132,7 @@ const BarIcon = ({ color, name, ...reset }: BarIconType) => {
 };
 
 export const TabNavigator = () => {
-  /* query and set store for user */
+  /* query and set store for user, this affects all screens */
   const setCurrentUser = useAuth((state) => state.setCurrentUser);
   const currentUserId = auth.currentUser?.uid;
 
@@ -152,6 +164,7 @@ export const TabNavigator = () => {
   const { colorScheme } = useColorScheme();
   return (
     <Tab.Navigator
+      initialRouteName="GamesNavigator"
       screenOptions={({ route }) => ({
         tabBarInactiveTintColor:
           colorScheme === 'dark' ? colors.charcoal[400] : colors.neutral[400],

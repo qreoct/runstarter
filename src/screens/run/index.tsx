@@ -86,7 +86,7 @@ export const Run = (props: RunProps) => {
       setPauser(data.pauser);
     });
 
-    socket.on('game_resumed', (data: any) => {
+    socket.on('game_resumed', (_data: any) => {
       setIsPaused(false);
       setPauser('');
     });

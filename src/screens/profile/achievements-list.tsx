@@ -104,7 +104,7 @@ const AchievementsPage = () => {
   );
 
   return (
-    <View className="min-h-4">
+    <View className="min-h-full">
       <FlashList
         data={achievementsData}
         keyExtractor={(item) => item.id.toString()}

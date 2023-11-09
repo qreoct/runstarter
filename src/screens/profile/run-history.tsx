@@ -67,12 +67,12 @@ export const RunHistory = ({ user }: RunHistoryProps) => {
   }
 
   return (
-    <View className="min-h-4">
+    <View className="min-h-full">
       <FlashList
         data={runs}
         renderItem={renderItem}
         keyExtractor={(_, index) => `item-${index}`}
-        ListEmptyComponent={<EmptyList isLoading={user === undefined} />}
+        ListEmptyComponent={<EmptyList isLoading={runs.length === 0} />}
         estimatedItemSize={15}
       />
     </View>

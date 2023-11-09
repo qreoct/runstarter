@@ -13,6 +13,7 @@ export const userConverter = {
     runningHabit: user.runningHabit,
     friends: user.friends,
     friendRequests: user.friendRequests,
+    invitedGames: user.invitedGames,
   }),
   fromFirestore: (snapshot: any, options: any) => {
     const data = snapshot.data(options);
@@ -25,6 +26,7 @@ export const userConverter = {
       runningHabit: data.runningHabit,
       friends: data.friends,
       friendRequests: data.friendRequests,
+      invitedGames: data.invitedGames,
     };
   },
 };

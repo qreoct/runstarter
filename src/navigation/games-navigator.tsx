@@ -1,27 +1,46 @@
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { StackActions, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Badge, Icon } from '@rneui/themed';
 import * as React from 'react';
+import { View } from 'react-native';
 
+import { useAuth } from '@/core';
 import { Invites, NewRun } from '@/screens';
-import { Pressable, Text, View } from '@/ui';
 
 export type GamesStackParamList = {
   Games: undefined;
-  Invites: undefined;
+  Invites: { invitedGameIDs: string[] };
 };
 
 const Stack = createNativeStackNavigator<GamesStackParamList>();
 
 const GoToInvites = () => {
-  const { navigate } = useNavigation();
+  const navigation = useNavigation();
+  const invitedGameIDs = useAuth().currentUser?.invitedGames || [];
   return (
-    <Pressable onPress={() => navigate('Invites')} className="p-2">
-      <Ionicons name="mail-open-outline" size={24} />
-      <View className="absolute -right-[0.5] -top-[0.5] h-4 w-4 items-center justify-center rounded-full bg-red-600">
-        <Text className="text-xs font-bold text-white">1</Text>
-      </View>
-    </Pressable>
+    <View>
+      <Icon
+        name={
+          invitedGameIDs.length === 0 ? 'mail-outline' : 'mail-open-outline'
+        }
+        type="ionicon"
+        containerStyle={{ padding: 8 }}
+        onPress={() =>
+          navigation.dispatch(
+            StackActions.push('Invites', {
+              invitedGameIDs: invitedGameIDs,
+            })
+          )
+        }
+      />
+      {invitedGameIDs.length > 0 && (
+        <Badge
+          status="primary"
+          value={invitedGameIDs.length}
+          containerStyle={{ position: 'absolute', top: 0, left: 20 }}
+        />
+      )}
+    </View>
   );
 };
 

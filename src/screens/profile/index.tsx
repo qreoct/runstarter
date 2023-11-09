@@ -24,8 +24,6 @@ export const Profile = () => {
   const [index, setIndex] = React.useState(0);
   const user = useAuth().currentUser;
 
-  console.log('user received on profile page is ', user);
-
   return (
     <>
       <FocusAwareStatusBar />
@@ -67,17 +65,17 @@ export const Profile = () => {
 
           <TabView value={index} onChange={setIndex} animationType="spring">
             <TabView.Item>
-              <ScrollView className="w-screen px-4 pt-4">
+              <ScrollView className="min-h-full w-screen px-4 pt-4">
                 <Text h4>Your Run History</Text>
-                <View className="min-h-20 pb-8">
+                <View className="min-h-full pb-8">
                   <RunHistory user={user} />
                 </View>
               </ScrollView>
             </TabView.Item>
             <TabView.Item>
-              <ScrollView className="w-screen p-4">
+              <ScrollView className="min-h-full w-screen p-4">
                 <Text h4>Your Achievements</Text>
-                <View className="min-h-20 pb-8">
+                <View className="min-h-full pb-8">
                   <AchievementsPage />
                 </View>
               </ScrollView>
