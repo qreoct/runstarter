@@ -4,6 +4,7 @@ export interface PreSavedIntervalRun {
 }
 
 export interface IntervalRun extends PreSavedIntervalRun {
+  gameId: string;
   id: string;
 }
 

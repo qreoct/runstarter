@@ -4,6 +4,7 @@ import { addDoc, collection } from 'firebase/firestore';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { pauseGame, resumeGame, socket } from 'server/server-utils';
 
+import type { User } from '@/api';
 import { auth, db } from '@/database/firebase-config';
 import type { Coord, Interval, PreSavedIntervalRun } from '@/database/runs';
 import {
@@ -14,7 +15,6 @@ import {
   TouchableOpacity,
   View,
 } from '@/ui';
-import { User } from '@/api';
 
 export interface RunProps {
   gameId: string;
@@ -28,7 +28,6 @@ const calculateDistance = (
   lon1: number,
   lat2: number,
   lon2: number
-  // eslint-disable-next-line max-params
 ): number => {
   const R = 6371e3;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -295,7 +294,7 @@ export const Run = (props: RunProps) => {
                   className="h-20 w-20 rounded-full"
                 />
                 <Text
-                  className="text-neutral-200 text-xs font-normal"
+                  className="text-xs font-normal text-neutral-200"
                   numberOfLines={1}
                 >
                   {player.name}

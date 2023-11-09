@@ -4,6 +4,7 @@ import type { IntervalRun } from './types';
 export const intervalRunConverter = {
   toFirestore: (intervalRun: IntervalRun) => ({
     id: intervalRun.id,
+    game: intervalRun.gameId,
     createdAt: intervalRun.createdAt,
     intervals: intervalRun.intervals,
   }),
@@ -11,6 +12,7 @@ export const intervalRunConverter = {
     const data = snapshot.data(options);
     return {
       id: data.id,
+      gameId: data.game,
       createdAt: data.createdAt,
       intervals: data.intervals,
     };

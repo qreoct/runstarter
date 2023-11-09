@@ -9,7 +9,7 @@ import { Pressable, Settings as SettingsIcon } from '@/ui';
 export type ProfileStackParamList = {
   Profile: undefined;
   Settings: undefined;
-  RunReport: { runId: string };
+  RunReport: { gameId: string; runId: string };
 };
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();

@@ -12,6 +12,6 @@ type RunReportScreenProps = NativeStackScreenProps<
 >;
 
 export const RunReportScreen = ({ route }: RunReportScreenProps) => {
-  const { runId } = route.params;
-  return <RunReport runId={runId} />;
+  const { gameId, runId } = route.params;
+  return <RunReport gameId={gameId} runId={runId} />;
 };

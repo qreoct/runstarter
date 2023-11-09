@@ -84,3 +84,17 @@ export async function finishUserOnboarding(uid) {
     friends: [],
   });
 }
+
+/**
+ * @param {string} uid
+ * @param {string} runId
+ * @param {string} gameId
+ */
+export async function linkRunToGame(uid, runId, gameId) {
+  const runRef = doc(db, 'users', uid, 'runs', runId);
+  const gameRef = doc(db, 'games', gameId);
+  updateDoc(runRef, {
+    game: gameId,
+  });
+  setDoc(gameRef, { runs: { [uid]: runId } }, { merge: true });
+}

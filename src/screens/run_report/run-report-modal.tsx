@@ -6,11 +6,16 @@ import { ModalHeader } from '@/ui/core/modal/modal-header';
 import { RunReport } from './run-report';
 
 type RunReportModalProps = {
+  gameId: string;
   runId: string;
   onFinish: () => void;
 };
 
-export const RunReportModal = ({ runId, onFinish }: RunReportModalProps) => {
+export const RunReportModal = ({
+  gameId,
+  runId,
+  onFinish,
+}: RunReportModalProps) => {
   return (
     <SafeAreaView>
       <ModalHeader
@@ -19,7 +24,7 @@ export const RunReportModal = ({ runId, onFinish }: RunReportModalProps) => {
           onFinish();
         }}
       />
-      <RunReport runId={runId} />
+      <RunReport gameId={gameId} runId={runId} />
     </SafeAreaView>
   );
 };

@@ -31,6 +31,7 @@ export const RunHistory = ({ user }: RunHistoryProps) => {
     (run: IntervalRun) => {
       navigation.dispatch(
         StackActions.push('RunReport', {
+          gameId: run.gameId,
           runId: run.id,
         })
       );

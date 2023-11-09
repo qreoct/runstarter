@@ -100,6 +100,19 @@ def set_game_state(game_id, game_state):
         # add the game to the database
         games_ref.add(game_state)
 
+def get_game_state(game_id):
+    # Reference to the games collection
+    games_ref = db.collection('games')
+    
+    # Fetch the document with the given game_id
+    doc = games_ref.document(game_id).get()
+    
+    # Check if the document exists and return its data
+    if doc.exists:
+        return doc.to_dict()
+    else:
+        return None
+
 def end_game(game_id):
     for user_id in active_games[game_id]["players"]:
         users[user_id]["currentGame"] = None
@@ -109,9 +122,10 @@ def end_game(game_id):
     # Remove the game locally and add it to the database
     active_games[game_id]["active"] = False
     set_game_state(game_id, active_games[game_id])
-    active_games[game_id] = None
+    print('ended game:', game_id)
     emit('status_change', {'status': 'game ended'}, room=game_id)
-    emit('game_ended', room=game_id)
+    emit('game_ended', active_games[game_id], room=game_id)
+    active_games[game_id] = None
 
 @socketio.on('connect')
 def on_connect():
@@ -136,6 +150,7 @@ def on_disconnect():
     #     if users[firebase_uid]["currentGame"]:
     #         leave_room(users[firebase_uid]["currentGame"])
     #     users.pop(firebase_uid)
+    user_end_game({'user_id': firebase_uid, 'game_id': users[firebase_uid]["currentGame"]})
     print(firebase_uid + ' disconnected')
 
 @socketio.on('create_game')
@@ -314,7 +329,7 @@ def user_end_game(data):
         print(f'User {user_id} not in game {game_id}!')
         return
     active_games[game_id]["playing"].remove(user_id)
-    if len(active_games[game_id]["playing"]) == 1:
+    if len(active_games[game_id]["playing"]) == 0:
         # Last player ends the game
         end_game(game_id)
 
