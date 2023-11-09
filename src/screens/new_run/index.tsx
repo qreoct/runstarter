@@ -69,15 +69,17 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
     }
   }, [gameId]);
 
-  socket.on('player_change', async (data: any) => {
-    const newPlayers = await fetchUsersWithIds(data.players);
-    setPlayers(newPlayers);
-  });
-
-  socket.on('game_started', async (_data: any) => {
-    // TODO: Play game-start sound and start 5 sec countdown
-    setRunModalVisibility(true);
-  });
+  if (socket) {
+    socket.on('player_change', async (data: any) => {
+      const newPlayers = await fetchUsersWithIds(data.players);
+      setPlayers(newPlayers);
+    });
+  
+    socket.on('game_started', async (_data: any) => {
+      // TODO: Play game-start sound and start 5 sec countdown
+      setRunModalVisibility(true);
+    });
+  }
 
   const exitGame = () => {
     // Reset game room
