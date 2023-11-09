@@ -61,6 +61,26 @@ const tabsIcons: TabIconsType = {
   // Settings: (props: SvgProps) => <SettingsIcon {...props} />,
 };
 
+import { StackActions } from '@react-navigation/native';
+
+// from https://stackoverflow.com/a/67895977
+const resetStacksOnTabClicks = ({ navigation }: any) => ({
+  tabPress: (e: any) => {
+    const state = navigation.getState();
+    if (state) {
+      const nonTargetTabs = state.routes.filter((r: any) => r.key !== e.target);
+      nonTargetTabs.forEach((tab: any) => {
+        if (tab?.state?.key) {
+          navigation.dispatch({
+            ...StackActions.popToTop(),
+            target: tab?.state?.key,
+          });
+        }
+      });
+    }
+  },
+});
+
 export type TabList<T extends keyof TabParamList> = {
   navigation: NativeStackNavigationProp<TabParamList, T>;
   route: RouteProp<TabParamList, T>;
@@ -101,7 +121,7 @@ const BarIcon = ({ color, name, ...reset }: BarIconType) => {
 
 export const TabNavigator = () => {
   /* query and set store for user */
-  const setUser = useAuth((state) => state.setCurrentUser);
+  const setCurrentUser = useAuth((state) => state.setCurrentUser);
   const currentUserId = auth.currentUser?.uid;
 
   React.useEffect(() => {
@@ -112,10 +132,10 @@ export const TabNavigator = () => {
     const userRef = doc(db, 'users', currentUserId).withConverter(
       userConverter
     );
-    const unsubscribe = onSnapshot(userRef, (snapshot) => {
+    const unsubscribe = onSnapshot(userRef, async (snapshot) => {
       const data = snapshot.data();
       if (data) {
-        setUser({
+        setCurrentUser({
           ...data,
           id: currentUserId,
         });
@@ -124,10 +144,10 @@ export const TabNavigator = () => {
 
     // cleanup & unsubscribe
     return () => {
-      setUser(undefined);
+      setCurrentUser(undefined);
       unsubscribe();
     };
-  }, [setUser, currentUserId]);
+  }, [setCurrentUser, currentUserId]);
 
   const { colorScheme } = useColorScheme();
   return (
@@ -154,6 +174,7 @@ export const TabNavigator = () => {
                 title: label,
                 tabBarTestID: `${name}-tab`,
               }}
+              listeners={resetStacksOnTabClicks}
             />
           );
         })}

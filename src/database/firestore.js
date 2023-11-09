@@ -2,6 +2,8 @@ import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 import { db } from '@/database/firebase-config';
 
+import { generateProfilePicture } from './utils';
+
 /**
  * @param {any} user
  */
@@ -9,6 +11,9 @@ export async function addUserIfNotExist(user) {
   const userRef = doc(db, 'users', user.uid);
   const docSnap = await getDoc(userRef);
   if (!docSnap.exists()) {
+    if (user.photoURL === null) {
+      user.photoURL = generateProfilePicture(user.uid);
+    }
     await setDoc(userRef, {
       hasCompletedOnboarding: false,
       photoURL: user.photoURL,

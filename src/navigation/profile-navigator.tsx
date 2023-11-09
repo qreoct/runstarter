@@ -3,11 +3,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 
 import { Profile, Settings } from '@/screens';
+import { RunReportScreen } from '@/screens/run_report/run-report-screen';
 import { Pressable, Settings as SettingsIcon } from '@/ui';
 
 export type ProfileStackParamList = {
   Profile: undefined;
   Settings: undefined;
+  RunReport: { runId: string };
 };
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
@@ -35,6 +37,10 @@ export const ProfileNavigator = () => {
 
       <Stack.Group>
         <Stack.Screen name="Settings" component={Settings} />
+      </Stack.Group>
+
+      <Stack.Group screenOptions={{ title: 'Run Report' }}>
+        <Stack.Screen name="RunReport" component={RunReportScreen} />
       </Stack.Group>
     </Stack.Navigator>
   );

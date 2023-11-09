@@ -24,8 +24,9 @@ import {
 } from '@/ui';
 
 import { Run } from '../run';
-import { RunReport } from '../run_report';
+import { RunReportModal } from '../run_report/run-report-modal';
 
+/* eslint-disable max-lines-per-function */
 export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
   // state to control modal visibility
   const [friends, setFriends] = useState<User[]>([]);
@@ -207,7 +208,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
         // onRequestClose={handlePress} // for Android back button
       >
         <View>
-          <RunReport
+          <RunReportModal
             runId={runReportId!}
             onFinish={() => {
               setRunReportId(null);
