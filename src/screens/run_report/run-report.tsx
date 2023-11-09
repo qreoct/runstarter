@@ -142,41 +142,6 @@ export const RunReport = ({ gameId, runId }: RunReportProps) => {
     fetchLeaderboardData();
   }, [gameEnded]);
 
-  // const leaderboardData = [
-  //   {
-  //     rank: 1,
-  //     profilePic:
-  //       'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-  //     name: 'Dexter Leng',
-  //     distance: 3.01,
-  //     avgPace: '2\'83"',
-  //   },
-  //   {
-  //     rank: 2,
-  //     profilePic:
-  //       'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-  //     name: 'Aria Stark',
-  //     distance: 2.78,
-  //     avgPace: '3\'12"',
-  //   },
-  //   {
-  //     rank: 3,
-  //     profilePic:
-  //       'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-  //     name: 'John Snow',
-  //     distance: 2.5,
-  //     avgPace: '3\'40"',
-  //   },
-  //   {
-  //     rank: 4,
-  //     profilePic:
-  //       'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-  //     name: 'Bartholomew Alexander Maximillian Montgomery Fitzgerald III',
-  //     distance: 2.1,
-  //     avgPace: '4\'05"',
-  //   },
-  // ];
-
   useEffect(() => {
     const fetchRunData = async () => {
       try {
@@ -189,6 +154,7 @@ export const RunReport = ({ gameId, runId }: RunReportProps) => {
         if (runSnapshot.exists()) {
           const runData = {
             id: runSnapshot.id,
+            gameId: runSnapshot.data().gameId,
             ...runSnapshot.data(),
           } as IntervalRun;
           console.log(runData);
