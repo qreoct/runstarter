@@ -5,8 +5,10 @@ import MapView, { Marker, Polyline } from 'react-native-maps';
 import { auth, db } from '@/database/firebase-config';
 import type { Coord, IntervalRun } from '@/database/runs';
 import { Image, ScrollView, Text, View } from '@/ui';
+import { fetchGameLeaderboard } from '@/database/games';
 
 export interface RunReportProps {
+  gameId: string;
   runId: string;
 }
 
@@ -106,45 +108,69 @@ function _calculateRegion(coords: Coord[]) {
 }
 
 /* eslint-disable max-lines-per-function */
-export const RunReport = ({ runId }: RunReportProps) => {
+export const RunReport = ({ gameId, runId }: RunReportProps) => {
   const [run, setRun] = useState<IntervalRun | null>(null);
   const [_isLoading, setIsLoading] = useState(true);
   const [_error, setError] = useState<any>(null);
 
-  const leaderboardData = [
-    {
-      rank: 1,
-      profilePic:
-        'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-      name: 'Dexter Leng',
-      distance: 3.01,
-      avgPace: '2\'83"',
-    },
-    {
-      rank: 2,
-      profilePic:
-        'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-      name: 'Aria Stark',
-      distance: 2.78,
-      avgPace: '3\'12"',
-    },
-    {
-      rank: 3,
-      profilePic:
-        'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-      name: 'John Snow',
-      distance: 2.5,
-      avgPace: '3\'40"',
-    },
-    {
-      rank: 4,
-      profilePic:
-        'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-      name: 'Bartholomew Alexander Maximillian Montgomery Fitzgerald III',
-      distance: 2.1,
-      avgPace: '4\'05"',
-    },
-  ];
+  const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchLeaderboardData = async () => {
+      const leaderboardData = await fetchGameLeaderboard(gameId);
+      if (!leaderboardData) {
+        // Game still in progress
+        console.log("No leaderboard data yet!");
+        return
+      }
+      // Update leaderboard avgPace
+      for (let entry of leaderboardData) {
+        entry.avgPace = formatAvgPace(entry.time, entry.distance);
+        // Convert distance from m to km
+        entry.distance = entry.distance / 1000;
+      }
+      console.log("leaderboard:", leaderboardData);
+      setLeaderboardData(leaderboardData);
+    };
+
+    fetchLeaderboardData();
+  }
+  , [runId]);
+
+  // const leaderboardData = [
+  //   {
+  //     rank: 1,
+  //     profilePic:
+  //       'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
+  //     name: 'Dexter Leng',
+  //     distance: 3.01,
+  //     avgPace: '2\'83"',
+  //   },
+  //   {
+  //     rank: 2,
+  //     profilePic:
+  //       'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
+  //     name: 'Aria Stark',
+  //     distance: 2.78,
+  //     avgPace: '3\'12"',
+  //   },
+  //   {
+  //     rank: 3,
+  //     profilePic:
+  //       'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
+  //     name: 'John Snow',
+  //     distance: 2.5,
+  //     avgPace: '3\'40"',
+  //   },
+  //   {
+  //     rank: 4,
+  //     profilePic:
+  //       'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
+  //     name: 'Bartholomew Alexander Maximillian Montgomery Fitzgerald III',
+  //     distance: 2.1,
+  //     avgPace: '4\'05"',
+  //   },
+  // ];
 
   useEffect(() => {
     const fetchRunData = async () => {
@@ -274,7 +300,8 @@ export const RunReport = ({ runId }: RunReportProps) => {
             <View className="pt-4">
               <Text className="text-lg font-bold">Leaderboard</Text>
               <View>
-                {leaderboardData.map((entry, index) => (
+                {leaderboardData.length > 0 
+                ? leaderboardData.map((entry, index) => (
                   <View
                     key={index}
                     className="flex flex-row items-center border-b border-gray-200 py-2"
@@ -300,7 +327,8 @@ export const RunReport = ({ runId }: RunReportProps) => {
                       </Text>
                     </View>
                   </View>
-                ))}
+                ))
+              : <Text className="text-sm text-neutral-600">Game still in progress, no leaderboard data yet!</Text>}
               </View>
             </View>
 

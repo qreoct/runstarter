@@ -10,6 +10,7 @@ import {
   socket,
   startGame,
 } from 'server/server-utils';
+import { linkRunToGame } from '@/database';
 
 import type { User } from '@/api';
 import { fetchUsersWithIds } from '@/api';
@@ -195,7 +196,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
               setRunModalVisibility(false);
               setRunReportId(runId);
               endGame(roomID);
-              exitGame();
+              linkRunToGame(currentUser!.id, runId!, roomID);
             }}
           />
         </View>
@@ -209,9 +210,11 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
       >
         <View>
           <RunReportModal
+            gameId={roomID}
             runId={runReportId!}
             onFinish={() => {
               setRunReportId(null);
+              exitGame();
             }}
           />
         </View>
