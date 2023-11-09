@@ -4,6 +4,7 @@ import { addDoc, collection } from 'firebase/firestore';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { auth, db } from '@/database/firebase-config';
+import type { Coord, Interval, PreSavedIntervalRun } from '@/database/runs';
 import {
   Image,
   SafeAreaView,
@@ -17,33 +18,13 @@ export interface RunProps {
   onFinish: (id: string | null) => void;
 }
 
-export interface IntervalRun {
-  intervals: Interval[];
-  createdAt: number;
-}
-
-export interface Interval {
-  durationMs: number;
-  distanceMeters: number;
-  route: Coord[];
-}
-
-export interface Coord {
-  latitude: number;
-  longitude: number;
-  altitude: number | null;
-  accuracy: number;
-  altitudeAccuracy: number | null;
-  heading: number | null;
-  speed: number | null;
-}
-
 /* eslint-disable max-params */
 const calculateDistance = (
   lat1: number,
   lon1: number,
   lat2: number,
   lon2: number
+  // eslint-disable-next-line max-params
 ): number => {
   const R = 6371e3;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -163,7 +144,7 @@ export const Run = (props: RunProps) => {
   }
 
   const saveAndEndRun = useCallback(
-    async (run: IntervalRun) => {
+    async (run: PreSavedIntervalRun) => {
       const uid = auth.currentUser?.uid;
       if (!uid) {
         console.error('No user logged in.');
@@ -209,7 +190,7 @@ export const Run = (props: RunProps) => {
           // TODO: implement an end state
           if (previousIntervals.length + 1 === TOTAL_INTERVALS) {
             const intervals = [...previousIntervals, interval];
-            const run: IntervalRun = {
+            const run: PreSavedIntervalRun = {
               intervals,
               createdAt: Date.now(),
             };
@@ -319,7 +300,7 @@ export const Run = (props: RunProps) => {
                     route,
                   };
                   const intervals = [...previousIntervals, interval];
-                  const run: IntervalRun = {
+                  const run: PreSavedIntervalRun = {
                     intervals,
                     createdAt: Date.now(),
                   };

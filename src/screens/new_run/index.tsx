@@ -10,7 +10,7 @@ import { useAuth } from '@/core';
 import { FocusAwareStatusBar, Text, TouchableOpacity, View } from '@/ui';
 
 import { Run } from '../run';
-import { RunReport } from '../run_report';
+import { RunReportModal } from '../run_report/run-report-modal';
 
 /* eslint-disable max-lines-per-function */
 export const NewRun: React.FC = () => {
@@ -108,7 +108,7 @@ export const NewRun: React.FC = () => {
           // onRequestClose={handlePress} // for Android back button
         >
           <View>
-            <RunReport
+            <RunReportModal
               runId={runReportId!}
               onFinish={() => {
                 setRunReportId(null);
