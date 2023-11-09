@@ -3,9 +3,9 @@ import React, { Fragment, useEffect, useState } from 'react';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 
 import { auth, db } from '@/database/firebase-config';
+import { fetchGameLeaderboard } from '@/database/games';
 import type { Coord, IntervalRun } from '@/database/runs';
 import { Image, ScrollView, Text, View } from '@/ui';
-import { fetchGameLeaderboard } from '@/database/games';
 
 export interface RunReportProps {
   gameId: string;
@@ -120,8 +120,8 @@ export const RunReport = ({ gameId, runId }: RunReportProps) => {
       const leaderboardData = await fetchGameLeaderboard(gameId);
       if (!leaderboardData) {
         // Game still in progress
-        console.log("No leaderboard data yet!");
-        return
+        console.log('No leaderboard data yet!');
+        return;
       }
       // Update leaderboard avgPace
       for (let entry of leaderboardData) {
@@ -129,13 +129,12 @@ export const RunReport = ({ gameId, runId }: RunReportProps) => {
         // Convert distance from m to km
         entry.distance = entry.distance / 1000;
       }
-      console.log("leaderboard:", leaderboardData);
+      console.log('leaderboard:', leaderboardData);
       setLeaderboardData(leaderboardData);
     };
 
     fetchLeaderboardData();
-  }
-  , [runId]);
+  }, [runId]);
 
   // const leaderboardData = [
   //   {
@@ -300,35 +299,42 @@ export const RunReport = ({ gameId, runId }: RunReportProps) => {
             <View className="pt-4">
               <Text className="text-lg font-bold">Leaderboard</Text>
               <View>
-                {leaderboardData.length > 0 
-                ? leaderboardData.map((entry, index) => (
-                  <View
-                    key={index}
-                    className="flex flex-row items-center border-b border-gray-200 py-2"
-                  >
-                    <Text className="mr-4 text-lg font-semibold">
-                      {entry.rank}
-                    </Text>
-                    <Image
-                      source={{ uri: entry.profilePic }}
-                      className="mr-4 h-8 w-8 rounded-full"
-                    />
-                    <View style={{ flex: 2 }}>
-                      <Text className="text-md font-semibold" numberOfLines={1}>
-                        {entry.name}
+                {leaderboardData.length > 0 ? (
+                  leaderboardData.map((entry, index) => (
+                    <View
+                      key={index}
+                      className="flex flex-row items-center border-b border-gray-200 py-2"
+                    >
+                      <Text className="mr-4 text-lg font-semibold">
+                        {entry.rank}
                       </Text>
+                      <Image
+                        source={{ uri: entry.profilePic }}
+                        className="mr-4 h-8 w-8 rounded-full"
+                      />
+                      <View style={{ flex: 2 }}>
+                        <Text
+                          className="text-md font-semibold"
+                          numberOfLines={1}
+                        >
+                          {entry.name}
+                        </Text>
+                      </View>
+                      <View className="ml-4 w-20">
+                        <Text className="text-md font-bold">
+                          {entry.distance.toFixed(2)} km
+                        </Text>
+                        <Text className="text-sm text-neutral-600">
+                          {entry.avgPace}
+                        </Text>
+                      </View>
                     </View>
-                    <View className="ml-4 w-20">
-                      <Text className="text-md font-bold">
-                        {entry.distance.toFixed(2)} km
-                      </Text>
-                      <Text className="text-sm text-neutral-600">
-                        {entry.avgPace}
-                      </Text>
-                    </View>
-                  </View>
-                ))
-              : <Text className="text-sm text-neutral-600">Game still in progress, no leaderboard data yet!</Text>}
+                  ))
+                ) : (
+                  <Text className="text-sm text-neutral-600">
+                    Game still in progress, no leaderboard data yet!
+                  </Text>
+                )}
               </View>
             </View>
 

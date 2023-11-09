@@ -93,11 +93,8 @@ export async function finishUserOnboarding(uid) {
 export async function linkRunToGame(uid, runId, gameId) {
   const runRef = doc(db, 'users', uid, 'runs', runId);
   const gameRef = doc(db, 'games', gameId);
-  updateDoc(runRef,
-    {
-      game: gameId
-    });
-  setDoc(gameRef,
-    { 'runs': { [uid]: runId } },
-    { merge: true });
+  updateDoc(runRef, {
+    game: gameId,
+  });
+  setDoc(gameRef, { runs: { [uid]: runId } }, { merge: true });
 }

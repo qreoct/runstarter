@@ -10,11 +10,11 @@ import {
   socket,
   startGame,
 } from 'server/server-utils';
-import { linkRunToGame } from '@/database';
 
 import type { User } from '@/api';
 import { fetchUsersWithIds } from '@/api';
 import { useAuth } from '@/core';
+import { linkRunToGame } from '@/database';
 import {
   FocusAwareStatusBar,
   Image,
@@ -89,7 +89,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
     setPlayers([]);
     setInvitedIds([]);
     gameId = createGame();
-  }
+  };
 
   const handleSheetChange = useCallback(() => {
     if (!currentUser || currentUser.friends?.length === 0) return;

@@ -11,7 +11,11 @@ type RunReportModalProps = {
   onFinish: () => void;
 };
 
-export const RunReportModal = ({ gameId, runId, onFinish }: RunReportModalProps) => {
+export const RunReportModal = ({
+  gameId,
+  runId,
+  onFinish,
+}: RunReportModalProps) => {
   return (
     <SafeAreaView>
       <ModalHeader
