@@ -31,6 +31,8 @@ active_games = {
     # "game_id": {
     #     "creator": "user_id",
     #     "players": ["user_id"],
+    #     "player_names": ["user_name"],
+    #     "playing": ["user_id"],
     #     "invited": ["user_id"],
     #     "active": False,
     #     "paused": False,
@@ -68,6 +70,22 @@ def get_user_ref(user_id):
     else:
         return None
     
+def update_user_in_firestore(user_id, data):
+    users_ref = db.collection('users')
+    user_doc = users_ref.document(user_id)
+    try:
+        user_doc.update(data)
+    except Exception as e:
+        print(f"Error updating user {user_id} in Firestore:", e)
+
+def invite_user(invitee_id, game_id):
+    users[invitee_id]["invited"].append(game_id)
+    update_user_in_firestore(invitee_id, {"invitedGames": firestore.ArrayUnion([game_id])})
+
+def uninvite_user(invitee_id, game_id):
+    users[invitee_id]["invited"].remove(game_id)
+    update_user_in_firestore(invitee_id, {"invitedGames": firestore.ArrayRemove([game_id])})
+
 def set_game_state(game_id, game_state):
     # Reference to the games collection
     games_ref = db.collection('games')
@@ -85,8 +103,9 @@ def set_game_state(game_id, game_state):
 def end_game(game_id):
     for user_id in active_games[game_id]["players"]:
         users[user_id]["currentGame"] = None
+        update_user_in_firestore(user_id, {"currentGame": None})
     for user_id in active_games[game_id]["invited"]:
-        users[user_id]["invited"].remove(game_id)
+        uninvite_user(user_id, game_id)
     # Remove the game locally and add it to the database
     active_games[game_id]["active"] = False
     set_game_state(game_id, active_games[game_id])
@@ -128,6 +147,7 @@ def create_game(data):
         "creator": user_id,
         "players": [user_id],
         "player_names": [name],
+        "playing": [],
         "invited": [],
         "active": False,
         "paused": False,
@@ -142,7 +162,9 @@ def create_game(data):
     print("User creating game room:", user_id)
     print("Room:", game_id)
     active_games[game_id] = game_state
+    set_game_state(game_id, game_state)
     users[user_id]["currentGame"] = game_id
+    update_user_in_firestore(user_id, {"currentGame": game_id})
     join_room(game_id)
     emit('game_created', { 'game_id': game_id }, room=game_id)
     emit('player_change', {'players': active_games[game_id]["players"], 'player_names': active_games[game_id]["player_names"] } , room=game_id)
@@ -160,9 +182,15 @@ def invite_to_game(data):
         print('invitee_not_found')
         return
     
+    # Check if the invitee is already in the users dictionary
+    if invitee_id not in users:
+        print(f'Invitee with ID {invitee_id} not found in users. Adding to users.')
+        users[invitee_id] = {"sid": "", "currentGame": None, "invited": []}
+
     if game_id not in users[invitee_id]["invited"]:
-        users[invitee_id]["invited"].append(game_id)
+        invite_user(invitee_id, game_id)
         active_games[game_id]["invited"].append(invitee_id)
+        set_game_state(game_id, active_games[game_id])
         inviter_name = get_user_data(user_id)["name"]
         emit('status_change', {'status': f'{invitee["name"]} invited'}, room=game_id)
         emit('game_invited', { 'inviter_name': inviter_name, 'game_id': game_id }, room=users[invitee_id]["sid"])
@@ -186,10 +214,13 @@ def leave_game(data):
         active_games[game_id]["players"].remove(user_id)
         active_games[game_id]["player_names"].remove(get_user_data(user_id)["name"])
         active_games[game_id]["creator"] = active_games[game_id]["players"][0]
+        set_game_state(game_id, active_games[game_id])
     else:
         active_games[game_id]["players"].remove(user_id)
         active_games[game_id]["player_names"].remove(get_user_data(user_id)["name"])
+        set_game_state(game_id, active_games[game_id])
     users[user_id]["currentGame"] = None
+    update_user_in_firestore(user_id, {"currentGame": None})
     name = get_user_data(user_id)["name"]
     leave_room(game_id)
     emit('player_change', {'players': active_games[game_id]['players'] if active_games[game_id] else [], 
@@ -209,8 +240,10 @@ def join_game(data):
     active_games[game_id]["invited"].remove(user_id)
     active_games[game_id]["players"].append(user_id)
     active_games[game_id]["player_names"].append(get_user_data(user_id)["name"])
-    users[user_id]["invited"].remove(game_id)
+    set_game_state(game_id, active_games[game_id])
+    uninvite_user(user_id, game_id)
     users[user_id]["currentGame"] = game_id
+    update_user_in_firestore(user_id, {"currentGame": game_id})
     join_room(game_id)
     name = get_user_data(user_id)["name"]
     emit('player_change', {'players': active_games[game_id]["players"], 'player_names': active_games[game_id]["player_names"]} , room=game_id)
@@ -227,6 +260,9 @@ def start_game(data):
         print(f'User {user_id} is not the creator of game {game_id}!')
         return
     active_games[game_id]["active"] = True
+    for player_id in active_games[game_id]["players"]:
+        active_games[game_id]["playing"].append(player_id)
+    set_game_state(game_id, active_games[game_id])
     emit('game_started', room=game_id)
     emit('status_change', {'status': 'game started'}, room=game_id)
 
@@ -242,8 +278,9 @@ def pause_game(data):
         return False
     active_games[game_id]["paused"] = True
     active_games[game_id]["pauser"] = user_id
-    emit('game_paused', { 'pauser': user_id }, room=game_id)
+    set_game_state(game_id, active_games[game_id])
     name = get_user_data(user_id)["name"]
+    emit('game_paused', { 'pauser': name }, room=game_id)
     emit('status_change', {'status': f'game paused by {name}'}, room=game_id)
     return True
 
@@ -260,10 +297,26 @@ def resume_game(data):
     #     return False
     active_games[game_id]["paused"] = False
     active_games[game_id]["pauser"] = None
-    emit('game_resumed', room=game_id)
+    set_game_state(game_id, active_games[game_id])
     name = get_user_data(user_id)["name"]
+    emit('game_resumed', { 'resumer': name }, room=game_id)
     emit('status_change', {'status': f'game resumed by {name}'}, room=game_id)
     return True
+
+@socketio.on('user_end_game')
+def user_end_game(data):
+    user_id = data['user_id']
+    game_id = data['game_id']
+    if not game_id or game_id not in active_games:
+        print(f'Invalid game ID!')
+        return
+    if user_id not in active_games[game_id]["players"]:
+        print(f'User {user_id} not in game {game_id}!')
+        return
+    active_games[game_id]["playing"].remove(user_id)
+    if len(active_games[game_id]["playing"]) == 1:
+        # Last player ends the game
+        end_game(game_id)
 
 if __name__ == "__main__":
     socketio.run(app, host="0.0.0.0", debug=True)

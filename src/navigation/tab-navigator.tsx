@@ -11,22 +11,24 @@ import { useAuth } from '@/core/auth';
 import { db } from '@/database';
 import { auth } from '@/database/firebase-config';
 import { userConverter } from '@/database/users/users-converter';
-import { NewRun } from '@/screens';
 import {
   colors,
   Controller as ControllerIcon,
   Profile as ProfileIcon,
   Runner as RunnerIcon,
+  Text,
+  View,
 } from '@/ui';
 
 import { FriendsNavigator } from './friends-navigator';
+import { GamesNavigator } from './games-navigator';
 import { ProfileNavigator } from './profile-navigator';
 
 type TabParamList = {
   Friends: undefined;
   // Run: undefined;
   ProfileNavigator: undefined;
-  NewRun: undefined;
+  GamesNavigator: undefined;
   // Settings: undefined;
 };
 
@@ -46,7 +48,16 @@ const tabsIcons: TabIconsType = {
   Friends: (props: SvgProps) => <RunnerIcon {...props} />,
   // Run: (props: SvgProps) => <StyleIcon {...props} />,
   ProfileNavigator: (props: SvgProps) => <ProfileIcon {...props} />,
-  NewRun: (props: SvgProps) => <ControllerIcon {...props} />,
+  GamesNavigator: (props: SvgProps) => {
+    return (
+      <View>
+        <ControllerIcon {...props} />
+        <View className="absolute -right-2 -top-1 h-4 w-4 items-center justify-center rounded-full bg-red-600">
+          <Text className="text-xs font-bold text-white">1</Text>
+        </View>
+      </View>
+    );
+  },
   // Settings: (props: SvgProps) => <SettingsIcon {...props} />,
 };
 
@@ -87,8 +98,8 @@ const tabs: TabType[] = [
   //   label: 'Run',
   // },
   {
-    name: 'NewRun',
-    component: NewRun,
+    name: 'GamesNavigator',
+    component: GamesNavigator,
     label: 'Games',
   },
   {

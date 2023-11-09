@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Geolocation from '@react-native-community/geolocation';
 import { addDoc, collection } from 'firebase/firestore';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { pauseGame, resumeGame, socket } from 'server/server-utils';
 
 import { auth, db } from '@/database/firebase-config';
 import type { Coord, Interval, PreSavedIntervalRun } from '@/database/runs';
@@ -13,8 +14,11 @@ import {
   TouchableOpacity,
   View,
 } from '@/ui';
+import { User } from '@/api';
 
 export interface RunProps {
+  gameId: string;
+  players: User[];
   onFinish: (id: string | null) => void;
 }
 
@@ -43,14 +47,6 @@ function calcDistance(a: Coord, b: Coord): number {
   return calculateDistance(a.latitude, a.longitude, b.latitude, b.longitude);
 }
 
-const profileImages = [
-  'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-  'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-  'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-  'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-  'https://ph-avatars.imgix.net/18280/d1c43757-f761-4a37-b933-c4d84b461aea?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
-];
-
 function formatAvgPace(timeMs: number, distanceMeters: number) {
   if (timeMs <= 0 || distanceMeters <= 0) {
     return '0\'00"';
@@ -75,13 +71,27 @@ export const Run = (props: RunProps) => {
   const INTERVAL_DURATION_MS = 60_000;
   const TOTAL_INTERVALS = 8;
 
-  const [isRunning, setIsRunning] = useState(false);
+  const [isRunning, setIsRunning] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
-  const [millisecondsLeft, setMillisecondsLeft] = useState(REST_DURATION_MS);
+  const [pauser, setPauser] = useState('');
+  const [millisecondsLeft, setMillisecondsLeft] =
+    useState(INTERVAL_DURATION_MS);
   const [route, setRoute] = useState<Coord[]>([]);
   const [distanceMeters, setDistanceMeters] = useState(0);
   const [previousIntervals, setPreviousIntervals] = useState<Interval[]>([]);
   const latestCoordsRef = useRef<Coord | null>(null);
+
+  useEffect(() => {
+    socket.on('game_paused', (data: any) => {
+      setIsPaused(true);
+      setPauser(data.pauser);
+    });
+
+    socket.on('game_resumed', (data: any) => {
+      setIsPaused(false);
+      setPauser('');
+    });
+  }, [props.gameId]);
 
   useEffect(() => {
     if (isRunning && !isPaused) {
@@ -231,7 +241,7 @@ export const Run = (props: RunProps) => {
   return (
     <>
       <SafeAreaView className="flex h-full justify-between bg-black">
-        <View className="flex-cols flex flex-1 justify-between py-4">
+        <View className="flex-cols flex py-4">
           <View className="flex flex-row justify-between gap-x-4 px-8">
             <View className="w-22 items-center">
               <Text className="text-2xl font-bold text-white">
@@ -252,31 +262,47 @@ export const Run = (props: RunProps) => {
               <Text className="font-semibold text-white/50">Metres</Text>
             </View>
           </View>
+        </View>
 
-          <View className="flex items-center">
-            <Text className="text-8xl font-extrabold italic text-white">
-              {formatTimeElapsed(millisecondsLeft)}
-            </Text>
-            <Text className="text-xl font-semibold text-white/50">
-              {isRunning ? 'Time' : 'Rest'}
-            </Text>
-          </View>
+        <View className="flex items-center">
+          <Text className="text-8xl font-extrabold italic text-white">
+            {formatTimeElapsed(millisecondsLeft)}
+          </Text>
+          <Text className="text-xl font-semibold text-white/50">
+            {isPaused
+              ? pauser + ' has paused the game'
+              : isRunning
+              ? 'Time'
+              : 'Rest'}
+          </Text>
+        </View>
 
-          <View>
-            <ScrollView
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              className="flex gap-x-4 px-6"
-            >
-              {profileImages.map((image, index) => (
+        <View className="flex items-center justify-center">
+          <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            className="flex gap-x-4 px-4"
+          >
+            {props.players.map((player, index) => (
+              <View
+                key={index}
+                className="flex w-24 items-center justify-center gap-y-2"
+              >
                 <Image
-                  key={index}
-                  source={{ uri: image }}
+                  source={{
+                    uri: player.photoURL ?? 'https://picsum.photos/200',
+                  }}
                   className="h-20 w-20 rounded-full"
                 />
-              ))}
-            </ScrollView>
-          </View>
+                <Text
+                  className="text-neutral-200 text-xs font-normal"
+                  numberOfLines={1}
+                >
+                  {player.name}
+                </Text>
+              </View>
+            ))}
+          </ScrollView>
         </View>
 
         <View className="flex items-center py-8">
@@ -285,6 +311,7 @@ export const Run = (props: RunProps) => {
               className="flex h-20 w-20 items-center justify-center rounded-full bg-white"
               onPress={() => {
                 setIsPaused(true);
+                pauseGame(props.gameId);
               }}
             >
               <Ionicons name="ios-pause" size={32} color="black" />
@@ -313,6 +340,7 @@ export const Run = (props: RunProps) => {
                 className="flex h-20 w-20 items-center justify-center rounded-full bg-white"
                 onPress={() => {
                   setIsPaused(false);
+                  resumeGame(props.gameId);
                 }}
               >
                 <Ionicons name="ios-play" size={32} color="black" />

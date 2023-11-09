@@ -1,5 +1,6 @@
 export * from './feed';
 export * from './friends';
+export * from './invites';
 export * from './login';
 export * from './new_run';
 export * from './onboarding';
