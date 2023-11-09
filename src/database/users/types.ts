@@ -11,4 +11,5 @@ export type User = {
     pending: string[];
     received: string[];
   };
+  invitedGames: string[];
 };

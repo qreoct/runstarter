@@ -1,14 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Avatar } from '@rneui/themed';
-import { doc, onSnapshot } from 'firebase/firestore';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Avatar, Button } from '@rneui/themed';
 import React, { useEffect, useState } from 'react';
 import { Modal, RefreshControl, SafeAreaView } from 'react-native';
 
+import type { User } from '@/api';
 import { fetchUsersWithIds } from '@/api';
-import { useAuth } from '@/core';
-import { db } from '@/database/firebase-config';
 import { fetchGameWithId } from '@/database/games';
-import { ScrollView, Text, TouchableOpacity, View } from '@/ui';
+import type { GamesStackParamList } from '@/navigation/games-navigator';
+import { generateProfilePicture, ScrollView, Text, View } from '@/ui';
 import { ModalHeader } from '@/ui/core/modal/modal-header';
 
 import { NewRun } from '../new_run';
@@ -19,13 +19,20 @@ const wait = (timeout: number) => {
   });
 };
 
-export const Invites = () => {
-  const currentUser = useAuth().currentUser;
+// from https://reactnavigation.org/docs/typescript/
+type InvitesScreenProps = NativeStackScreenProps<
+  GamesStackParamList,
+  'Invites'
+>;
+
+// eslint-disable-next-line max-lines-per-function
+export const Invites = ({ route }: InvitesScreenProps) => {
+  // const currentUser = useAuth().currentUser;
   const [refreshing, setRefreshing] = useState(false);
   const [isNewRunModalVisible, setNewRunModalVisible] = useState(false);
-  const [invitedGameIDs, setInvitedGameIDs] = useState<string[]>([]);
   const [invitedGames, setInvitedGames] = useState<any[]>([]);
   const [selectedGameID, setSelectedGameID] = useState<any>(null);
+  const { invitedGameIDs } = route.params;
 
   // Function to handle the opening of the NewRun modal
   const openNewRunModal = (game_id: any) => {
@@ -47,22 +54,6 @@ export const Invites = () => {
       othersCount > 1 ? 's' : ''
     }`;
   };
-
-  // Subscribe to invited games from firebase
-  useEffect(() => {
-    if (!currentUser?.id) return;
-    const userRef = doc(db, 'users', currentUser.id);
-    const unsubscribe = onSnapshot(userRef, (doc) => {
-      if (doc.exists()) {
-        const userData = doc.data();
-        const updatedInvitedGames = userData?.invitedGames || [];
-        setInvitedGameIDs(updatedInvitedGames);
-      }
-    });
-
-    // Clean up the listener when the component unmounts
-    return () => unsubscribe();
-  }, [currentUser]);
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -115,7 +106,6 @@ export const Invites = () => {
             }}
           />
         }
-        // className can be added here if you're using a utility like Tailwind CSS or Styled Components
       >
         {invitedGameIDs.length === 0 ? (
           <View className="flex items-center justify-center p-10">
@@ -138,13 +128,9 @@ export const Invites = () => {
               // Fetch game data from firebase
               const friends = game.players ?? [];
               return (
-                <TouchableOpacity
+                <View
                   key={index}
                   className="flex flex-row items-center justify-between p-4"
-                  onPress={() => {
-                    console.log('Game:', game);
-                    openNewRunModal(game.id);
-                  }}
                 >
                   <View>
                     <Text className="text-lg font-bold">
@@ -153,13 +139,15 @@ export const Invites = () => {
                       8x1 minute intervals (Room: {game.id.slice(0, 5)})
                     </Text>
                     <View className="flex flex-row pt-2">
-                      {friends.map((friend: any, index: any) => (
+                      {friends.map((friend: User, friendIndex: number) => (
                         <Avatar
-                          key={index}
+                          key={friendIndex}
                           size="small"
                           rounded
                           source={{
-                            uri: friend.photoURL ?? 'https://picsum.photos/200',
+                            uri:
+                              friend.photoURL ??
+                              generateProfilePicture(friend.name),
                           }}
                           containerStyle={{
                             marginLeft: index === 0 ? 0 : -10, // Overlap effect here, adjust as necessary
@@ -177,10 +165,16 @@ export const Invites = () => {
                       )}
                     </Text>
                   </View>
-                  <View>
-                    <Ionicons name="chevron-forward-outline" size={20} />
-                  </View>
-                </TouchableOpacity>
+                  <Button
+                    type="solid"
+                    onPress={() => {
+                      console.log('Game:', game);
+                      openNewRunModal(game.id);
+                    }}
+                  >
+                    Accept
+                  </Button>
+                </View>
               );
             })}
           </View>

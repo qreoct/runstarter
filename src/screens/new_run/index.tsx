@@ -34,18 +34,14 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
   const sheetRef = useRef<BottomSheet>(null);
   const currentUser = useAuth().currentUser;
   const [isRunModalVisible, setRunModalVisibility] = useState(false);
-  // const [runReportId, setRunReportId] = useState<string | null>(null);
-  const [runReportId, setRunReportId] = useState<string | null>(
-    null
-    // 'HdXuDf8HYUc1Z9vZFyqw'
-  );
+  const [runReportId, setRunReportId] = useState<string | null>(null);
   const [roomID, setRoomID] = useState('');
   const [players, setPlayers] = useState<User[]>([]);
   const [invitedIds, setInvitedIds] = useState<string[]>([]);
 
   useEffect(() => {
     console.log('gameId', gameId);
-    if (!gameId) {
+    if (!gameId || gameId === '') {
       createGame();
     } else {
       // If a gameId is passed, use it as the roomID
@@ -56,7 +52,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
 
   // Only set up the socket listener for game creation if we are creating a new game
   useEffect(() => {
-    if (!gameId) {
+    if (!gameId || gameId === '') {
       const handleGameCreated = (data: any) => {
         setRoomID(data.game_id);
         console.log('game_created', data);
@@ -73,11 +69,11 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
   }, [gameId]);
 
   socket.on('player_change', async (data: any) => {
-    const players = await fetchUsersWithIds(data.players);
-    setPlayers(players);
+    const newPlayers = await fetchUsersWithIds(data.players);
+    setPlayers(newPlayers);
   });
 
-  socket.on('game_started', async (data: any) => {
+  socket.on('game_started', async (_data: any) => {
     // TODO: Play game-start sound and start 5 sec countdown
     setRunModalVisibility(true);
   });
@@ -88,7 +84,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
     setPlayers([]);
     setInvitedIds([]);
     gameId = createGame();
-  }
+  };
 
   const handleSheetChange = useCallback(() => {
     if (!currentUser || currentUser.friends?.length === 0) return;
