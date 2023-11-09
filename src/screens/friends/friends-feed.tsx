@@ -28,6 +28,7 @@ export const FriendsFeed = () => {
   const currentUser = useAuth().currentUser;
 
   const [activity, setActivity] = React.useState<Activity[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(true);
 
   const renderIncomingRequestsLength = () => {
     return (
@@ -39,26 +40,22 @@ export const FriendsFeed = () => {
   };
 
   useEffect(() => {
-    if (
-      !currentUser ||
-      !currentUser.friends ||
-      currentUser.friends?.length === 0
-    )
-      return;
+    console.log(currentUser);
+    if (!currentUser || !currentUser.friends) return;
     // fetchActivityForUsers(ids)
+    setLoading(true);
     fetchUsersWithIds(currentUser.friends).then((users) => {
       let friendsActivity: Activity[] = [];
       users.forEach((user) => {
         friendsActivity.push({
           user: user,
-          message: 'I ran 5.2km and won in Duck Duck Chase!',
-          avatar:
-            user.photoURL?.toString() ||
-            'https://storage.googleapis.com/runsquad-images/0.png',
-          timestamp: '5H',
+          message: 'Hi! I am your friend.',
+          avatar: user.photoURL?.toString(),
+          timestamp: '',
         });
         setActivity(friendsActivity);
       });
+      setLoading(false);
     });
   }, [currentUser, currentUser?.friends]);
 
@@ -100,9 +97,7 @@ export const FriendsFeed = () => {
             data={activity}
             renderItem={renderItem}
             keyExtractor={(_, index) => `item-${index}`}
-            ListEmptyComponent={
-              <EmptyList isLoading={currentUser === undefined} />
-            }
+            ListEmptyComponent={<EmptyList isLoading={loading} />}
             estimatedItemSize={15}
           />
         </View>

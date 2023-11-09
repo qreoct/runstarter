@@ -164,6 +164,7 @@ export const TabNavigator = () => {
   const { colorScheme } = useColorScheme();
   return (
     <Tab.Navigator
+      initialRouteName="GamesNavigator"
       screenOptions={({ route }) => ({
         tabBarInactiveTintColor:
           colorScheme === 'dark' ? colors.charcoal[400] : colors.neutral[400],

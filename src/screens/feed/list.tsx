@@ -34,7 +34,7 @@ export const Feed = () => {
         renderItem={renderItem}
         keyExtractor={(_, index) => `item-${index}`}
         ListEmptyComponent={<EmptyList isLoading={isLoading} />}
-        estimatedItemSize={300}
+        estimatedItemSize={30}
       />
     </View>
   );
