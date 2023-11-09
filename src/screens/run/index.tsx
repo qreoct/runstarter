@@ -18,6 +18,7 @@ export interface RunProps {
   onFinish: (id: string | null) => void;
 }
 
+/* eslint-disable max-params */
 const calculateDistance = (
   lat1: number,
   lon1: number,
@@ -169,13 +170,6 @@ export const Run = (props: RunProps) => {
         if (newMillisecondsLeft >= 0) {
           // interval still happening
           setMillisecondsLeft(newMillisecondsLeft);
-          // console.log('RUN', {
-          //   currentInterval: previousIntervals.length + 1,
-          //   newMillisecondsLeft,
-          //   distance: distanceMeters,
-          //   pace: lastAvgPace(),
-          //   route: route.length,
-          // });
         } else {
           // interval ended. transition to rest or end the run.
           const interval: Interval = {

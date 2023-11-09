@@ -110,7 +110,7 @@ const BarIcon = ({ color, name, ...reset }: BarIconType) => {
 
 export const TabNavigator = () => {
   /* query and set store for user */
-  const setUser = useAuth((state) => state.setCurrentUser);
+  const setCurrentUser = useAuth((state) => state.setCurrentUser);
   const currentUserId = auth.currentUser?.uid;
 
   React.useEffect(() => {
@@ -123,9 +123,8 @@ export const TabNavigator = () => {
     );
     const unsubscribe = onSnapshot(userRef, async (snapshot) => {
       const data = snapshot.data();
-
       if (data) {
-        setUser({
+        setCurrentUser({
           ...data,
           id: currentUserId,
         });
@@ -134,10 +133,10 @@ export const TabNavigator = () => {
 
     // cleanup & unsubscribe
     return () => {
-      setUser(undefined);
+      setCurrentUser(undefined);
       unsubscribe();
     };
-  }, [setUser, currentUserId]);
+  }, [setCurrentUser, currentUserId]);
 
   const { colorScheme } = useColorScheme();
   return (
