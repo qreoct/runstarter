@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
+import { Appearance } from 'react-native';
 
 import { useAuth } from '@/core';
 
@@ -23,6 +24,8 @@ export const Root = () => {
       hideSplash();
     }
   }, [hideSplash, status]);
+
+  useEffect(() => Appearance.setColorScheme('light'), []);
 
   return (
     <Stack.Navigator
