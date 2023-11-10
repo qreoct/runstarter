@@ -56,13 +56,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         enabled: true,
         badges: [
           {
-            text: Env.APP_ENV,
+            text: 'BETA',
             type: 'banner',
-            color: 'white',
-          },
-          {
-            text: Env.VERSION.toString(),
-            type: 'ribbon',
             color: 'white',
           },
         ],
