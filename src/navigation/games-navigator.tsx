@@ -2,10 +2,11 @@ import { StackActions, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Badge, Icon } from '@rneui/themed';
 import * as React from 'react';
-import { View } from 'react-native';
 
 import { useAuth } from '@/core';
-import { Invites, NewRun } from '@/screens';
+import { Invites } from '@/screens';
+import { GamesList } from '@/screens/games';
+import { View } from '@/ui';
 
 export type GamesStackParamList = {
   Games: undefined;
@@ -53,7 +54,7 @@ export const GamesNavigator = () => {
           headerRight: () => <GoToInvites />,
         }}
       >
-        <Stack.Screen name="Games" component={NewRun} />
+        <Stack.Screen name="Games" component={GamesList} />
       </Stack.Group>
 
       <Stack.Group>
