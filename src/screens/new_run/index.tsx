@@ -26,6 +26,8 @@ import {
 
 import { Run } from '../run';
 import { RunReportModal } from '../run_report/run-report-modal';
+import { useNavigation } from '@react-navigation/native';
+import { set } from 'lodash';
 
 /* eslint-disable max-lines-per-function */
 export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
@@ -34,6 +36,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
   // hook for friend invites bottom sheet
   const sheetRef = useRef<BottomSheet>(null);
   const currentUser = useAuth().currentUser;
+  const navigation = useNavigation();
   const [isRunModalVisible, setRunModalVisibility] = useState(false);
   const [runReportId, setRunReportId] = useState<string | null>(null);
   const [roomID, setRoomID] = useState('');
@@ -81,11 +84,14 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
     });
   }
 
-  const exitGame = () => {
+  const resetGame = () => {
+    console.log('Resetting game...');
     // Reset game room
     setRoomID('');
     setPlayers([]);
     setInvitedIds([]);
+    // Navigate back to home screen
+    navigation.navigate('Games'); // Already in 'Games'
     gameId = createGame();
   };
 
@@ -212,7 +218,10 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
             runId={runReportId!}
             onFinish={() => {
               setRunReportId(null);
-              exitGame();
+              setRunModalVisibility(false);
+              console.log("toggle modal");
+              resetGame();
+              console.log("reset game");
             }}
           />
         </View>
