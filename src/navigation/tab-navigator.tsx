@@ -144,15 +144,18 @@ export const TabNavigator = () => {
     const userRef = doc(db, 'users', currentUserId).withConverter(
       userConverter
     );
-    const unsubscribe = onSnapshot(userRef, async (snapshot) => {
-      const data = snapshot.data();
-      if (data) {
-        setCurrentUser({
-          ...data,
-          id: currentUserId,
-        });
+    const unsubscribe = onSnapshot(
+      userRef,
+      async (snapshot: { data: () => any }) => {
+        const data = snapshot.data();
+        if (data) {
+          setCurrentUser({
+            ...data,
+            id: currentUserId,
+          });
+        }
       }
-    });
+    );
 
     // cleanup & unsubscribe
     return () => {
@@ -169,7 +172,9 @@ export const TabNavigator = () => {
         tabBarInactiveTintColor:
           colorScheme === 'dark' ? colors.charcoal[400] : colors.neutral[400],
         // eslint-disable-next-line react/no-unstable-nested-components
-        tabBarIcon: ({ color }) => <BarIcon name={route.name} color={color} />,
+        tabBarIcon: ({ color }: { color: string }) => (
+          <BarIcon name={route.name} color={color} />
+        ),
       })}
     >
       <Tab.Group
