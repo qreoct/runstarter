@@ -32,6 +32,7 @@ require('dotenv').config({
  * for example: if the APP_ENV is staging, the bundle id will be com.runstarter.staging
  */
 
+
 const BUNDLE_ID = 'com.runstarter'; // ios bundle id
 const PACKAGE = 'com.runstarter'; // android package name
 const NAME = 'RunStarter'; // app name
