@@ -35,6 +35,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
   const [friends, setFriends] = useState<User[]>([]);
   // hook for friend invites bottom sheet
   const sheetRef = useRef<BottomSheet>(null);
+  const userId = useAuth().userId; // required for creating a game (useAuth::currentUser is null on first render)
   const currentUser = useAuth().currentUser;
   const navigation = useNavigation();
   const [isRunModalVisible, setRunModalVisibility] = useState(false);
@@ -45,15 +46,14 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
   const [isAwaitingGameStart, setIsAwaitingGameStart] = useState(false);
 
   useEffect(() => {
-    console.log('gameId', gameId);
     if (!gameId || gameId === '') {
-      createGame();
+      createGame(userId);
     } else {
       // If a gameId is passed, use it as the roomID
       setRoomID(gameId);
       joinGame(gameId);
     }
-  }, [gameId]);
+  }, [gameId, userId]);
 
   // Only set up the socket listener for game creation if we are creating a new game
   useEffect(() => {
@@ -112,7 +112,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
     setInvitedIds([]);
     // Navigate back to home screen
     navigation.navigate('Games'); // Already in 'Games'
-    gameId = createGame();
+    gameId = createGame(userId);
   };
 
   const handleSheetChange = useCallback(() => {

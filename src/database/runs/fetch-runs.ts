@@ -22,7 +22,7 @@ export const fetchRunsForUser = async (userId: string) => {
     });
   });
 
-  // Sort runs by datetime (most recent first) 
+  // Sort runs by datetime (most recent first)
   runData.sort((a, b) => {
     return b.createdAt - a.createdAt;
   });
