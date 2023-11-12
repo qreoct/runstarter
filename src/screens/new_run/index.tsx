@@ -57,7 +57,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
 
   // Only set up the socket listener for game creation if we are creating a new game
   useEffect(() => {
-    if (!gameId || gameId === '') {
+    if (socket && (!gameId || gameId === '')) {
       const handleGameCreated = (data: any) => {
         setRoomID(data.game_id);
         console.log('game_created', data);
@@ -68,27 +68,41 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
 
       // Clean up the listener when the component is unmounted or if the gameId changes
       return () => {
-        socket.off('game_created', handleGameCreated);
+        if (socket) {
+          socket.off('game_created', handleGameCreated);
+        }
       };
     }
   }, [gameId]);
 
-  if (socket) {
-    socket.on('player_change', async (data: any) => {
-      const newPlayers = await fetchUsersWithIds(data.players);
-      setPlayers(newPlayers);
-    });
+  useEffect(() => {
+    if (socket) {
+      const handlePlayerChange = async (data: any) => {
+        const newPlayers = await fetchUsersWithIds(data.players);
+        setPlayers(newPlayers);
+      };
 
-    socket.on('game_started', async (_data: any) => {
-      // Play game-start sound and start 5 sec countdown
-      playStartSound();
-      setIsAwaitingGameStart(true);
-      setTimeout(() => {
-        setRunModalVisibility(true);
-        setIsAwaitingGameStart(false);
-      }, 5000);
-    });
-  }
+      const handleGameStarted = async (_data: any) => {
+        // Play game-start sound and start 5 sec countdown
+        playStartSound();
+        setIsAwaitingGameStart(true);
+        setTimeout(() => {
+          setRunModalVisibility(true);
+          setIsAwaitingGameStart(false);
+        }, 5000);
+      };
+
+      socket.on('player_change', handlePlayerChange);
+      socket.on('game_started', handleGameStarted);
+
+      return () => {
+        if (socket) {
+          socket.off('player_change', handlePlayerChange);
+          socket.off('game_started', handleGameStarted);
+        }
+      };
+    }
+  }, []);
 
   const resetGame = () => {
     console.log('Resetting game...');

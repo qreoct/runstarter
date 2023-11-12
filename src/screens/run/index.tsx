@@ -93,26 +93,33 @@ export const Run = (props: RunProps) => {
 
   // Effects triggered by server events
   useEffect(() => {
-    socket.on('game_paused', (data: any) => {
-      // Play sound
-      playPauseSound();
-      // Set pause state
-      setIsPaused(true);
-      setPauser(data.pauser);
-    });
+    if (socket) {
+      const handleGamePaused = (data: any) => {
+        playPauseSound();
+        setIsPaused(true);
+        setPauser(data.pauser);
+      };
 
-    socket.on('game_resumed', (_data: any) => {
-      // Play sound
-      playResumeSound();
-      // Set countdown
-      setIsCountdown(true);
-      setTimeout(() => {
-        setIsCountdown(false);
-        // Set pause state
-        setIsPaused(false);
-        setPauser('');
-      }, 5000);
-    });
+      const handleGameResumed = (_data: any) => {
+        playResumeSound();
+        setIsCountdown(true);
+        setTimeout(() => {
+          setIsCountdown(false);
+          setIsPaused(false);
+          setPauser('');
+        }, 5000);
+      };
+
+      socket.on('game_paused', handleGamePaused);
+      socket.on('game_resumed', handleGameResumed);
+
+      return () => {
+        if (socket) {
+          socket.off('game_paused', handleGamePaused);
+          socket.off('game_resumed', handleGameResumed);
+        }
+      };
+    }
   }, [props.gameId]);
 
   useEffect(() => {
