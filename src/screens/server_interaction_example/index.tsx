@@ -11,8 +11,8 @@ import {
   startGame,
 } from 'server/server-utils';
 
-import { Button } from '@/ui';
 import { useAuth } from '@/core';
+import { Button } from '@/ui';
 
 interface JoinGameButtonProps {
   roomSetter: (roomId: string) => void;
