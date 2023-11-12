@@ -1,4 +1,5 @@
 import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
+import { useNavigation } from '@react-navigation/native';
 import { Avatar, Button } from '@rneui/themed';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Modal } from 'react-native';
@@ -13,6 +14,7 @@ import {
 
 import type { User } from '@/api';
 import { fetchUsersWithIds } from '@/api';
+import { playStartSound } from '@/audio';
 import { useAuth } from '@/core';
 import { linkRunToGame } from '@/database';
 import {
@@ -26,8 +28,6 @@ import {
 
 import { Run } from '../run';
 import { RunReportModal } from '../run_report/run-report-modal';
-import { useNavigation } from '@react-navigation/native';
-import { set } from 'lodash';
 
 /* eslint-disable max-lines-per-function */
 export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
@@ -42,6 +42,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
   const [roomID, setRoomID] = useState('');
   const [players, setPlayers] = useState<User[]>([]);
   const [invitedIds, setInvitedIds] = useState<string[]>([]);
+  const [isAwaitingGameStart, setIsAwaitingGameStart] = useState(false);
 
   useEffect(() => {
     console.log('gameId', gameId);
@@ -77,10 +78,15 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
       const newPlayers = await fetchUsersWithIds(data.players);
       setPlayers(newPlayers);
     });
-  
+
     socket.on('game_started', async (_data: any) => {
-      // TODO: Play game-start sound and start 5 sec countdown
-      setRunModalVisibility(true);
+      // Play game-start sound and start 5 sec countdown
+      playStartSound();
+      setIsAwaitingGameStart(true);
+      setTimeout(() => {
+        setRunModalVisibility(true);
+        setIsAwaitingGameStart(false);
+      }, 5000);
     });
   }
 
@@ -177,7 +183,10 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
       </View>
       <View className="flex items-center pb-8">
         <TouchableOpacity
-          className="flex h-28 w-28 items-center justify-center rounded-full bg-green-400"
+          className={`flex h-28 w-28 items-center justify-center rounded-full ${
+            isAwaitingGameStart ? 'bg-gray-400' : 'bg-green-400'
+          }`}
+          disabled={isAwaitingGameStart}
           onPress={() => {
             startGame(roomID);
           }}
@@ -219,9 +228,9 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
             onFinish={() => {
               setRunReportId(null);
               setRunModalVisibility(false);
-              console.log("toggle modal");
+              console.log('toggle modal');
               resetGame();
-              console.log("reset game");
+              console.log('reset game');
             }}
           />
         </View>

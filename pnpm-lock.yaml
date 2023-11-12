@@ -158,6 +158,9 @@ dependencies:
   react-native-screens:
     specifier: ~3.22.1
     version: 3.22.1(react-native@0.72.6)(react@18.2.0)
+  react-native-sound:
+    specifier: ^0.11.2
+    version: 0.11.2(react-native@0.72.6)
   react-native-svg:
     specifier: 13.9.0
     version: 13.9.0(react-native@0.72.6)(react@18.2.0)
@@ -12671,6 +12674,14 @@ packages:
     resolution: {integrity: sha512-DKE3f/sdcozd24oASgkP1iGg+YU3HoajRa5k3a4wkRzpiqREq8SGX12Y5zBgAt/8IivLQoTMYkyQu1/Giuy+zQ==}
     peerDependencies:
       react-native: '*'
+    dependencies:
+      react-native: 0.72.6(@babel/core@7.23.2)(@babel/preset-env@7.23.2)(react@18.2.0)
+    dev: false
+
+  /react-native-sound@0.11.2(react-native@0.72.6):
+    resolution: {integrity: sha512-LmGc8lgOK3qecYMVQpyHvww/C+wgT6sWeMpVbOe4NCRGC2yKd4fo4U0KBUo9PO7AqKESO3I/2GZg1/C0+bwiiA==}
+    peerDependencies:
+      react-native: '>=0.8.0'
     dependencies:
       react-native: 0.72.6(@babel/core@7.23.2)(@babel/preset-env@7.23.2)(react@18.2.0)
     dev: false
