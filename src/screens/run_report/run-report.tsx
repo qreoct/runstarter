@@ -117,7 +117,7 @@ export const RunReport = ({ gameId, runId }: RunReportProps) => {
 
   const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
 
-  socket.on('game_ended', async (data: any) => {
+  socket.on('game_ended', async (_data: any) => {
     setGameEnded(true);
   });
 
