@@ -60,13 +60,13 @@ export const deinitializeSocket = () => {
   }
 };
 
-export const createGame = () => {
-  if (!auth.currentUser) {
+export const createGame = (userID: string) => {
+  if (userID === '') {
     console.log('NO USER FOUND!');
     return;
   }
   var gameID = '';
-  socket.emit('create_game', { user_id: auth.currentUser.uid }, (data: any) => {
+  socket.emit('create_game', { user_id: userID }, (data: any) => {
     console.log('Returned data:', data);
     gameID = data.game_id;
   });

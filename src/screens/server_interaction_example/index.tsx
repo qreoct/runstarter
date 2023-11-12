@@ -12,6 +12,7 @@ import {
 } from 'server/server-utils';
 
 import { Button } from '@/ui';
+import { useAuth } from '@/core';
 
 interface JoinGameButtonProps {
   roomSetter: (roomId: string) => void;
@@ -65,6 +66,7 @@ export const ServerTest: React.FC = () => {
   const [roomID, setRoomID] = useState('');
   const [players, setPlayers] = useState([]);
   const [lastStatus, setLastStatus] = useState('');
+  const userId = useAuth().userId;
 
   // Can add your own user ID (from Firebase auth page) here for testing.
   // In prod, should query who to invite from friends list
@@ -88,7 +90,7 @@ export const ServerTest: React.FC = () => {
       <Button
         label="Create Game"
         onPress={() => {
-          createGame();
+          createGame(userId);
         }}
       />
 

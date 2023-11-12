@@ -35,6 +35,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
   const [friends, setFriends] = useState<User[]>([]);
   // hook for friend invites bottom sheet
   const sheetRef = useRef<BottomSheet>(null);
+  const userId = useAuth().userId;
   const currentUser = useAuth().currentUser;
   const navigation = useNavigation();
   const [isRunModalVisible, setRunModalVisibility] = useState(false);
@@ -43,11 +44,10 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
   const [players, setPlayers] = useState<User[]>([]);
   const [invitedIds, setInvitedIds] = useState<string[]>([]);
   const [isAwaitingGameStart, setIsAwaitingGameStart] = useState(false);
-
+  
   useEffect(() => {
-    console.log('gameId', gameId);
     if (!gameId || gameId === '') {
-      createGame();
+      createGame(userId);
     } else {
       // If a gameId is passed, use it as the roomID
       setRoomID(gameId);
@@ -112,7 +112,7 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
     setInvitedIds([]);
     // Navigate back to home screen
     navigation.navigate('Games'); // Already in 'Games'
-    gameId = createGame();
+    gameId = createGame(userId);
   };
 
   const handleSheetChange = useCallback(() => {
