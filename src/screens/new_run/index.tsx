@@ -1,4 +1,5 @@
 import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
+import { useNavigation } from '@react-navigation/native';
 import { Avatar, Button } from '@rneui/themed';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Modal } from 'react-native';
@@ -13,6 +14,7 @@ import {
 
 import type { User } from '@/api';
 import { fetchUsersWithIds } from '@/api';
+import { playStartSound } from '@/audio';
 import { useAuth } from '@/core';
 import { linkRunToGame } from '@/database';
 import {
@@ -34,11 +36,13 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
   // hook for friend invites bottom sheet
   const sheetRef = useRef<BottomSheet>(null);
   const currentUser = useAuth().currentUser;
+  const navigation = useNavigation();
   const [isRunModalVisible, setRunModalVisibility] = useState(false);
   const [runReportId, setRunReportId] = useState<string | null>(null);
   const [roomID, setRoomID] = useState('');
   const [players, setPlayers] = useState<User[]>([]);
   const [invitedIds, setInvitedIds] = useState<string[]>([]);
+  const [isAwaitingGameStart, setIsAwaitingGameStart] = useState(false);
 
   useEffect(() => {
     console.log('gameId', gameId);
@@ -74,18 +78,26 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
       const newPlayers = await fetchUsersWithIds(data.players);
       setPlayers(newPlayers);
     });
-  
+
     socket.on('game_started', async (_data: any) => {
-      // TODO: Play game-start sound and start 5 sec countdown
-      setRunModalVisibility(true);
+      // Play game-start sound and start 5 sec countdown
+      playStartSound();
+      setIsAwaitingGameStart(true);
+      setTimeout(() => {
+        setRunModalVisibility(true);
+        setIsAwaitingGameStart(false);
+      }, 5000);
     });
   }
 
-  const exitGame = () => {
+  const resetGame = () => {
+    console.log('Resetting game...');
     // Reset game room
     setRoomID('');
     setPlayers([]);
     setInvitedIds([]);
+    // Navigate back to home screen
+    navigation.navigate('Games'); // Already in 'Games'
     gameId = createGame();
   };
 
@@ -171,7 +183,10 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
       </View>
       <View className="flex items-center pb-8">
         <TouchableOpacity
-          className="flex h-28 w-28 items-center justify-center rounded-full bg-green-400"
+          className={`flex h-28 w-28 items-center justify-center rounded-full ${
+            isAwaitingGameStart ? 'bg-gray-400' : 'bg-green-400'
+          }`}
+          disabled={isAwaitingGameStart}
           onPress={() => {
             startGame(roomID);
           }}
@@ -212,7 +227,10 @@ export const NewRun: React.FC<{ gameId?: string }> = ({ gameId }) => {
             runId={runReportId!}
             onFinish={() => {
               setRunReportId(null);
-              exitGame();
+              setRunModalVisibility(false);
+              console.log('toggle modal');
+              resetGame();
+              console.log('reset game');
             }}
           />
         </View>

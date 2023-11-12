@@ -1,12 +1,12 @@
 import { doc, getDoc } from 'firebase/firestore';
 import React, { Fragment, useEffect, useState } from 'react';
 import MapView, { Marker, Polyline } from 'react-native-maps';
+import { socket } from 'server/server-utils';
 
 import { auth, db } from '@/database/firebase-config';
 import { fetchGameLeaderboard } from '@/database/games';
 import type { Coord, IntervalRun } from '@/database/runs';
 import { Image, ScrollView, Text, View } from '@/ui';
-import { socket } from 'server/server-utils';
 
 export interface RunReportProps {
   gameId: string;
