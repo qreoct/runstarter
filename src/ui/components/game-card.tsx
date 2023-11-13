@@ -12,7 +12,8 @@ export interface GameProps {
   description: string;
   tags?: string[];
   image?: ImageProps;
-  color?: string;
+  backgroundColor?: string;
+  textColor?: string;
   onPress: () => void;
 }
 
@@ -21,21 +22,29 @@ export const GameCard = ({
   description,
   tags,
   image,
-  color = 'papayawhip',
+  backgroundColor = 'papayawhip',
+  textColor = 'black',
 }: GameProps) => {
   return (
     <Card
       containerStyle={{
-        backgroundColor: color,
+        backgroundColor: backgroundColor,
         borderRadius: 8,
         flex: 1,
         height: '100%',
       }}
     >
-      <View className="flex flex-row px-4 pt-4">
+      <View className="flex flex-row p-4 pb-2">
         <View className="flex">
-          <Text className="text-lg font-bold">{title}</Text>
-          <Text className="max-w-[90%] text-gray-800">{description}</Text>
+          <Text className="text-lg font-bold" style={{ color: textColor }}>
+            {title}
+          </Text>
+          <Text
+            className="max-w-[90%] text-gray-800"
+            style={{ color: textColor }}
+          >
+            {description}
+          </Text>
           {tags && (
             <View className="flex flex-row items-center ">
               {tags.map((tag, index) => (
