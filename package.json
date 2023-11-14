@@ -1,6 +1,6 @@
 {
   "name": "runstarter",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "private": true,
   "scripts": {
     "start": "cross-env EXPO_NO_DOTENV=1 expo start",
@@ -44,6 +44,7 @@
     "@react-native-async-storage/async-storage": "^1.19.3",
     "@react-native-community/geolocation": "^3.1.0",
     "@react-native-google-signin/google-signin": "^10.0.1",
+    "@react-native-masked-view/masked-view": "^0.3.0",
     "@react-navigation/bottom-tabs": "^6.5.7",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/native-stack": "^6.9.12",

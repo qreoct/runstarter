@@ -39,7 +39,7 @@ export const Profile = () => {
             />
 
             <View>
-              <Text h1>{user.name}</Text>
+              <Text h1>{user.name} ({user.id.slice(0, 5)})</Text>
             </View>
           </View>
 
