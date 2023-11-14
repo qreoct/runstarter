@@ -1,6 +1,8 @@
-import React from 'react';
+import { StackActions, useNavigation } from '@react-navigation/native';
+import React, { useCallback } from 'react';
 
 import { FocusAwareStatusBar, ScrollView } from '@/ui';
+import type { GameProps } from '@/ui/components/game-card';
 import { GameCard } from '@/ui/components/game-card';
 
 const images = {
@@ -11,6 +13,7 @@ const images = {
 
 const games = [
   {
+    type: 'duckduckrun',
     title: 'Duck Duck Run!',
     description:
       'Run intervals with a buddy while a wave of ducks chase you down.',
@@ -19,6 +22,7 @@ const games = [
     backgroundColor: '#FFF9E4',
   },
   {
+    type: 'fartlekwithkittens',
     title: 'Fartleks with Kittens!',
     description:
       'Run a fartlek with a buddy while a wave of kittens tries to adopt you their parent!',
@@ -27,6 +31,7 @@ const games = [
     backgroundColor: '#F2E4FF',
   },
   {
+    type: 'steps25contest',
     title: '[Limited Time] STePS Contest',
     description:
       'Win $100 worth of prizes! Check out our booth @ COM1 SR1 3216-06 to find out more!',
@@ -42,6 +47,21 @@ const games = [
 ];
 
 export const GamesList = () => {
+  const navigation = useNavigation();
+  const handleCardPress = useCallback(
+    (game: GameProps) => {
+      if (game.type) {
+        console.log('handlepress');
+        navigation.dispatch(
+          StackActions.push('NewGame', {
+            gameType: game.type,
+          })
+        );
+      }
+    },
+    [navigation]
+  );
+
   return (
     <>
       <FocusAwareStatusBar />
@@ -55,7 +75,7 @@ export const GamesList = () => {
             image={game.image}
             backgroundColor={game.backgroundColor}
             textColor={game.textColor}
-            onPress={() => {}}
+            onPress={() => handleCardPress(game)}
           />
         ))}
       </ScrollView>

@@ -4,13 +4,14 @@ import { Badge, Icon } from '@rneui/themed';
 import * as React from 'react';
 
 import { useAuth } from '@/core';
-import { Invites } from '@/screens';
+import { Invites, NewRun } from '@/screens';
 import { GamesList } from '@/screens/games';
 import { View } from '@/ui';
 
 export type GamesStackParamList = {
   Games: undefined;
   Invites: { invitedGameIDs: string[] };
+  NewGame: { gameType: string };
 };
 
 const Stack = createNativeStackNavigator<GamesStackParamList>();
@@ -59,6 +60,14 @@ export const GamesNavigator = () => {
 
       <Stack.Group>
         <Stack.Screen name="Invites" component={Invites} />
+      </Stack.Group>
+
+      <Stack.Group
+        screenOptions={{
+          title: 'Game Lobby',
+        }}
+      >
+        <Stack.Screen name="NewGame" component={NewRun} />
       </Stack.Group>
     </Stack.Navigator>
   );
