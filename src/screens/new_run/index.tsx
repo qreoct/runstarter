@@ -56,7 +56,6 @@ export const NewRun: React.FC<{
   const [roomID, setRoomID] = useState('');
   const [players, setPlayers] = useState<User[]>([]);
   const [invitedIds, setInvitedIds] = useState<string[]>([]);
-  const navigation = useNavigation();
   const [isAwaitingGameStart, setIsAwaitingGameStart] = useState(false);
 
   useEffect(() => {
