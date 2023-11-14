@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 import { useNavigation } from '@react-navigation/native';
+import { Divider } from '@rneui/base';
 import * as Google from 'expo-auth-session/providers/google';
 import {
   GoogleAuthProvider,
@@ -94,6 +95,7 @@ export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
 
       <GoogleSigninButton
         size={GoogleSigninButton.Size.Wide}
+        style={{ width: '100%', height: 60 }}
         color={GoogleSigninButton.Color.Dark}
         onPress={() => promptAsync()}
       />
@@ -133,6 +135,12 @@ const EmailPasswordLogin = ({ onSubmit = () => {} }: LoginFormProps) => {
         onPress={handleSubmit(onSubmit)}
         variant="primary"
       />
+
+      <View className="my-4 flex flex-row items-center justify-center">
+        <Divider />
+        <Text> Don't have an account? </Text>
+        <Divider />
+      </View>
 
       <Button
         testID="signup-button"

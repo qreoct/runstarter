@@ -24,7 +24,8 @@ export const AuthNavigator = () => {
         name="Signup"
         component={Signup}
         options={{
-          headerShown: false,
+          headerShown: true,
+          title: 'Create Account',
         }}
       />
     </Stack.Navigator>
