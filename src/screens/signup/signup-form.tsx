@@ -33,10 +33,12 @@ export const SignupForm = ({
   return (
     <View className="flex-1 justify-center p-4">
       <Text className="text-center text-3xl font-bold">Sign Up</Text>
-      <Text className="mb-8 text-center">
-        Ready to turn your miles into smiles? Join the latest social running app
-        to enjoy minigames and rewards!
-      </Text>
+      <View className="flex items-center">
+        <Text className="mb-8 w-80 items-center text-center">
+          Ready to turn your miles into smiles? {'\n'} Join the latest social
+          running app to enjoy minigames and rewards!
+        </Text>
+      </View>
       <Image
         source={require('/assets/images/Running.png')}
         style={{
