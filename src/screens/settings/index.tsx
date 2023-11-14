@@ -1,10 +1,11 @@
 import { Env } from '@env';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
+import { Linking } from 'react-native';
 
 import { useAuth } from '@/core';
 import { FocusAwareStatusBar, ScrollView, View } from '@/ui';
-import { Instagram, Rate, Share, Website } from '@/ui/icons';
+import { Instagram, Rate, Website } from '@/ui/icons';
 import colors from '@/ui/theme/colors';
 
 import { Item } from './item';
@@ -15,6 +16,12 @@ export const Settings = () => {
   const { colorScheme } = useColorScheme();
   const iconColor =
     colorScheme === 'dark' ? colors.neutral[400] : colors.neutral[500];
+
+  const openURL = (url: string) => {
+    Linking.openURL(url).catch((err) =>
+      console.error('An error occurred', err)
+    );
+  };
   return (
     <>
       <FocusAwareStatusBar />
@@ -27,15 +34,19 @@ export const Settings = () => {
           </ItemsContainer>
 
           <ItemsContainer title="settings.support_us">
-            <Item
+            {/* <Item
               text="settings.share"
               icon={<Share color={iconColor} />}
               onPress={() => {}}
-            />
+            /> */}
             <Item
               text="settings.rate"
               icon={<Rate color={iconColor} />}
-              onPress={() => {}}
+              onPress={() => {
+                openURL(
+                  'https://play.google.com/store/apps/details?id=com.runstarter.development'
+                );
+              }}
             />
           </ItemsContainer>
 
@@ -43,12 +54,16 @@ export const Settings = () => {
             <Item
               text="settings.instagram"
               icon={<Instagram color={iconColor} />}
-              onPress={() => {}}
+              onPress={() => {
+                openURL('https://instagram.com/runsquadv');
+              }}
             />
             <Item
               text="settings.website"
               icon={<Website color={iconColor} />}
-              onPress={() => {}}
+              onPress={() => {
+                openURL('https://run-squad-landing.vercel.app');
+              }}
             />
           </ItemsContainer>
 
