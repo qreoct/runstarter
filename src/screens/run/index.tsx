@@ -22,10 +22,14 @@ import {
   TouchableOpacity,
   View,
 } from '@/ui';
+import { set } from 'lodash';
 
 export interface RunProps {
   gameId: string;
   players: User[];
+  gameType: string;
+  numIntervals: number;
+  intervalDurationMs: number;
   onFinish: (id: string | null) => void;
 }
 
@@ -64,25 +68,26 @@ function formatAvgPace(timeMs: number, distanceMeters: number) {
 }
 
 function formatTimeElapsed(milliseconds: number) {
-  const minutes = Math.floor(milliseconds / 1000 / 60)
+  const hours = Math.floor(milliseconds / 1000 / 60 / 60)
+    .toString()
+    .padStart(2, '0');
+  const minutes = Math.floor((milliseconds / 1000 / 60) % 60)
     .toString()
     .padStart(2, '0');
   const seconds = ((milliseconds / 1000) % 60).toString().padStart(2, '0');
-  return `${minutes}:${seconds}`;
+  return milliseconds >= 3600000 ? `${hours}:${minutes}:${seconds}` : `${minutes}:${seconds}`;
 }
 
 /* eslint-disable max-lines-per-function */
 export const Run = (props: RunProps) => {
-  const REST_DURATION_MS = 60_000;
-  const INTERVAL_DURATION_MS = 60_000;
-  const TOTAL_INTERVALS = 8;
-
+  const REST_DURATION_MS = props.intervalDurationMs;
+  const TOTAL_INTERVALS = props.numIntervals;
+  const [INTERVAL_DURATION_MS, setIntervalDurationMs] = useState(props.intervalDurationMs);
+  const [millisecondsLeft, setMillisecondsLeft] = useState(INTERVAL_DURATION_MS);
   const [isRunning, setIsRunning] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [isCountdown, setIsCountdown] = useState(false);
   const [pauser, setPauser] = useState('');
-  const [millisecondsLeft, setMillisecondsLeft] =
-    useState(INTERVAL_DURATION_MS);
   const [currentRestSoundPlayed, setCurrentRestSoundPlayed] = useState(false);
   const [currentIntervalSoundPlayed, setCurrentIntervalSoundPlayed] =
     useState(false);
@@ -90,6 +95,21 @@ export const Run = (props: RunProps) => {
   const [distanceMeters, setDistanceMeters] = useState(0);
   const [previousIntervals, setPreviousIntervals] = useState<Interval[]>([]);
   const latestCoordsRef = useRef<Coord | null>(null);
+
+  useEffect(() => {
+    // Calculate the interval duration when the component mounts
+    if (props.gameType === 'steps') {
+      // Event ends on November 15, 2023, 19:00:00
+      const target = new Date(2023, 10, 15, 19, 0, 0).getTime();
+      const timeNow = Date.now();
+      const timeLeft = Math.round((target - timeNow) / 1000) * 1000;
+      setIntervalDurationMs(timeLeft <= 0 ? 0 : timeLeft);
+      setMillisecondsLeft(timeLeft <= 0 ? 0 : timeLeft);
+    } else {
+      setIntervalDurationMs(props.intervalDurationMs);
+      setMillisecondsLeft(props.intervalDurationMs);
+    }
+  }, [props.gameType]);
 
   // Effects triggered by server events
   useEffect(() => {
@@ -371,7 +391,7 @@ export const Run = (props: RunProps) => {
                 disabled={isCountdown}
                 onPress={() => {
                   const interval: Interval = {
-                    durationMs: INTERVAL_DURATION_MS,
+                    durationMs: INTERVAL_DURATION_MS - millisecondsLeft,
                     distanceMeters,
                     route,
                   };

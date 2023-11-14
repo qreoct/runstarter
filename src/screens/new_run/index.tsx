@@ -32,6 +32,7 @@ import {
   View,
 } from '@/ui';
 import { GameTypeHeader } from '@/ui/components/game-type-header';
+import { games } from '@/ui/components/game-type-header';
 
 import { Run } from '../run';
 import { RunReportModal } from '../run_report/run-report-modal';
@@ -251,6 +252,9 @@ export const NewRun: React.FC<{
           <Run
             gameId={roomID}
             players={players}
+            gameType={route?.params.gameType as keyof typeof games}
+            numIntervals={games[route?.params.gameType as keyof typeof games].data.numIntervals}
+            intervalDurationMs={games[route?.params.gameType as keyof typeof games].data.intervalDurationMs}
             onFinish={(runId) => {
               setRunModalVisibility(false);
               setRunReportId(runId);

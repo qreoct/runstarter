@@ -146,16 +146,23 @@ def on_connect():
 @socketio.on('disconnect')
 def on_disconnect():
     firebase_uid = request.args.get('user_id')
+    print(firebase_uid + ' disconnecting')
     # if firebase_uid in users:
     #     if users[firebase_uid]["currentGame"]:
     #         leave_room(users[firebase_uid]["currentGame"])
     #     users.pop(firebase_uid)
-    user_end_game({'user_id': firebase_uid, 'game_id': users[firebase_uid]["currentGame"]})
-    print(firebase_uid + ' disconnected')
+
+    # Disconnects user from a game if they are in one
+    # if firebase_uid in users and users[firebase_uid]["currentGame"]:
+    #     user_end_game({'user_id': firebase_uid, 'game_id': users[firebase_uid]["currentGame"]})
+    
 
 @socketio.on('create_game')
 def create_game(data):
     user_id = data['user_id']
+    # Update users dict if user not in it
+    if user_id not in users:
+        users[user_id] = {"sid": request.sid, "currentGame": None, "invited": []}
     name = get_user_data(user_id)["name"]
     games_ref = db.collection('games')
     game_state = {
@@ -268,6 +275,7 @@ def join_game(data):
 def start_game(data):
     user_id = data['user_id']
     game_id = data['game_id']
+    print(user_id, "starting game", game_id)
     if not game_id or game_id not in active_games:
         print(f'Invalid game ID!')
         return
@@ -322,6 +330,7 @@ def resume_game(data):
 def user_end_game(data):
     user_id = data['user_id']
     game_id = data['game_id']
+    print(user_id, "ending game", game_id)
     if not game_id or game_id not in active_games:
         print(f'Invalid game ID!')
         return
