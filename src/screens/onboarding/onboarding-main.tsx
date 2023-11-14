@@ -13,6 +13,7 @@ import {
   ControlledInput,
   ControlledSelect,
   FocusAwareStatusBar,
+  Image,
   SafeAreaView,
   Text,
   View,
@@ -63,13 +64,21 @@ export const OnboardingForm = ({
     <View className="flex-1 justify-center p-4">
       <FocusAwareStatusBar />
       <SafeAreaView className="mt-6">
-        <Text variant="h1" style={{ fontWeight: 'bold' }}>
-          Welcome to RunSquad!
-        </Text>
-        <Text variant="lg">
-          We're glad to have you on board. Let's get to know you a little
+        <Text className="text-3xl font-bold">Welcome to RunSquad!</Text>
+        <Text className="text-lg">
+          We're so glad to have you on board. Let's get to know you a little
           better!
         </Text>
+        <Image
+          source={require('/assets/images/Running-headphones.png')}
+          style={{
+            width: '80%',
+            height: 200,
+            resizeMode: 'contain',
+            alignSelf: 'center',
+            marginBottom: 0,
+          }}
+        />
       </SafeAreaView>
 
       <SafeAreaView className="mt-6">

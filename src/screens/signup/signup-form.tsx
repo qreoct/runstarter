@@ -3,7 +3,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
-import { Button, ControlledInput, Text, View } from '@/ui';
+import { Button, ControlledInput, Image, Text, View } from '@/ui';
 
 import type { LoginFormProps } from '../login/login-form';
 
@@ -32,9 +32,23 @@ export const SignupForm = ({
 
   return (
     <View className="flex-1 justify-center p-4">
-      <Text testID="form-title" variant="h1" className="pb-6 text-center">
-        Sign Up
-      </Text>
+      <Text className="text-center text-3xl font-bold">Sign Up</Text>
+      <View className="flex items-center">
+        <Text className="mb-8 w-80 items-center text-center">
+          Ready to turn your miles into smiles? {'\n'} Join the latest social
+          running app to enjoy minigames and rewards!
+        </Text>
+      </View>
+      <Image
+        source={require('/assets/images/Running.png')}
+        style={{
+          width: '80%',
+          height: 150,
+          resizeMode: 'contain',
+          alignSelf: 'center',
+          marginBottom: 20,
+        }}
+      />
 
       <ControlledInput
         testID="email-input"
@@ -53,7 +67,7 @@ export const SignupForm = ({
 
       <Button
         testID="signup-submit-button"
-        label="Submit"
+        label="Create Account"
         onPress={handleSubmit(onSubmit)}
         variant="primary"
         disabled={isLoading}

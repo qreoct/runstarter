@@ -34,7 +34,7 @@ require('dotenv').config({
 
 const BUNDLE_ID = 'com.dexterleng.RunSquad'; // ios bundle id
 const PACKAGE = 'com.runstarter'; // android package name
-const NAME = 'RunStarter'; // app name
+const NAME = 'Run Squad'; // app name
 const EXPO_ACCOUNT_OWNER = 'qreoct'; // expo account owner
 
 /**
