@@ -7,11 +7,12 @@ import { useAuth } from '@/core';
 import { Invites, NewRun } from '@/screens';
 import { GamesList } from '@/screens/games';
 import { View } from '@/ui';
+import type { Games } from '@/ui/components/game-type-header';
 
 export type GamesStackParamList = {
   Games: undefined;
   Invites: { invitedGameIDs: string[] };
-  NewGame: { gameType: string };
+  NewGame: { gameType: Games };
 };
 
 const Stack = createNativeStackNavigator<GamesStackParamList>();
@@ -65,6 +66,9 @@ export const GamesNavigator = () => {
       <Stack.Group
         screenOptions={{
           title: 'Game Lobby',
+          headerBackVisible: false,
+          navigationBarHidden: true,
+          presentation: 'fullScreenModal',
         }}
       >
         <Stack.Screen name="NewGame" component={NewRun} />

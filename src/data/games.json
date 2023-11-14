@@ -1,0 +1,32 @@
+{
+  "duckduckrun": {
+    "type": "duckduckrun",
+    "title": "Duck Duck Run!",
+    "description": "Run intervals with your squad while a wave of ducks chase you down.",
+    "tags": ["10 Min", "15 Min"],
+    "thumbnailImage": "Goose.png",
+    "previewImage": "DuckDuckRun.png",
+    "backgroundColor": "#FFF9E4",
+    "textColor": "black"
+  },
+  "steps": {
+    "type": "steps",
+    "title": "[Limited Time] STePS Contest",
+    "description": "Win $100 worth of prizes! Check out our booth @ COM1 SR1 3216-06 to find out more!",
+    "tags": [],
+    "thumbnailImage": "Dazzy.png",
+    "previewImage": "Steps.png",
+    "backgroundColor": "#FFDC9A",
+    "textColor": "black"
+  },
+  "comingsoon": {
+    "type": "",
+    "title": "More Games Coming Soon",
+    "description": "Stay tuned for more games!",
+    "backgroundColor": "black",
+    "tags": [],
+    "thumbnailImage": "",
+    "previewImage": "",
+    "textColor": "white"
+  }
+}

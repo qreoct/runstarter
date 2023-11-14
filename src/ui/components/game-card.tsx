@@ -1,16 +1,17 @@
 import { Card } from '@rneui/base';
 import { Badge } from '@rneui/themed';
 import React from 'react';
-import type { ImageProps } from 'react-native';
 
 import { Image, Pressable, Text, View } from '@/ui';
+
+import images from '../core/images';
 
 export interface GameProps {
   type?: string;
   title: string;
   description: string;
   tags?: string[];
-  image?: ImageProps;
+  image?: string;
   backgroundColor?: string;
   textColor?: string;
   onPress?: () => void;
@@ -19,7 +20,7 @@ export interface GameProps {
 export const GameCard = ({
   title,
   description,
-  tags,
+  tags = [],
   image,
   backgroundColor = 'papayawhip',
   textColor = 'black',
@@ -64,14 +65,14 @@ export const GameCard = ({
               </View>
             )}
           </View>
-          <View className="flex">
+          <View className="ml-[-20] flex">
             {image && (
               <Image
-                source={image}
+                source={images[image as keyof typeof images]}
                 style={{
                   width: 100,
                   height: 120,
-                  resizeMode: 'center',
+                  resizeMode: 'contain',
                 }}
               />
             )}
