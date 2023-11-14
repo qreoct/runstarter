@@ -5,6 +5,13 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { pauseGame, resumeGame, socket } from 'server/server-utils';
 
 import type { User } from '@/api';
+import {
+  playEndSound,
+  playIntervalSound,
+  playPauseSound,
+  playRestSound,
+  playResumeSound,
+} from '@/audio';
 import { auth, db } from '@/database/firebase-config';
 import type { Coord, Interval, PreSavedIntervalRun } from '@/database/runs';
 import {
@@ -72,24 +79,47 @@ export const Run = (props: RunProps) => {
 
   const [isRunning, setIsRunning] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
+  const [isCountdown, setIsCountdown] = useState(false);
   const [pauser, setPauser] = useState('');
   const [millisecondsLeft, setMillisecondsLeft] =
     useState(INTERVAL_DURATION_MS);
+  const [currentRestSoundPlayed, setCurrentRestSoundPlayed] = useState(false);
+  const [currentIntervalSoundPlayed, setCurrentIntervalSoundPlayed] =
+    useState(false);
   const [route, setRoute] = useState<Coord[]>([]);
   const [distanceMeters, setDistanceMeters] = useState(0);
   const [previousIntervals, setPreviousIntervals] = useState<Interval[]>([]);
   const latestCoordsRef = useRef<Coord | null>(null);
 
+  // Effects triggered by server events
   useEffect(() => {
-    socket.on('game_paused', (data: any) => {
-      setIsPaused(true);
-      setPauser(data.pauser);
-    });
+    if (socket) {
+      const handleGamePaused = (data: any) => {
+        playPauseSound();
+        setIsPaused(true);
+        setPauser(data.pauser);
+      };
 
-    socket.on('game_resumed', (_data: any) => {
-      setIsPaused(false);
-      setPauser('');
-    });
+      const handleGameResumed = (_data: any) => {
+        playResumeSound();
+        setIsCountdown(true);
+        setTimeout(() => {
+          setIsCountdown(false);
+          setIsPaused(false);
+          setPauser('');
+        }, 5000);
+      };
+
+      socket.on('game_paused', handleGamePaused);
+      socket.on('game_resumed', handleGameResumed);
+
+      return () => {
+        if (socket) {
+          socket.off('game_paused', handleGamePaused);
+          socket.off('game_resumed', handleGameResumed);
+        }
+      };
+    }
   }, [props.gameId]);
 
   useEffect(() => {
@@ -159,6 +189,8 @@ export const Run = (props: RunProps) => {
         console.error('No user logged in.');
         return;
       }
+      // Play end sound
+      playEndSound();
       const collectionRef = collection(db, 'users', uid, 'runs');
       const docRef = await addDoc(collectionRef, run);
       console.log('Document saved with ID: ', docRef.id);
@@ -176,6 +208,11 @@ export const Run = (props: RunProps) => {
       const pollMs = 1000;
       const timer = setTimeout(() => {
         const newMillisecondsLeft = millisecondsLeft - pollMs;
+        if (newMillisecondsLeft <= 5000 && !currentRestSoundPlayed) {
+          // Play interval sound
+          playRestSound();
+          setCurrentRestSoundPlayed(true);
+        }
         if (newMillisecondsLeft >= 0) {
           // interval still happening
           setMillisecondsLeft(newMillisecondsLeft);
@@ -188,16 +225,19 @@ export const Run = (props: RunProps) => {
           };
 
           if (previousIntervals.length + 1 < TOTAL_INTERVALS) {
+            // Transition to rest
             setPreviousIntervals((intervals) => [...intervals, interval]);
             setIsRunning(false);
             setRoute([]);
             setDistanceMeters(0);
             latestCoordsRef.current = null;
             setMillisecondsLeft(REST_DURATION_MS);
+            setCurrentRestSoundPlayed(false);
           }
 
           // TODO: implement an end state
           if (previousIntervals.length + 1 === TOTAL_INTERVALS) {
+            // End the run
             const intervals = [...previousIntervals, interval];
             const run: PreSavedIntervalRun = {
               intervals,
@@ -215,6 +255,11 @@ export const Run = (props: RunProps) => {
       const pollMs = 1000;
       const timer = setTimeout(() => {
         const newMillisecondsLeft = millisecondsLeft - pollMs;
+        if (newMillisecondsLeft <= 5000 && !currentIntervalSoundPlayed) {
+          // Play interval sound
+          playIntervalSound();
+          setCurrentIntervalSoundPlayed(true);
+        }
         if (newMillisecondsLeft >= 0) {
           // rest still happening
           // console.log('REST', { newMillisecondsLeft });
@@ -223,6 +268,7 @@ export const Run = (props: RunProps) => {
           // rest ended. transition to interval.
           setIsRunning(true);
           setMillisecondsLeft(INTERVAL_DURATION_MS);
+          setCurrentIntervalSoundPlayed(false);
         }
       }, pollMs);
       return () => clearInterval(timer);
@@ -308,6 +354,7 @@ export const Run = (props: RunProps) => {
           {!isPaused ? (
             <TouchableOpacity
               className="flex h-20 w-20 items-center justify-center rounded-full bg-white"
+              disabled={isCountdown}
               onPress={() => {
                 setIsPaused(true);
                 pauseGame(props.gameId);
@@ -318,7 +365,10 @@ export const Run = (props: RunProps) => {
           ) : (
             <View className="flex flex-row gap-20">
               <TouchableOpacity
-                className="flex h-20 w-20 items-center justify-center rounded-full bg-red-600"
+                className={`flex h-20 w-20 items-center justify-center rounded-full ${
+                  isCountdown ? 'bg-gray-500' : 'bg-red-600'
+                }`}
+                disabled={isCountdown}
                 onPress={() => {
                   const interval: Interval = {
                     durationMs: INTERVAL_DURATION_MS,
@@ -336,9 +386,11 @@ export const Run = (props: RunProps) => {
                 <Ionicons name="ios-stop" size={32} color="black" />
               </TouchableOpacity>
               <TouchableOpacity
-                className="flex h-20 w-20 items-center justify-center rounded-full bg-white"
+                className={`flex h-20 w-20 items-center justify-center rounded-full ${
+                  isCountdown ? 'bg-gray-300' : 'bg-white'
+                }`}
+                disabled={isCountdown}
                 onPress={() => {
-                  setIsPaused(false);
                   resumeGame(props.gameId);
                 }}
               >

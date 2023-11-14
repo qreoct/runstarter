@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>RunStarter</string>
+	<string>RunSquad</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -60,6 +60,8 @@
 	<string>Allowing location access lets us track your run accurately, even if you switch to another app or lock your screen.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We use your location to calculate and display the distance you've traveled during a run.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app does not require access to the microphone.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Inter.ttf</string>

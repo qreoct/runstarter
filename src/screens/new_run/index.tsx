@@ -19,6 +19,7 @@ import {
 
 import type { User } from '@/api';
 import { fetchUsersWithIds } from '@/api';
+import { playStartSound } from '@/audio';
 import { useAuth } from '@/core';
 import { linkRunToGame } from '@/database';
 import type { GamesStackParamList } from '@/navigation/games-navigator';
@@ -47,28 +48,30 @@ export const NewRun: React.FC<{
   const [friends, setFriends] = useState<User[]>([]);
   // hook for friend invites bottom sheet
   const sheetRef = useRef<BottomSheet>(null);
+  const userId = useAuth().userId; // required for creating a game (useAuth::currentUser is null on first render)
   const currentUser = useAuth().currentUser;
+  const navigation = useNavigation();
   const [isRunModalVisible, setRunModalVisibility] = useState(false);
   const [runReportId, setRunReportId] = useState<string | null>(null);
   const [roomID, setRoomID] = useState('');
   const [players, setPlayers] = useState<User[]>([]);
   const [invitedIds, setInvitedIds] = useState<string[]>([]);
   const navigation = useNavigation();
+  const [isAwaitingGameStart, setIsAwaitingGameStart] = useState(false);
 
   useEffect(() => {
-    console.log('gameId', gameId);
     if (!gameId || gameId === '') {
-      createGame();
+      createGame(userId);
     } else {
       // If a gameId is passed, use it as the roomID
       setRoomID(gameId);
       joinGame(gameId);
     }
-  }, [gameId]);
+  }, [gameId, userId]);
 
   // Only set up the socket listener for game creation if we are creating a new game
   useEffect(() => {
-    if (!gameId || gameId === '') {
+    if (socket && (!gameId || gameId === '')) {
       const handleGameCreated = (data: any) => {
         setRoomID(data.game_id);
         console.log('game_created', data);
@@ -79,27 +82,51 @@ export const NewRun: React.FC<{
 
       // Clean up the listener when the component is unmounted or if the gameId changes
       return () => {
-        socket.off('game_created', handleGameCreated);
+        if (socket) {
+          socket.off('game_created', handleGameCreated);
+        }
       };
     }
   }, [gameId]);
 
-  socket.on('player_change', async (data: any) => {
-    const newPlayers = await fetchUsersWithIds(data.players);
-    setPlayers(newPlayers);
-  });
+  useEffect(() => {
+    if (socket) {
+      const handlePlayerChange = async (data: any) => {
+        const newPlayers = await fetchUsersWithIds(data.players);
+        setPlayers(newPlayers);
+      };
 
-  socket.on('game_started', async (_data: any) => {
-    // TODO: Play game-start sound and start 5 sec countdown
-    setRunModalVisibility(true);
-  });
+      const handleGameStarted = async (_data: any) => {
+        // Play game-start sound and start 5 sec countdown
+        playStartSound();
+        setIsAwaitingGameStart(true);
+        setTimeout(() => {
+          setRunModalVisibility(true);
+          setIsAwaitingGameStart(false);
+        }, 5000);
+      };
 
-  const exitGame = () => {
+      socket.on('player_change', handlePlayerChange);
+      socket.on('game_started', handleGameStarted);
+
+      return () => {
+        if (socket) {
+          socket.off('player_change', handlePlayerChange);
+          socket.off('game_started', handleGameStarted);
+        }
+      };
+    }
+  }, []);
+
+  const resetGame = () => {
+    console.log('Resetting game...');
     // Reset game room
     setRoomID('');
     setPlayers([]);
     setInvitedIds([]);
-    gameId = createGame();
+    // Navigate back to home screen
+    navigation.navigate('Games'); // Already in 'Games'
+    gameId = createGame(userId);
   };
 
   const handleSheetChange = useCallback(() => {
@@ -190,7 +217,10 @@ export const NewRun: React.FC<{
         </View>
         <View className="flex">
           <TouchableOpacity
-            className="flex h-28 w-28 items-center justify-center rounded-full bg-green-400"
+            className={`flex h-28 w-28 items-center justify-center rounded-full ${
+              isAwaitingGameStart ? 'bg-gray-400' : 'bg-green-400'
+            }`}
+            disabled={isAwaitingGameStart}
             onPress={() => {
               startGame(roomID);
             }}
@@ -244,7 +274,10 @@ export const NewRun: React.FC<{
             runId={runReportId!}
             onFinish={() => {
               setRunReportId(null);
-              exitGame();
+              setRunModalVisibility(false);
+              console.log('toggle modal');
+              resetGame();
+              console.log('reset game');
             }}
           />
         </View>

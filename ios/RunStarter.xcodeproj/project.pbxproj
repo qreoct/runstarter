@@ -16,6 +16,12 @@
 		5CC83BE79EDC40F7B3886005 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB906F35B47948B7ADB23FC7 /* noop-file.swift */; };
 		B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
+		E2AB99982B010C2C001ACDE9 /* game_pause.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2AB99922B010C2C001ACDE9 /* game_pause.wav */; };
+		E2AB99992B010C2C001ACDE9 /* game_start.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2AB99932B010C2C001ACDE9 /* game_start.wav */; };
+		E2AB999A2B010C2C001ACDE9 /* game_end.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2AB99942B010C2C001ACDE9 /* game_end.wav */; };
+		E2AB999B2B010C2C001ACDE9 /* game_rest_begin.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2AB99952B010C2C001ACDE9 /* game_rest_begin.wav */; };
+		E2AB999C2B010C2C001ACDE9 /* game_interval_begin.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2AB99962B010C2C001ACDE9 /* game_interval_begin.wav */; };
+		E2AB999D2B010C2C001ACDE9 /* game_resume.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2AB99972B010C2C001ACDE9 /* game_resume.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +39,12 @@
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = RunStarter/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		CB906F35B47948B7ADB23FC7 /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "RunStarter/noop-file.swift"; sourceTree = "<group>"; };
+		E2AB99922B010C2C001ACDE9 /* game_pause.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = game_pause.wav; sourceTree = "<group>"; };
+		E2AB99932B010C2C001ACDE9 /* game_start.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = game_start.wav; sourceTree = "<group>"; };
+		E2AB99942B010C2C001ACDE9 /* game_end.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = game_end.wav; sourceTree = "<group>"; };
+		E2AB99952B010C2C001ACDE9 /* game_rest_begin.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = game_rest_begin.wav; sourceTree = "<group>"; };
+		E2AB99962B010C2C001ACDE9 /* game_interval_begin.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = game_interval_begin.wav; sourceTree = "<group>"; };
+		E2AB99972B010C2C001ACDE9 /* game_resume.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = game_resume.wav; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-RunStarter/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -52,6 +64,7 @@
 		13B07FAE1A68108700A75B9A /* RunStarter */ = {
 			isa = PBXGroup;
 			children = (
+				E2AB99912B010C2C001ACDE9 /* game-sounds */,
 				BB2F792B24A3F905000567C9 /* Supporting */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
@@ -147,6 +160,20 @@
 			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
+		E2AB99912B010C2C001ACDE9 /* game-sounds */ = {
+			isa = PBXGroup;
+			children = (
+				E2AB99922B010C2C001ACDE9 /* game_pause.wav */,
+				E2AB99932B010C2C001ACDE9 /* game_start.wav */,
+				E2AB99942B010C2C001ACDE9 /* game_end.wav */,
+				E2AB99952B010C2C001ACDE9 /* game_rest_begin.wav */,
+				E2AB99962B010C2C001ACDE9 /* game_interval_begin.wav */,
+				E2AB99972B010C2C001ACDE9 /* game_resume.wav */,
+			);
+			name = "game-sounds";
+			path = "../assets/game-sounds";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -213,8 +240,14 @@
 			files = (
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				E2AB999B2B010C2C001ACDE9 /* game_rest_begin.wav in Resources */,
+				E2AB999A2B010C2C001ACDE9 /* game_end.wav in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
+				E2AB99992B010C2C001ACDE9 /* game_start.wav in Resources */,
+				E2AB99982B010C2C001ACDE9 /* game_pause.wav in Resources */,
+				E2AB999D2B010C2C001ACDE9 /* game_resume.wav in Resources */,
 				0AA72398070F48C2A98D13EE /* Inter.ttf in Resources */,
+				E2AB999C2B010C2C001ACDE9 /* game_interval_begin.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -385,7 +418,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = com.runstarter.development;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dexterleng.RunSquad;
 				PRODUCT_NAME = RunStarter;
 				SWIFT_OBJC_BRIDGING_HEADER = "RunStarter/RunStarter-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -419,7 +452,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = com.runstarter.development;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dexterleng.RunSquad;
 				PRODUCT_NAME = RunStarter;
 				SWIFT_OBJC_BRIDGING_HEADER = "RunStarter/RunStarter-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -495,7 +528,8 @@
 					"-ld_classic",
 					"-Wl",
 					"-ld_classic",
-					"-Wl -ld_classic ",
+					"-Wl",
+					"-ld_classic",
 				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
@@ -564,7 +598,8 @@
 					"-ld_classic",
 					"-Wl",
 					"-ld_classic",
-					"-Wl -ld_classic ",
+					"-Wl",
+					"-ld_classic",
 				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;

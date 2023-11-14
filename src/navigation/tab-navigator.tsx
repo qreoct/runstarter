@@ -44,7 +44,7 @@ const Tab = createBottomTabNavigator<TabParamList>();
 
 const tabsIcons: TabIconsType = {
   Friends: (props: SvgProps) => {
-    const requests = useAuth().currentUser?.friendRequests.pending || [];
+    const requests = useAuth().currentUser?.friendRequests?.pending || [];
     return (
       <View>
         <RunnerIcon {...props} />
