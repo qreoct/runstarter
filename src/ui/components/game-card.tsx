@@ -18,6 +18,7 @@ export interface GameProps {
 }
 
 export const GameCard = ({
+  type,
   title,
   description,
   tags = [],
@@ -29,10 +30,10 @@ export const GameCard = ({
   },
 }: GameProps) => {
   return (
-    <Pressable onPress={onPress}>
+    <Pressable onPress={onPress} disabled={type === 'steps'}>
       <Card
         containerStyle={{
-          backgroundColor: backgroundColor,
+          backgroundColor: type === 'steps' ? 'darkgray' : backgroundColor,
           borderRadius: 8,
           flex: 1,
           height: '100%',

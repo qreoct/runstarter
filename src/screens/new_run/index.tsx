@@ -167,6 +167,33 @@ export const NewRun: React.FC<{
     );
   };
 
+  const startButton = () => {
+    if (route?.params.gameType === 'steps') {
+      return (
+        <TouchableOpacity
+          className="flex h-28 w-28 items-center justify-center rounded-full bg-gray-400"
+          disabled={true}
+        >
+          <Text className="text-xl font-extrabold italic">EVENT{"\n"}ENDED</Text>
+        </TouchableOpacity>
+      );
+    } else {
+      return (
+        <TouchableOpacity
+          className={`flex h-28 w-28 items-center justify-center rounded-full ${
+            isAwaitingGameStart ? 'bg-gray-400' : 'bg-green-400'
+          }`}
+          disabled={isAwaitingGameStart}
+          onPress={() => {
+            startGame(roomID);
+          }}
+        >
+          <Text className="text-xl font-extrabold italic">START</Text>
+        </TouchableOpacity>
+      );
+    }
+  }
+
   return (
     <View className="flex h-full">
       <FocusAwareStatusBar hidden={isRunModalVisible} />
@@ -216,17 +243,7 @@ export const NewRun: React.FC<{
           </TouchableOpacity>
         </View>
         <View className="flex">
-          <TouchableOpacity
-            className={`flex h-28 w-28 items-center justify-center rounded-full ${
-              isAwaitingGameStart ? 'bg-gray-400' : 'bg-green-400'
-            }`}
-            disabled={isAwaitingGameStart}
-            onPress={() => {
-              startGame(roomID);
-            }}
-          >
-            <Text className="text-xl font-extrabold italic">START</Text>
-          </TouchableOpacity>
+          {startButton()}
         </View>
         <View className="flex">
           <TouchableOpacity
