@@ -69,6 +69,7 @@ export const GamesList = () => {
         {Object.keys(games).map((game, idx) => (
           <GameCard
             key={idx}
+            type={games[game as keyof typeof games].data.type}
             title={games[game as keyof typeof games].data.title}
             description={games[game as keyof typeof games].data.description}
             tags={games[game as keyof typeof games].data.tags}
